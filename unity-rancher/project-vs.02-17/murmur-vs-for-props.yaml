@@ -1,0 +1,33 @@
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: elastic-vs
+  namespace: opr-develop
+spec:
+  gateways:
+    - istio-system/mimeo-gateway 
+  hosts:
+    - murmur.s3gis.be
+  http:
+    - match:
+        - uri:
+            prefix: /
+      route:
+        - destination:
+            host: murmur 
+            port:
+              number: 8082
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+  name: murmur
+  namespace: opr-develop
+spec:
+  ports:
+    - name: http
+      port: 8082
+      protocol: TCP
+      targetPort: 8082
+  type: ClusterIP

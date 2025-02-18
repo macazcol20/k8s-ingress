@@ -1,0 +1,28 @@
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: project-http
+  namespace: opr-develop
+spec:
+  gateways:
+  - istio-system/mimeo-gateway  # Adjust based on your gateway name
+  hosts:
+  - develop.opr.s3gis.be
+  http:
+  - match:
+    - uri:
+        regex: "/(api|swagger|v1).*"  # Equivalent to `nginx.ingress.kubernetes.io/use-regex`
+    route:
+    - destination:
+        host: project
+        port:
+          number: 80  # Assuming HTTP service is running on port 80
+  tls:
+  - match:
+    - sniHosts:
+      - develop.opr.s3gis.be
+    route:
+    - destination:
+        host: project
+        port:
+          number: 443  # Assuming HTTPS termination at the gateway

@@ -1,0 +1,40 @@
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    app.kubernetes.io/instance: opr
+    app.kubernetes.io/name: matchmaker
+  creationTimestamp: "2024-01-16T20:15:02Z"
+  labels:
+    app.kubernetes.io/instance: opr
+    app.kubernetes.io/managed-by: manual
+    app.kubernetes.io/name: matchmaker
+  name: matchmaker
+  namespace: opr-develop
+  resourceVersion: "191643267"
+  uid: f70f9130-8c8c-43d5-b37c-49e1bd5c15ac
+spec:
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+  - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+  - name: http
+    port: 80
+    protocol: TCP
+    targetPort: 80
+  - name: prom-publisher
+    port: 1234
+    protocol: TCP
+    targetPort: 1234
+  - name: grpc
+    port: 10042
+    protocol: TCP
+    targetPort: 10042
+  selector:
+    app.kubernetes.io/instance: opr
+    app.kubernetes.io/name: matchmaker
+  sessionAffinity: None
+  type: ClusterIP
+status:
+  loadBalancer: {}

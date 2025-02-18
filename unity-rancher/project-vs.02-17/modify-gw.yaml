@@ -1,0 +1,35 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: mimeo-gateway
+  namespace: istio-system
+spec:
+  selector:
+    app: istio-ingressgateway
+  servers:
+  - hosts:
+    - '*.s3gis.be'
+    port:
+      name: http
+      number: 8080
+      protocol: HTTP
+    tls:
+      httpsRedirect: true
+  - hosts:
+    - '*.s3gis.be'
+    port:
+      name: https
+      number: 8443
+      protocol: HTTPS
+    tls:
+      credentialName: wildcard-cert
+      mode: SIMPLE
+  - hosts:
+    - '*.s3gis.be'
+    port:
+      name: grpc
+      number: 10010
+      protocol: HTTPS
+    tls:
+      credentialName: wildcard-cert
+      mode: SIMPLE

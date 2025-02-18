@@ -1,0 +1,139 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    deployment.kubernetes.io/revision: "18"
+    field.cattle.io/publicEndpoints: '[{"addresses":["10.2.0.20","10.2.0.29","10.2.0.30","10.2.0.31"],"port":443,"protocol":"HTTPS","serviceName":"opr-develop:matchmaker","ingressName":"opr-develop:matchmaker-http","hostname":"matchmaker-develop.opr.unity.com","path":"/api","allNodes":false},{"addresses":["10.2.0.20","10.2.0.29","10.2.0.30","10.2.0.31"],"port":443,"protocol":"HTTPS","serviceName":"opr-develop:matchmaker","ingressName":"opr-develop:matchmaker-grpc","hostname":"matchmaker-develop.opr.unity.com","path":"/","allNodes":false}]'
+    meta.helm.sh/release-name: opr
+    meta.helm.sh/release-namespace: opr-develop
+  creationTimestamp: "2024-01-19T00:35:28Z"
+  generation: 40
+  labels:
+    app.kubernetes.io/instance: opr
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: matchmaker
+    helm.sh/chart: reflect-common-chart-1.0.0
+  name: matchmaker
+  namespace: opr-develop
+  resourceVersion: "406710693"
+  uid: 15d89297-9621-4272-8dcb-9d95778d869d
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: opr
+      app.kubernetes.io/name: matchmaker
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      annotations:
+        checksum/config: b8677dbde48ced43986ba512f074d0577e421b8f78d1d93a60e6211b18020f78
+        checksum/externalSecrets: 5acf3ff77b4420677b5923071f303facaba7a9273a346284a667a275df325146
+        checksum/secrets: 6bf08e4cae2f2379312d45da04f1eb2a7c08ba9fd7d3d96f27b734d14a2629bd
+        kubectl.kubernetes.io/restartedAt: "2025-02-05T16:33:12-05:00"
+      creationTimestamp: null
+      labels:
+        app.kubernetes.io/instance: opr
+        app.kubernetes.io/name: matchmaker
+      namespace: opr-develop
+    spec:
+      containers:
+      - env:
+        - name: REFLECT_POD_NAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.name
+        envFrom:
+        - secretRef:
+            name: matchmaker-secrets
+        - configMapRef:
+            name: matchmaker-config
+        image: us-east1-docker.pkg.dev/unity-solutions-tyndall-prd/docker/reflect-matchmaker:develop-latest
+        imagePullPolicy: Always
+        livenessProbe:
+          exec:
+            command:
+            - /bin/grpc_health_probe
+            - -addr=:10042
+          failureThreshold: 3
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 1
+        name: matchmaker
+        ports:
+        - containerPort: 10042
+          name: grpc
+          protocol: TCP
+        - containerPort: 80
+          name: http
+          protocol: TCP
+        - containerPort: 1234
+          name: prom-publisher
+          protocol: TCP
+        readinessProbe:
+          exec:
+            command:
+            - /bin/grpc_health_probe
+            - -addr=:10042
+          failureThreshold: 3
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 1
+        resources:
+          limits:
+            cpu: 500m
+            memory: 1000Mi
+          requests:
+            cpu: 500m
+            memory: 1000Mi
+        securityContext: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /app/netcode-manifests
+          name: netcode-manifests
+          readOnly: true
+      dnsPolicy: ClusterFirst
+      imagePullSecrets:
+      - name: regcred-gcp
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      serviceAccount: matchmaker-sa
+      serviceAccountName: matchmaker-sa
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - name: cloudsql-credentials
+        secret:
+          defaultMode: 420
+          secretName: cloudsql
+      - configMap:
+          defaultMode: 420
+          name: netcode-manifests
+        name: netcode-manifests
+status:
+  availableReplicas: 1
+  conditions:
+  - lastTransitionTime: "2025-02-05T20:50:49Z"
+    lastUpdateTime: "2025-02-05T20:50:49Z"
+    message: Deployment has minimum availability.
+    reason: MinimumReplicasAvailable
+    status: "True"
+    type: Available
+  - lastTransitionTime: "2024-01-19T00:35:29Z"
+    lastUpdateTime: "2025-02-05T21:33:24Z"
+    message: ReplicaSet "matchmaker-5bc975fc74" has successfully progressed.
+    reason: NewReplicaSetAvailable
+    status: "True"
+    type: Progressing
+  observedGeneration: 40
+  readyReplicas: 1
+  replicas: 1
+  updatedReplicas: 1

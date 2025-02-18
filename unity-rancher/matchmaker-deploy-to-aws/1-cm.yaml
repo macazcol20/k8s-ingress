@@ -1,0 +1,39 @@
+apiVersion: v1
+data:
+  ASPNETCORE_URLS: http://+:8090
+  OTEL_EXPORTER_OTLP_ENDPOINT: http://apm-server-apm-http:8200
+  OTEL_EXPORTER_OTLP_HEADERS: Authorization=Bearer 4113wNO7AFYO336Yn3vj2yvP
+  OTEL_RESOURCE_ATTRIBUTES: deployment.environment=production
+  OTEL_SERVICE_NAME: matchmaker
+  REFLECT_COMPONENT: matchmaker
+  REFLECT_ENVIRONMENT: Production
+  REFLECTMULTIPLAYER_ClusterController__AllocationPool__PoolSize: "0"
+  REFLECTMULTIPLAYER_ClusterController__KubeApi__CertsSecretName: matchmaker-reflect-tls
+  REFLECTMULTIPLAYER_ClusterController__KubeApi__Images__Init: us-east1-docker.pkg.dev/unity-solutions-tyndall-prd/docker/reflect-netcode-init:develop-latest
+  REFLECTMULTIPLAYER_ClusterController__KubeApi__Images__Netcode: us-east1-docker.pkg.dev/unity-solutions-tyndall-prd/docker/reflect-netcode:develop-latest
+  REFLECTMULTIPLAYER_ClusterController__KubeApi__KubeNamespace: opr-develop
+  REFLECTMULTIPLAYER_ClusterController__KubeApi__KubeNodepool: 'kubernetes.io/os :
+    linux'
+  REFLECTMULTIPLAYER_ClusterController__KubeApi__MatchMakerEndpoint: matchmaker
+  REFLECTMULTIPLAYER_ClusterController__KubeApi__Namespace: default
+  REFLECTMULTIPLAYER_ClusterController__KubeApi__NetcodeServerAddress: develop.opr.s3gis.be
+  REFLECTMULTIPLAYER_Mumble__OwnerManagerAclGroupName: OprOwnerManager
+  REFLECTMULTIPLAYER_Mumble__RestApiUrl: https://murmur.s3gis.be
+  REFLECTMULTIPLAYER_ProjectServer__Address: https://develop.opr.s3gis.be  # http://project:10010
+  REFLECTMULTIPLAYER_ProjectServer__HttpAddress: https://develop.opr.s3gis.be
+  REFLECTMULTIPLAYER_Prometheus__Enabled: "true"
+  REFLECTMULTIPLAYER_Serilog__MinimumLevel__Default: Debug
+  URLS: http://+:8090
+kind: ConfigMap
+metadata:
+  annotations:
+    app.kubernetes.io/instance: opr
+    app.kubernetes.io/name: matchmaker
+  creationTimestamp: "2024-01-16T20:14:56Z"
+  labels:
+    app.kubernetes.io/instance: opr
+    app.kubernetes.io/name: matchmaker
+  name: matchmaker-config
+  namespace: opr-develop
+  resourceVersion: "193319503"
+  uid: d733c8bc-7129-480d-ae7a-1fdbeb6566b8

@@ -1,0 +1,361 @@
+---
+##Netcode Service Account
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: netcode-sa
+  namespace: opr-develop
+
+---
+##Matchmaker Service Account
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: matchmaker-sa
+  namespace: opr-develop
+
+
+---
+##Matchmaker ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: matchmaker-clusterrole
+rules:
+  - apiGroups: ["", "apps", "batch"]
+    resources: ["services", "jobs", "pods", "pods/log", "configmaps", "events"]
+    verbs: ["create", "get", "watch", "list", "update", "patch", "delete"]
+  - apiGroups: ["batch"]
+    resources: ["jobs"]
+    verbs: ["create", "delete", "get", "list", "watch"]
+
+---
+##Matchmaker ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: matchmaker-rb
+subjects:
+  - kind: ServiceAccount
+    name: matchmaker-sa
+    namespace: opr-develop
+roleRef:
+  kind: ClusterRole
+  name: matchmaker-clusterrole
+  apiGroup: rbac.authorization.k8s.io
+
+---
+##Netcode ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: netcode-clusterrole
+rules:
+  - apiGroups: [""]
+    resources: ["services", "nodes", "secrets", "pods", "pods/log", "configmaps", "events"]
+    verbs: ["get", "watch", "list", "create", "delete"]
+  - apiGroups: ["batch"]
+    resources: ["jobs"]
+    verbs: ["create", "delete", "get", "list", "watch"]
+
+---
+##Netcode ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: netcode-rb
+subjects:
+  - kind: ServiceAccount
+    name: netcode-sa
+    namespace: opr-develop
+roleRef:
+  kind: ClusterRole
+  name: netcode-clusterrole
+  apiGroup: rbac.authorization.k8s.io
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: netcode-manifests
+  namespace: opr-develop
+data:
+  job.yml: |
+    apiVersion: batch/v1
+    kind: Job
+    metadata:
+      name: netcode-job-instance
+      namespace: opr-develop
+    spec:
+      template:
+        metadata:
+          labels:
+            app: netcode-job-instance
+        spec:
+          restartPolicy: Never
+          serviceAccountName: netcode-sa
+          volumes:
+            - name: netcode-config
+              emptyDir: {}
+          initContainers:
+            - name: netcode-init
+              image: us-east1-docker.pkg.dev/unity-solutions-tyndall-prd/docker/reflect-netcode-init:develop-latest
+              imagePullPolicy: "Always"
+              volumeMounts:
+                - name: netcode-config
+                  mountPath: /etc/reflect
+              env:
+                - name: REFLECT_NETCODE_NODE_NAME
+                  valueFrom:
+                    fieldRef:
+                      fieldPath: spec.nodeName
+                - name: CERTS_SECRET_NAME
+                  value: "matchmaker-reflect-tls"
+                - name: NAMESPACE
+                  value: "opr-develop"
+          imagePullSecrets:
+            - name: regcred-gcp        
+          containers:
+            - name: netcode-server
+              image: us-east1-docker.pkg.dev/unity-solutions-tyndall-prd/docker/reflect-netcode:develop-latest
+              imagePullPolicy: "Always"
+              ports:
+                - containerPort: 30303
+                  name: mlapi
+                  protocol: UDP
+              env:
+                - name: REFLECT_NETCODE_NODE_NAME
+                  valueFrom:
+                    fieldRef:
+                      fieldPath: spec.nodeName
+                - name: REFLECT_NETCODE_POD_NAME
+                  valueFrom:
+                    fieldRef:
+                      fieldPath: metadata.name
+                - name: MATCHMAKER_ENABLE
+                  value: "true"
+                - name: MATCHMAKER_HOST
+                  value: "matchmaker-develop.opr.kapistiogroup.com"
+                - name: MATCHMAKER_PORT
+                  value: "10042"
+                - name: REFLECT_NETCODE_IP
+                  value: "develop.opr.kapistiogroup.com"
+              volumeMounts:
+                - name: netcode-config
+                  mountPath: /etc/reflect
+  service.yml: |
+    apiVersion: v1
+    kind: Service
+    metadata:
+      name: netcode-svc-instance
+      namespace: opr-develop
+      labels:
+        app: netcode-svc-instance
+    spec:
+      type: NodePort
+      selector:
+        app: netcode-job-instance
+      ports:
+        - port: 30303
+          targetPort: mlapi
+          name: mlapi
+          protocol: UDP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: matchmaker
+  namespace: opr-develop
+  labels:
+    app: matchmaker
+    app.kubernetes.io/name: matchmaker
+    app.kubernetes.io/instance: opr
+    app.kubernetes.io/managed-by: manual
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: opr
+      app.kubernetes.io/name: matchmaker
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/instance: opr
+        app.kubernetes.io/name: matchmaker
+    spec:
+      serviceAccountName: matchmaker-sa
+      imagePullSecrets:
+        - name: regcred-gcp
+      containers:
+        - name: matchmaker
+          image: us-east1-docker.pkg.dev/unity-solutions-tyndall-prd/docker/reflect-matchmaker:develop-latest
+          imagePullPolicy: Always
+          envFrom:
+            - secretRef:
+                name: matchmaker-secrets
+            - configMapRef:
+                name: matchmaker-config
+          ports:
+            - containerPort: 10042
+              name: grpc
+            - containerPort: 80
+              name: http
+            - containerPort: 1234
+              name: prom-publisher
+          volumeMounts:
+            - mountPath: /app/netcode-manifests
+              name: netcode-manifests
+              readOnly: true
+      volumes:
+        - name: netcode-manifests
+          configMap:
+            name: netcode-manifests
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: matchmaker-clusterrole
+rules:
+  - apiGroups: [ "batch" ]
+    resources: [ "jobs" ]
+    verbs: [ "create", "get", "watch", "list", "delete" ]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: matchmaker-rb
+subjects:
+  - kind: ServiceAccount
+    name: matchmaker-sa
+    namespace: opr-develop
+roleRef:
+  kind: ClusterRole
+  name: matchmaker-clusterrole
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: netcode-clusterrole
+rules:
+  - apiGroups: [ "" ]
+    resources: [ "services", "nodes", "secrets" ]
+    verbs: [ "get", "watch", "list" ]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: netcode-rb
+subjects:
+  - kind: ServiceAccount
+    name: netcode-sa
+    namespace: opr-develop
+roleRef:
+  kind: ClusterRole
+  name: netcode-clusterrole
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: matchmaker
+  namespace: opr-develop
+  labels:
+    app: matchmaker
+    app.kubernetes.io/name: matchmaker
+    app.kubernetes.io/instance: opr
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/instance: opr
+    app.kubernetes.io/name: matchmaker
+  ports:
+    - name: grpc
+      port: 10042
+      targetPort: 10042
+    - name: http
+      port: 80
+      targetPort: 80
+    - name: prom-publisher
+      port: 1234
+      targetPort: 1234
+---
+---
+##Matchmaker ConfigMap
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: matchmaker-config
+  namespace: opr-develop
+data:
+  REFLECT_ENVIRONMENT: "Production"
+  ASPNETCORE_URLS: http://+:8090  # collins
+  URLS: http://+:8090   # collins
+  REFLECT_COMPONENT: matchmaker
+  REFLECTMULTIPLAYER_ClusterController__KubeApi__Images__Init: "us-east1-docker.pkg.dev/unity-solutions-tyndall-prd/docker/reflect-netcode-init:develop-latest"
+  REFLECTMULTIPLAYER_ClusterController__KubeApi__Images__Netcode: "us-east1-docker.pkg.dev/unity-solutions-tyndall-prd/docker/reflect-netcode:develop-latest"
+  REFLECTMULTIPLAYER_ClusterController__KubeApi__NetcodeServerAddress: "develop.opr.kapistiogroup.com"
+  REFLECTMULTIPLAYER_ClusterController__KubeApi__CertsSecretName: "matchmaker-reflect-tls"
+  REFLECTMULTIPLAYER_ClusterController__KubeApi__KubeNamespace: "opr-develop"
+  REFLECTMULTIPLAYER_ClusterController__KubeApi__KubeNodepool: "kubernetes.io/os : linux"
+  REFLECTMULTIPLAYER_ClusterController__AllocationPool__PoolSize: "0"
+  REFLECTMULTIPLAYER_ProjectServer__HttpAddress: "https://develop.kapistiogroup.com"
+  REFLECTMULTIPLAYER_Mumble__RestApiUrl: "http://mumble-rest.opr-develop.svc.cluster.local:8082"
+  OTEL_EXPORTER_OTLP_ENDPOINT: "http://apm-server-apm-http:8200"
+  OTEL_EXPORTER_OTLP_HEADERS: "Authorization=Bearer 4113wNO7AFYO336Yn3vj2yvP"
+  OTEL_RESOURCE_ATTRIBUTES: "deployment.environment=production"
+  OTEL_SERVICE_NAME: "matchmaker"
+
+  # REFLECT_COMPONENT: matchmaker
+  # REFLECTMULTIPLAYER_Prometheus__Enabled: 'true'
+  # REFLECTMULTIPLAYER_Sentry__Environment: gcp-test
+  # REFLECTMULTIPLAYER_ClusterController__KubeApi__MatchMakerEndpoint: matchmaker
+  # REFLECTMULTIPLAYER_ClusterController__KubeApi__CertsSecretName: reflect-tls
+  # REFLECTMULTIPLAYER_ClusterController__KubeApi__Namespace: default
+  # REFLECTMULTIPLAYER_ProjectServer__Address: http://project:10010
+
+---
+##Matchmaker Secrets
+apiVersion: v1
+kind: Secret
+metadata:
+  name: matchmaker-secrets
+  namespace: opr-develop
+type: Opaque
+data:
+  REFLECTMULTIPLAYER_ConnectionStrings__MatchmakerDatabase: SG9zdD1vcHItcG9zdGdyZXNxbDtEYXRhYmFzZT1NYXRjaG1ha2VyO1VzZXJuYW1lPW1hdGNobWFrZXJfc2VydmljZTtQYXNzd29yZD1yZWZsZWN0
+  REFLECTMULTIPLAYER_Mumble__RestApiPassword: bXVybXVyLXJlc3Qtc2VjcmV0LWtleQ==
+  REFLECTMULTIPLAYER_Mumble__RestApiUsername: cmVmbGVjdA==
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: matchmaker-ingress
+  namespace: opr-develop
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt
+spec:
+  ingressClassName: nginx
+  tls:
+    - secretName: matchmaker-reflect-tls
+      hosts:
+        - matchmaker-develop.opr.kapistiogroup.com
+  rules:
+    - host: matchmaker-develop.opr.kapistiogroup.com
+      http:
+        paths:
+          - path: /
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: matchmaker
+                port:
+                  name: grpc
+          - path: /api
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: matchmaker
+                port:
+                  name: http
+---

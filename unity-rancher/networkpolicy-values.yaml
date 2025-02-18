@@ -1,0 +1,13 @@
+COMPUTED VALUES:
+ingressRules:
+- from:
+    podSelector:
+      matchLabels:
+        app.kubernetes.io/name: mumble-rest
+  ports:
+  - port: 6502
+    protocol: TCP
+podSelector:
+  matchLabels:
+    app.kubernetes.io/instance: opr
+    app.kubernetes.io/name: murmur

@@ -1,0 +1,548 @@
+apiVersion: v1
+items:
+- apiVersion: networking.k8s.io/v1
+  kind: Ingress
+  metadata:
+    annotations:
+      cert-manager.io/cluster-issuer: letsencrypt
+      field.cattle.io/publicEndpoints: '[{"addresses":["10.2.0.20","10.2.0.29","10.2.0.30","10.2.0.31"],"port":443,"protocol":"HTTPS","serviceName":"opr-develop:annotations","ingressName":"opr-develop:annotations","hostname":"annotations-develop.opr.unity.com","path":"/","allNodes":false}]'
+      meta.helm.sh/release-name: opr
+      meta.helm.sh/release-namespace: opr-develop
+    creationTimestamp: "2023-11-02T19:04:31Z"
+    generation: 4
+    labels:
+      app.kubernetes.io/instance: opr
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/name: annotations
+      helm.sh/chart: reflect-common-chart-1.0.0
+    name: annotations
+    namespace: opr-develop
+    resourceVersion: "406678408"
+    uid: 9e2d6183-d7a5-4d07-bf03-90af22929dbc
+  spec:
+    ingressClassName: nginx
+    rules:
+    - host: annotations-develop.opr.unity.com
+      http:
+        paths:
+        - backend:
+            service:
+              name: annotations
+              port:
+                name: http
+          path: /
+          pathType: ImplementationSpecific
+    tls:
+    - hosts:
+      - annotations-develop.opr.unity.com
+      secretName: annotations-develop-tls
+  status:
+    loadBalancer:
+      ingress:
+      - ip: 10.2.0.20
+      - ip: 10.2.0.29
+      - ip: 10.2.0.30
+      - ip: 10.2.0.31
+- apiVersion: networking.k8s.io/v1
+  kind: Ingress
+  metadata:
+    annotations:
+      cert-manager.io/cluster-issuer: letsencrypt
+      field.cattle.io/publicEndpoints: '[{"addresses":["10.2.0.20","10.2.0.29","10.2.0.30","10.2.0.31"],"port":443,"protocol":"HTTPS","serviceName":"opr-develop:commonui","ingressName":"opr-develop:commonui","hostname":"dashboard-develop.opr.unity.com","path":"/","allNodes":false}]'
+      kubernetes.io/ingress.class: nginx
+      meta.helm.sh/release-name: opr
+      meta.helm.sh/release-namespace: opr-develop
+    creationTimestamp: "2024-04-02T16:35:59Z"
+    generation: 2
+    labels:
+      app.kubernetes.io/instance: opr
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/name: commonui
+      helm.sh/chart: reflect-common-chart-1.0.0
+    name: commonui
+    namespace: opr-develop
+    resourceVersion: "406678508"
+    uid: 69e1c3f0-b0fd-4be7-9a69-09cc39618926
+  spec:
+    rules:
+    - host: dashboard-develop.opr.unity.com
+      http:
+        paths:
+        - backend:
+            service:
+              name: commonui
+              port:
+                name: http
+          path: /
+          pathType: ImplementationSpecific
+    tls:
+    - hosts:
+      - dashboard-develop.opr.unity.com
+      secretName: dashboard-develop-tls
+  status:
+    loadBalancer:
+      ingress:
+      - ip: 10.2.0.20
+      - ip: 10.2.0.29
+      - ip: 10.2.0.30
+      - ip: 10.2.0.31
+- apiVersion: networking.k8s.io/v1
+  kind: Ingress
+  metadata:
+    annotations:
+      cert-manager.io/cluster-issuer: letsencrypt
+      field.cattle.io/publicEndpoints: '[{"addresses":["10.2.0.20","10.2.0.29","10.2.0.30","10.2.0.31"],"port":443,"protocol":"HTTPS","serviceName":"opr-develop:kibana-kb-http","ingressName":"opr-develop:kibana-ingress","hostname":"kibana.opr.unity.com","path":"/","allNodes":false}]'
+      kubernetes.io/ingress.class: nginx
+      nginx.ingress.kubernetes.io/backend-protocol: HTTPS
+      nginx.ingress.kubernetes.io/proxy-ssl-verify: "off"
+    creationTimestamp: "2023-11-21T23:54:04Z"
+    generation: 3
+    name: kibana-ingress
+    namespace: opr-develop
+    resourceVersion: "406678480"
+    uid: 052b70c5-048b-4bb2-92b1-2fd37dcfd2d3
+  spec:
+    ingressClassName: nginx
+    rules:
+    - host: kibana.opr.unity.com
+      http:
+        paths:
+        - backend:
+            service:
+              name: kibana-kb-http
+              port:
+                name: https
+          path: /
+          pathType: Prefix
+    tls:
+    - hosts:
+      - kibana.opr.unity.com
+      secretName: kibana-develop-tls
+  status:
+    loadBalancer:
+      ingress:
+      - ip: 10.2.0.20
+      - ip: 10.2.0.29
+      - ip: 10.2.0.30
+      - ip: 10.2.0.31
+- apiVersion: networking.k8s.io/v1
+  kind: Ingress
+  metadata:
+    annotations:
+      cert-manager.io/cluster-issuer: letsencrypt
+      field.cattle.io/publicEndpoints: '[{"addresses":["10.2.0.20","10.2.0.29","10.2.0.30","10.2.0.31"],"port":443,"protocol":"HTTPS","serviceName":"opr-develop:links","ingressName":"opr-develop:links-http","hostname":"links-develop.opr.unity.com","path":"/","allNodes":false}]'
+      meta.helm.sh/release-name: opr
+      meta.helm.sh/release-namespace: opr-develop
+    creationTimestamp: "2023-12-05T22:24:12Z"
+    generation: 1
+    labels:
+      app.kubernetes.io/instance: opr
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/name: links
+      helm.sh/chart: reflect-common-chart-1.0.0
+    name: links-http
+    namespace: opr-develop
+    resourceVersion: "406678496"
+    uid: 9b2fe670-f313-4716-871a-fcd1ca0d6aa6
+  spec:
+    ingressClassName: nginx
+    rules:
+    - host: links-develop.opr.unity.com
+      http:
+        paths:
+        - backend:
+            service:
+              name: links
+              port:
+                name: http
+          path: /
+          pathType: ImplementationSpecific
+    tls:
+    - hosts:
+      - links-develop.opr.unity.com
+      secretName: links-develop-tls
+  status:
+    loadBalancer:
+      ingress:
+      - ip: 10.2.0.20
+      - ip: 10.2.0.29
+      - ip: 10.2.0.30
+      - ip: 10.2.0.31
+- apiVersion: networking.k8s.io/v1
+  kind: Ingress
+  metadata:
+    annotations:
+      cert-manager.io/cluster-issuer: letsencrypt
+      field.cattle.io/publicEndpoints: '[{"addresses":["10.2.0.20","10.2.0.29","10.2.0.30","10.2.0.31"],"port":443,"protocol":"HTTPS","serviceName":"opr-develop:matchmaker","ingressName":"opr-develop:matchmaker-grpc","hostname":"matchmaker-develop.opr.unity.com","path":"/","allNodes":false}]'
+      meta.helm.sh/release-name: opr
+      meta.helm.sh/release-namespace: opr-develop
+      nginx.ingress.kubernetes.io/backend-protocol: GRPC
+      nginx.ingress.kubernetes.io/proxy-body-size: 1024m
+    creationTimestamp: "2024-01-17T23:34:50Z"
+    generation: 1
+    labels:
+      app.kubernetes.io/instance: opr
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/name: matchmaker
+      helm.sh/chart: reflect-common-chart-1.0.0
+    name: matchmaker-grpc
+    namespace: opr-develop
+    resourceVersion: "406678421"
+    uid: 6147ac5b-f626-4ab4-9ac8-30f89b6702ac
+  spec:
+    ingressClassName: nginx
+    rules:
+    - host: matchmaker-develop.opr.unity.com
+      http:
+        paths:
+        - backend:
+            service:
+              name: matchmaker
+              port:
+                name: grpc
+          path: /
+          pathType: ImplementationSpecific
+    tls:
+    - hosts:
+      - matchmaker-develop.opr.unity.com
+      secretName: matchmaker-reflect-tls
+  status:
+    loadBalancer:
+      ingress:
+      - ip: 10.2.0.20
+      - ip: 10.2.0.29
+      - ip: 10.2.0.30
+      - ip: 10.2.0.31
+- apiVersion: networking.k8s.io/v1
+  kind: Ingress
+  metadata:
+    annotations:
+      cert-manager.io/cluster-issuer: letsencrypt
+      field.cattle.io/publicEndpoints: '[{"addresses":["10.2.0.20","10.2.0.29","10.2.0.30","10.2.0.31"],"port":443,"protocol":"HTTPS","serviceName":"opr-develop:matchmaker","ingressName":"opr-develop:matchmaker-http","hostname":"matchmaker-develop.opr.unity.com","path":"/api","allNodes":false}]'
+      meta.helm.sh/release-name: opr
+      meta.helm.sh/release-namespace: opr-develop
+    creationTimestamp: "2024-03-26T16:51:03Z"
+    generation: 1
+    labels:
+      app.kubernetes.io/instance: opr
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/name: matchmaker
+      helm.sh/chart: reflect-common-chart-1.0.0
+    name: matchmaker-http
+    namespace: opr-develop
+    resourceVersion: "406678587"
+    uid: f97e6073-47ee-43fb-8240-ae2c172555d5
+  spec:
+    ingressClassName: nginx
+    rules:
+    - host: matchmaker-develop.opr.unity.com
+      http:
+        paths:
+        - backend:
+            service:
+              name: matchmaker
+              port:
+                name: http
+          path: /api
+          pathType: ImplementationSpecific
+    tls:
+    - hosts:
+      - matchmaker-develop.opr.unity.com
+      secretName: matchmaker-reflect-tls
+  status:
+    loadBalancer:
+      ingress:
+      - ip: 10.2.0.20
+      - ip: 10.2.0.29
+      - ip: 10.2.0.30
+      - ip: 10.2.0.31
+- apiVersion: networking.k8s.io/v1
+  kind: Ingress
+  metadata:
+    annotations:
+      cert-manager.io/cluster-issuer: letsencrypt
+      field.cattle.io/publicEndpoints: '[{"addresses":["10.2.0.20","10.2.0.29","10.2.0.30","10.2.0.31"],"port":443,"protocol":"HTTPS","serviceName":"opr-develop:opr-keycloak-http","ingressName":"opr-develop:opr-keycloak","hostname":"keycloak-develop.opr.unity.com","path":"/","allNodes":false}]'
+      meta.helm.sh/release-name: opr
+      meta.helm.sh/release-namespace: opr-develop
+      nginx.ingress.kubernetes.io/cors-allow-origin: https://dashboard-develop.opr.unity.com
+      nginx.ingress.kubernetes.io/cors-expose-headers: '*'
+      nginx.ingress.kubernetes.io/enable-cors: "true"
+    creationTimestamp: "2023-10-17T19:32:00Z"
+    generation: 1
+    labels:
+      app.kubernetes.io/instance: opr
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/name: keycloak
+      app.kubernetes.io/version: 21.1.2
+      helm.sh/chart: keycloak-18.4.3
+    name: opr-keycloak
+    namespace: opr-develop
+    resourceVersion: "406678518"
+    uid: a5e32004-3577-42c7-8e5c-f4af58d69a88
+  spec:
+    ingressClassName: nginx
+    rules:
+    - host: keycloak-develop.opr.unity.com
+      http:
+        paths:
+        - backend:
+            service:
+              name: opr-keycloak-http
+              port:
+                name: http
+          path: /
+          pathType: Prefix
+    tls:
+    - hosts:
+      - keycloak-develop.opr.unity.com
+      secretName: keycloak-develop-tls
+  status:
+    loadBalancer:
+      ingress:
+      - ip: 10.2.0.20
+      - ip: 10.2.0.29
+      - ip: 10.2.0.30
+      - ip: 10.2.0.31
+- apiVersion: networking.k8s.io/v1
+  kind: Ingress
+  metadata:
+    annotations:
+      cert-manager.io/cluster-issuer: letsencrypt
+      field.cattle.io/publicEndpoints: '[{"addresses":["10.2.0.20","10.2.0.29","10.2.0.30","10.2.0.31"],"port":443,"protocol":"HTTPS","serviceName":"opr-develop:opr-rabbitmq","ingressName":"opr-develop:opr-rabbitmq","hostname":"rabbitmq-develop.opr.unity.com","path":"/","allNodes":false}]'
+      meta.helm.sh/release-name: opr
+      meta.helm.sh/release-namespace: opr-develop
+    creationTimestamp: "2024-01-16T18:44:20Z"
+    generation: 1
+    labels:
+      app.kubernetes.io/instance: opr
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/name: rabbitmq
+      helm.sh/chart: rabbitmq-12.0.9
+    name: opr-rabbitmq
+    namespace: opr-develop
+    resourceVersion: "406678468"
+    uid: 6dd1c04a-c723-48ce-b38a-83ea1396f069
+  spec:
+    ingressClassName: nginx
+    rules:
+    - host: rabbitmq-develop.opr.unity.com
+      http:
+        paths:
+        - backend:
+            service:
+              name: opr-rabbitmq
+              port:
+                name: http-stats
+          path: /
+          pathType: ImplementationSpecific
+    tls:
+    - hosts:
+      - rabbitmq-develop.opr.unity.com
+      secretName: rabbitmq-develop.opr.unity.com-tls
+  status:
+    loadBalancer:
+      ingress:
+      - ip: 10.2.0.20
+      - ip: 10.2.0.29
+      - ip: 10.2.0.30
+      - ip: 10.2.0.31
+- apiVersion: networking.k8s.io/v1
+  kind: Ingress
+  metadata:
+    annotations:
+      cert-manager.io/cluster-issuer: letsencrypt
+      field.cattle.io/publicEndpoints: '[{"addresses":["10.2.0.20","10.2.0.29","10.2.0.30","10.2.0.31"],"port":443,"protocol":"HTTPS","serviceName":"opr-develop:project","ingressName":"opr-develop:project-grpc","hostname":"develop.opr.unity.com","path":"/","allNodes":false},{"addresses":["10.2.0.20","10.2.0.29","10.2.0.30","10.2.0.31"],"port":443,"protocol":"HTTPS","serviceName":"opr-develop:project","ingressName":"opr-develop:project-grpc","hostname":"web-develop.opr.unity.com","path":"/","allNodes":false}]'
+      meta.helm.sh/release-name: opr
+      meta.helm.sh/release-namespace: opr-develop
+      nginx.ingress.kubernetes.io/backend-protocol: GRPC
+      nginx.ingress.kubernetes.io/cors-allow-headers: x-user-agent,x-grpc-web,x-reflect-appid,x-reflect-clienttrace,authorization,content-type
+      nginx.ingress.kubernetes.io/cors-allow-origin: https://dashboard-develop.opr.unity.com
+      nginx.ingress.kubernetes.io/cors-expose-headers: '*'
+      nginx.ingress.kubernetes.io/enable-cors: "true"
+      nginx.ingress.kubernetes.io/proxy-body-size: 1024m
+      nginx.ingress.kubernetes.io/use-regex: "true"
+    creationTimestamp: "2024-04-02T19:12:51Z"
+    generation: 1
+    labels:
+      app.kubernetes.io/instance: opr
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/name: project
+      helm.sh/chart: reflect-common-chart-1.0.0
+    name: project-grpc
+    namespace: opr-develop
+    resourceVersion: "406678530"
+    uid: 8a340a4b-f17e-4f51-844e-c459998d273b
+  spec:
+    ingressClassName: nginx
+    rules:
+    - host: develop.opr.unity.com
+      http:
+        paths:
+        - backend:
+            service:
+              name: project
+              port:
+                name: grpc
+          path: /
+          pathType: ImplementationSpecific
+    - host: web-develop.opr.unity.com
+      http:
+        paths:
+        - backend:
+            service:
+              name: project
+              port:
+                name: grpc-web
+          path: /
+          pathType: ImplementationSpecific
+    tls:
+    - hosts:
+      - develop.opr.unity.com
+      secretName: develop-tls
+    - hosts:
+      - web-develop.opr.unity.com
+      secretName: web-develop-tls
+  status:
+    loadBalancer:
+      ingress:
+      - ip: 10.2.0.20
+      - ip: 10.2.0.29
+      - ip: 10.2.0.30
+      - ip: 10.2.0.31
+- apiVersion: networking.k8s.io/v1
+  kind: Ingress
+  metadata:
+    annotations:
+      cert-manager.io/cluster-issuer: letsencrypt
+      field.cattle.io/publicEndpoints: '[{"addresses":["10.2.0.20","10.2.0.29","10.2.0.30","10.2.0.31"],"port":443,"protocol":"HTTPS","serviceName":"opr-develop:project","ingressName":"opr-develop:project-http","hostname":"develop.opr.unity.com","path":"/(api|swagger|v1)","allNodes":false}]'
+      meta.helm.sh/release-name: opr
+      meta.helm.sh/release-namespace: opr-develop
+      nginx.ingress.kubernetes.io/use-regex: "true"
+    creationTimestamp: "2024-04-02T19:12:51Z"
+    generation: 1
+    labels:
+      app.kubernetes.io/instance: opr
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/name: project
+      helm.sh/chart: reflect-common-chart-1.0.0
+    name: project-http
+    namespace: opr-develop
+    resourceVersion: "406678449"
+    uid: 91a5cb5b-0833-4952-bcfd-30dca1855c53
+  spec:
+    ingressClassName: nginx
+    rules:
+    - host: develop.opr.unity.com
+      http:
+        paths:
+        - backend:
+            service:
+              name: project
+              port:
+                name: http
+          path: /(api|swagger|v1)
+          pathType: Prefix
+    tls:
+    - hosts:
+      - develop.opr.unity.com
+      secretName: develop-tls
+  status:
+    loadBalancer:
+      ingress:
+      - ip: 10.2.0.20
+      - ip: 10.2.0.29
+      - ip: 10.2.0.30
+      - ip: 10.2.0.31
+- apiVersion: networking.k8s.io/v1
+  kind: Ingress
+  metadata:
+    annotations:
+      cert-manager.io/cluster-issuer: letsencrypt
+      field.cattle.io/publicEndpoints: '[{"addresses":["10.2.0.20","10.2.0.29","10.2.0.30","10.2.0.31"],"port":443,"protocol":"HTTPS","serviceName":"opr-develop:sync-api","ingressName":"opr-develop:sync-api-grpc","hostname":"sync-develop.opr.unity.com","path":"/","allNodes":false}]'
+      meta.helm.sh/release-name: opr
+      meta.helm.sh/release-namespace: opr-develop
+      nginx.ingress.kubernetes.io/backend-protocol: GRPC
+      nginx.ingress.kubernetes.io/proxy-body-size: 1024m
+    creationTimestamp: "2023-10-17T19:32:00Z"
+    generation: 1
+    labels:
+      app.kubernetes.io/instance: opr
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/name: sync-api
+      helm.sh/chart: reflect-common-chart-1.0.0
+    name: sync-api-grpc
+    namespace: opr-develop
+    resourceVersion: "406678627"
+    uid: 21aefc6d-98ba-4f89-9482-6e1a5d67a989
+  spec:
+    ingressClassName: nginx
+    rules:
+    - host: sync-develop.opr.unity.com
+      http:
+        paths:
+        - backend:
+            service:
+              name: sync-api
+              port:
+                name: grpc
+          path: /
+          pathType: ImplementationSpecific
+    tls:
+    - hosts:
+      - sync-develop.opr.unity.com
+      secretName: sync-develop-tls
+  status:
+    loadBalancer:
+      ingress:
+      - ip: 10.2.0.20
+      - ip: 10.2.0.29
+      - ip: 10.2.0.30
+      - ip: 10.2.0.31
+- apiVersion: networking.k8s.io/v1
+  kind: Ingress
+  metadata:
+    annotations:
+      cert-manager.io/cluster-issuer: letsencrypt
+      field.cattle.io/publicEndpoints: '[{"addresses":["10.2.0.20","10.2.0.29","10.2.0.30","10.2.0.31"],"port":443,"protocol":"HTTPS","serviceName":"opr-develop:sync-api","ingressName":"opr-develop:sync-api-http","hostname":"sync-develop.opr.unity.com","path":"/api","allNodes":false}]'
+      meta.helm.sh/release-name: opr
+      meta.helm.sh/release-namespace: opr-develop
+      nginx.ingress.kubernetes.io/proxy-body-size: 1024m
+      nginx.ingress.kubernetes.io/use-regex: "true"
+    creationTimestamp: "2023-10-17T19:32:00Z"
+    generation: 4
+    labels:
+      app.kubernetes.io/instance: opr
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/name: sync-api
+      helm.sh/chart: reflect-common-chart-1.0.0
+    name: sync-api-http
+    namespace: opr-develop
+    resourceVersion: "406678599"
+    uid: 7b7ced87-403c-4b83-8f76-1a942db58cf8
+  spec:
+    ingressClassName: nginx
+    rules:
+    - host: sync-develop.opr.unity.com
+      http:
+        paths:
+        - backend:
+            service:
+              name: sync-api
+              port:
+                name: http
+          path: /api
+          pathType: ImplementationSpecific
+    tls:
+    - hosts:
+      - sync-develop.opr.unity.com
+      secretName: sync-develop-tls
+  status:
+    loadBalancer:
+      ingress:
+      - ip: 10.2.0.20
+      - ip: 10.2.0.29
+      - ip: 10.2.0.30
+      - ip: 10.2.0.31
+kind: List
+metadata:
+  resourceVersion: ""

@@ -1,0 +1,3998 @@
+COMPUTED VALUES:
+annotations:
+  global: {}
+  reflect-common-chart:
+    affinity: {}
+    autoscaling:
+      enabled: false
+      maxReplicas: 10
+      metrics:
+      - resource:
+          name: cpu
+          target:
+            averageUtilization: 75
+            type: Utilization
+        type: Resource
+      - resource:
+          name: memory
+          target:
+            averageUtilization: 75
+            type: Utilization
+        type: Resource
+      minReplicas: 1
+    cloudSqlSidecar:
+      enabled: false
+    clusterRole:
+      create: false
+    clusterRoleBinding:
+      create: false
+    configMaps:
+      annotations-config:
+        data:
+          OTEL_EXPORTER_OTLP_ENDPOINT: http://apm-server-apm-http:8200
+          OTEL_EXPORTER_OTLP_HEADERS: Authorization=Bearer 4113wNO7AFYO336Yn3vj2yvP
+          OTEL_RESOURCE_ATTRIBUTES: deployment.environment=production
+          OTEL_SERVICE_NAME: annotations
+          REFLECT_COMPONENT: annotations
+          REFLECT_ENVIRONMENT: Production
+          REFLECTANNOTATIONS_Multiplayer__Address: https://multiplayer-develop.opr.unity.com
+          REFLECTANNOTATIONS_ProjectServer__Address: https://web-develop.opr.unity.com
+          REFLECTANNOTATIONS_ProjectServer__HttpAddress: https://develop.opr.unity.com
+          REFLECTANNOTATIONS_Prometheus__Enabled: "true"
+          REFLECTANNOTATIONS_Swagger__Enabled: "false"
+    cronJob:
+      enabled: false
+    deployment:
+      enabled: true
+      envFrom:
+      - secretRef:
+          name: annotations-secret
+      - configMapRef:
+          name: annotations-config
+      initContainers: []
+      livenessProbe:
+        httpGet:
+          path: /health
+          port: 80
+      ports:
+      - containerPort: 80
+        name: http
+        protocol: TCP
+      readinessProbe:
+        httpGet:
+          path: /health
+          port: 80
+    externalSecrets:
+      enabled: false
+    fullnameOverride: annotations
+    global: {}
+    image:
+      pullPolicy: Always
+      repository: us-east1-docker.pkg.dev/unity-solutions-tyndall-prd/docker/reflect-annotations
+      tag: develop-latest
+    imagePullSecrets:
+    - name: regcred-gcp
+    ingress:
+      annotations:
+        annotations:
+          cert-manager.io/cluster-issuer: letsencrypt
+        hosts:
+        - host: annotations-develop.opr.unity.com
+          http:
+            paths:
+            - backend:
+                service:
+                  name: annotations
+                  port:
+                    name: http
+              path: /
+              pathType: ImplementationSpecific
+        ingressClassName: nginx
+        tls:
+        - hosts:
+          - annotations-develop.opr.unity.com
+          secretName: annotations-develop-tls
+    nameOverride: ""
+    overprovisioning:
+      count: 2
+      enabled: false
+    podAnnotations: {}
+    podMonitor:
+      enabled: false
+      endpoints: []
+      labels: {}
+      namespaceSelector:
+        matchNames:
+        - default
+    podSecurityContext: {}
+    replicaCount: 1
+    resources: {}
+    secrets:
+      annotations-secret:
+        data:
+          REFLECTANNOTATIONS_ConnectionStrings__AnnotationsDatabase: Host=opr-postgresql;Database=Annotations;Username=annotations;Password=reflect
+        type: Opaque
+    securityContext: {}
+    service:
+      enabled: true
+      port: 80
+      ports:
+      - name: http
+        port: 80
+        protocol: TCP
+      - name: prom-publisher
+        port: 1234
+        protocol: TCP
+      type: ClusterIP
+    serviceAccount:
+      annotations: {}
+      create: false
+      name: ""
+    serviceMonitor:
+      enabled: false
+      endpoints: []
+      labels: {}
+      namespaceSelector:
+        matchNames:
+        - default
+    sidecarContainers:
+      enabled: false
+    statefulSet:
+      enabled: false
+    tolerations: []
+    volumes: []
+    workloadIdentity:
+      enabled: false
+commonui:
+  global: {}
+  reflect-common-chart:
+    affinity: {}
+    autoscaling:
+      enabled: false
+      maxReplicas: 10
+      metrics:
+      - resource:
+          name: cpu
+          target:
+            averageUtilization: 75
+            type: Utilization
+        type: Resource
+      - resource:
+          name: memory
+          target:
+            averageUtilization: 75
+            type: Utilization
+        type: Resource
+      minReplicas: 1
+    cloudSqlSidecar:
+      enabled: false
+    clusterRole:
+      create: false
+    clusterRoleBinding:
+      create: false
+    configMaps:
+      commonui-config:
+        data:
+          REACT_APP_BIM360_SERVER_ENV: local
+          REACT_APP_CLOUD_PROVIDER: gcp
+          REACT_APP_COMPONENT_NAME: WebDashboard
+          REACT_APP_ENABLE_APRIL_2021_FEATURES: "true"
+          REACT_APP_IS_ON_PREM_REFLECT: "true"
+          REACT_APP_ON_PREM_REFLECT_ENTERPRISE_DOMAIN: BAH OPR
+          REACT_APP_PROJECT_SERVER_ADDRESS: https://develop.opr.unity.com
+          REACT_APP_PROJECT_SERVER_ENV: develop
+          REACT_APP_PROJECT_SERVER_HTTP_ADDRESS: https://develop.opr.unity.com
+          REACT_APP_SENTRY_ENABLED: "false"
+          REACT_APP_UNITY_API_ADDRESS: ""
+          REACT_APP_UNITY_ID_ADDRESS: ""
+          REFLECT_DOMAIN: BAH OPR
+    cronJob:
+      enabled: false
+    deployment:
+      enabled: true
+      envFrom:
+      - configMapRef:
+          name: commonui-config
+      initContainers: []
+      livenessProbe: {}
+      ports:
+      - containerPort: 5000
+        name: http
+        protocol: TCP
+      readinessProbe: {}
+    externalSecrets:
+      enabled: false
+    fullnameOverride: commonui
+    global: {}
+    image:
+      pullPolicy: Always
+      repository: us-east1-docker.pkg.dev/unity-solutions-tyndall-prd/docker/reflect-dashboard
+      tag: develop-latest
+    imagePullSecrets:
+    - name: regcred-gcp
+    ingress:
+      commonui:
+        annotations:
+          cert-manager.io/cluster-issuer: letsencrypt
+          kubernetes.io/ingress.class: nginx
+        hosts:
+        - host: dashboard-develop.opr.unity.com
+          http:
+            paths:
+            - backend:
+                service:
+                  name: commonui
+                  port:
+                    name: http
+              path: /
+              pathType: ImplementationSpecific
+        tls:
+        - hosts:
+          - dashboard-develop.opr.unity.com
+          secretName: dashboard-develop-tls
+    nameOverride: ""
+    nodeSelector: {}
+    overprovisioning:
+      count: 2
+      enabled: false
+    podAnnotations: {}
+    podMonitor:
+      enabled: false
+      endpoints: []
+      labels: {}
+      namespaceSelector:
+        matchNames:
+        - default
+    podSecurityContext: {}
+    replicaCount: 1
+    secrets: {}
+    securityContext: {}
+    service:
+      enabled: true
+      port: 80
+      ports:
+      - name: http
+        port: 5000
+        protocol: TCP
+      type: ClusterIP
+    serviceAccount:
+      annotations: {}
+      create: false
+      name: ""
+    serviceMonitor:
+      enabled: false
+      endpoints: []
+      labels: {}
+      namespaceSelector:
+        matchNames:
+        - default
+    sidecarContainers:
+      enabled: false
+    statefulSet:
+      enabled: false
+    tolerations: []
+    workloadIdentity:
+      enabled: false
+infra:
+  keycloak: true
+  postgres-integration-svc: true
+  postgresql: true
+  project-grpc-nodeport: true
+  rabbitmq: true
+keycloak:
+  affinity: |
+    podAntiAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        - labelSelector:
+            matchLabels:
+              {{- include "keycloak.selectorLabels" . | nindent 10 }}
+            matchExpressions:
+              - key: app.kubernetes.io/component
+                operator: NotIn
+                values:
+                  - test
+          topologyKey: kubernetes.io/hostname
+      preferredDuringSchedulingIgnoredDuringExecution:
+        - weight: 100
+          podAffinityTerm:
+            labelSelector:
+              matchLabels:
+                {{- include "keycloak.selectorLabels" . | nindent 12 }}
+              matchExpressions:
+                - key: app.kubernetes.io/component
+                  operator: NotIn
+                  values:
+                    - test
+            topologyKey: failure-domain.beta.kubernetes.io/zone
+  args:
+  - start-dev
+  - --import-realm
+  - --health-enabled=true
+  autoscaling:
+    behavior:
+      scaleDown:
+        policies:
+        - periodSeconds: 300
+          type: Pods
+          value: 1
+        stabilizationWindowSeconds: 300
+    enabled: false
+    labels: {}
+    maxReplicas: 10
+    metrics:
+    - resource:
+        name: cpu
+        target:
+          averageUtilization: 80
+          type: Utilization
+      type: Resource
+    minReplicas: 3
+  clusterDomain: cluster.local
+  command:
+  - /opt/keycloak/bin/kc.sh
+  enableServiceLinks: true
+  extraContainers: ""
+  extraEnv: |
+    - name: KEYCLOAK_IMPORT
+      value: /opt/keycloak/data/import/realm.json
+    - name: KEYCLOAK_REFLECT_REALM_NAME
+      value: "reflect"
+    - name: KEYCLOAK_LOGLEVEL
+      value: DEBUG
+    - name: PROXY_ADDRESS_FORWARDING
+      value: 'true'
+    - name: KC_PROXY
+      value: edge
+    - name: KC_HOSTNAME_URL
+      value: "https://keycloak-develop.opr.unity.com"
+  extraEnvFrom: |
+    - secretRef:
+        name: opr-keycloak-env
+  extraInitContainers: ""
+  extraPorts: []
+  extraServiceMonitor:
+    annotations: {}
+    enabled: false
+    interval: 10s
+    labels: {}
+    namespace: ""
+    namespaceSelector: {}
+    path: /auth/realms/master/metrics
+    port: http
+    scrapeTimeout: 10s
+  extraVolumeMounts: |
+    - name: realm-secret
+      mountPath: "/opt/keycloak/data/import/"
+      readOnly: true
+  extraVolumes: |
+    - name: realm-secret
+      secret:
+        secretName: realm-secret
+  fullnameOverride: ""
+  global: {}
+  hostAliases: []
+  image:
+    pullPolicy: IfNotPresent
+    repository: registry1.dso.mil/ironbank/opensource/keycloak/keycloak
+    tag: 21.1.2
+  imagePullSecrets:
+  - name: regcred-ironbank
+  ingress:
+    annotations:
+      cert-manager.io/cluster-issuer: letsencrypt
+      nginx.ingress.kubernetes.io/cors-allow-origin: https://dashboard-develop.opr.unity.com
+      nginx.ingress.kubernetes.io/cors-expose-headers: '*'
+      nginx.ingress.kubernetes.io/enable-cors: "true"
+    console:
+      annotations: {}
+      enabled: false
+      ingressClassName: ""
+      rules:
+      - host: '{{ .Release.Name }}.keycloak.example.com'
+        paths:
+        - path: /auth/admin/
+          pathType: Prefix
+      tls: []
+    enabled: true
+    ingressClassName: nginx
+    labels: {}
+    rules:
+    - host: keycloak-develop.opr.unity.com
+      paths:
+      - path: /
+        pathType: Prefix
+    servicePort: http
+    tls:
+    - hosts:
+      - keycloak-develop.opr.unity.com
+      secretName: keycloak-develop-tls
+  lifecycleHooks: ""
+  livenessProbe: |
+    httpGet:
+      path: /health/live
+      port: http
+    initialDelaySeconds: 0
+    timeoutSeconds: 5
+  nameOverride: ""
+  networkPolicy:
+    enabled: false
+    extraFrom: []
+    labels: {}
+  nodeSelector: {}
+  pgchecker:
+    image:
+      pullPolicy: IfNotPresent
+      repository: docker.io/busybox
+      tag: 1.32
+    resources:
+      limits:
+        cpu: 20m
+        memory: 32Mi
+      requests:
+        cpu: 20m
+        memory: 32Mi
+    securityContext:
+      allowPrivilegeEscalation: false
+      runAsGroup: 1000
+      runAsNonRoot: true
+      runAsUser: 1000
+  podAnnotations: {}
+  podDisruptionBudget: {}
+  podLabels: {}
+  podManagementPolicy: Parallel
+  podSecurityContext:
+    fsGroup: 1000
+  postgresql:
+    enabled: false
+    networkPolicy:
+      enabled: false
+    postgresqlDatabase: keycloak
+    postgresqlPassword: keycloak
+    postgresqlUsername: keycloak
+  priorityClassName: ""
+  prometheusRule:
+    annotations: {}
+    enabled: false
+    labels: {}
+    rules: []
+  rbac:
+    create: false
+    rules: []
+  readinessProbe: |
+    httpGet:
+      path: /health/ready
+      port: http
+    initialDelaySeconds: 30
+    timeoutSeconds: 1
+  replicas: 1
+  resources: {}
+  restartPolicy: Always
+  route:
+    annotations: {}
+    enabled: false
+    host: ""
+    labels: {}
+    path: /
+    tls:
+      enabled: true
+      insecureEdgeTerminationPolicy: Redirect
+      termination: edge
+  secrets:
+    env:
+      stringData:
+        KEYCLOAK_ADMIN: admin
+        KEYCLOAK_ADMIN_PASSWORD: admin
+        KEYCLOAK_REFLECT_TEST_ANONYMOUS_USERNAME: reflect-anonymous
+        KEYCLOAK_REFLECT_TEST_MANAGER_USERNAME: reflect-admin
+        KEYCLOAK_REFLECT_TEST_USERNAME: reflect-user
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 1000
+  service:
+    annotations: {}
+    externalTrafficPolicy: Cluster
+    extraPorts: []
+    httpManagementNodePort: null
+    httpManagementPort: 9990
+    httpNodePort: null
+    httpPort: 80
+    httpsNodePort: null
+    httpsPort: 8443
+    labels: {}
+    loadBalancerIP: ""
+    loadBalancerSourceRanges: []
+    sessionAffinity: ""
+    sessionAffinityConfig: {}
+    type: ClusterIP
+  serviceAccount:
+    annotations: {}
+    create: true
+    imagePullSecrets: []
+    labels: {}
+    name: ""
+  serviceMonitor:
+    annotations: {}
+    enabled: false
+    interval: 10s
+    labels: {}
+    namespace: ""
+    namespaceSelector: {}
+    path: /metrics
+    port: http-management
+    scrapeTimeout: 10s
+  skipInitContainers: false
+  startupProbe: |
+    httpGet:
+      path: /health/started
+      port: http
+    initialDelaySeconds: 30
+    timeoutSeconds: 1
+    failureThreshold: 60
+    periodSeconds: 5
+  startupScripts:
+    keycloak.cli: |
+      {{- .Files.Get "scripts/keycloak.cli" }}
+  statefulsetAnnotations: {}
+  statefulsetLabels: {}
+  terminationGracePeriodSeconds: 60
+  test:
+    deletionPolicy: before-hook-creation
+    enabled: false
+    image:
+      pullPolicy: IfNotPresent
+      repository: docker.io/unguiculus/docker-python3-phantomjs-selenium
+      tag: v1
+    podSecurityContext:
+      fsGroup: 1000
+    securityContext:
+      runAsNonRoot: true
+      runAsUser: 1000
+  tolerations: []
+  topologySpreadConstraints: null
+  updateStrategy: RollingUpdate
+links:
+  global: {}
+  reflect-common-chart:
+    affinity: {}
+    autoscaling:
+      enabled: false
+      maxReplicas: 10
+      metrics:
+      - resource:
+          name: cpu
+          target:
+            averageUtilization: 75
+            type: Utilization
+        type: Resource
+      - resource:
+          name: memory
+          target:
+            averageUtilization: 75
+            type: Utilization
+        type: Resource
+      minReplicas: 1
+    cloudSqlSidecar:
+      enabled: false
+    clusterRole:
+      create: false
+    clusterRoleBinding:
+      create: false
+    configMaps:
+      links-config:
+        data:
+          OTEL_EXPORTER_OTLP_ENDPOINT: http://apm-server-apm-http:8200
+          OTEL_EXPORTER_OTLP_HEADERS: Authorization=Bearer 4113wNO7AFYO336Yn3vj2yvP
+          OTEL_RESOURCE_ATTRIBUTES: deployment.environment=production
+          OTEL_SERVICE_NAME: links
+          REFLECT_COMPONENT: links
+          REFLECT_ENVIRONMENT: Production
+          REFLECTLINKS_LinkSharing__Domain: links-develop.opr.unity.com
+          REFLECTLINKS_Prometheus__Enabled: "true"
+    cronJob:
+      enabled: false
+    deployment:
+      enabled: true
+      envFrom:
+      - configMapRef:
+          name: links-config
+      initContainers: []
+      livenessProbe: {}
+      ports:
+      - containerPort: 80
+        name: http
+        protocol: TCP
+      readinessProbe: {}
+    externalSecrets:
+      enabled: false
+    fullnameOverride: links
+    global: {}
+    image:
+      pullPolicy: Always
+      repository: us-east1-docker.pkg.dev/unity-solutions-tyndall-prd/docker/reflect-links
+      tag: develop-latest
+    imagePullSecrets:
+    - name: regcred-gcp
+    ingress:
+      links-http:
+        annotations:
+          cert-manager.io/cluster-issuer: letsencrypt
+        hosts:
+        - host: links-develop.opr.unity.com
+          http:
+            paths:
+            - backend:
+                service:
+                  name: links
+                  port:
+                    name: http
+              path: /
+              pathType: ImplementationSpecific
+        ingressClassName: nginx
+        tls:
+        - hosts:
+          - links-develop.opr.unity.com
+          secretName: links-develop-tls
+    nameOverride: ""
+    nodeSelector: {}
+    overprovisioning:
+      count: 2
+      enabled: false
+    podAnnotations: {}
+    podMonitor:
+      enabled: false
+      endpoints: []
+      labels: {}
+      namespaceSelector:
+        matchNames:
+        - default
+    podSecurityContext: {}
+    replicaCount: 1
+    resources: {}
+    secrets: {}
+    securityContext: {}
+    service:
+      enabled: true
+      port: 80
+      ports:
+      - name: http
+        port: 80
+        protocol: TCP
+      type: ClusterIP
+    serviceAccount:
+      annotations: {}
+      create: false
+      name: ""
+    serviceMonitor:
+      enabled: false
+      endpoints: []
+      labels: {}
+      namespaceSelector:
+        matchNames:
+        - default
+    sidecarContainers:
+      enabled: false
+    statefulSet:
+      enabled: false
+    tolerations: []
+    workloadIdentity:
+      enabled: false
+multiplayer:
+  global: {}
+  matchmaker:
+    global: {}
+    netcodeManifests:
+      create: true
+    reflect-common-chart:
+      affinity: {}
+      autoscaling:
+        enabled: false
+        maxReplicas: 10
+        metrics:
+        - resource:
+            name: cpu
+            target:
+              averageUtilization: 75
+              type: Utilization
+          type: Resource
+        - resource:
+            name: memory
+            target:
+              averageUtilization: 75
+              type: Utilization
+          type: Resource
+        minReplicas: 1
+      cloudSqlSidecar:
+        enabled: false
+      clusterRole:
+        create: true
+        name: matchmaker-clusterrole
+        rules:
+        - apiGroups:
+          - ""
+          - apps
+          - batch
+          resources:
+          - services
+          - jobs
+          verbs:
+          - create
+          - get
+          - watch
+          - list
+          - delete
+      clusterRoleBinding:
+        create: true
+        name: matchmaker-rb
+        roleRef:
+          apiGroup: rbac.authorization.k8s.io
+          kind: ClusterRole
+          name: matchmaker-clusterrole
+        subjects:
+        - kind: ServiceAccount
+          name: matchmaker-sa
+          namespace: opr-develop
+      configMaps:
+        matchmaker-config:
+          data:
+            ASPNETCORE_URLS: http://+:80
+            OTEL_EXPORTER_OTLP_ENDPOINT: http://apm-server-apm-http:8200
+            OTEL_EXPORTER_OTLP_HEADERS: Authorization=Bearer 4113wNO7AFYO336Yn3vj2yvP
+            OTEL_RESOURCE_ATTRIBUTES: deployment.environment=production
+            OTEL_SERVICE_NAME: matchmaker
+            REFLECT_COMPONENT: matchmaker
+            REFLECT_ENVIRONMENT: Production
+            REFLECTMULTIPLAYER_ClusterController__AllocationPool__PoolSize: "0"
+            REFLECTMULTIPLAYER_ClusterController__KubeApi__CertsSecretName: matchmaker-reflect-tls
+            REFLECTMULTIPLAYER_ClusterController__KubeApi__Images__Init: us-east1-docker.pkg.dev/unity-solutions-tyndall-prd/docker/reflect-netcode-init:develop-latest
+            REFLECTMULTIPLAYER_ClusterController__KubeApi__Images__Netcode: us-east1-docker.pkg.dev/unity-solutions-tyndall-prd/docker/reflect-netcode:develop-latest
+            REFLECTMULTIPLAYER_ClusterController__KubeApi__KubeNamespace: opr-develop
+            REFLECTMULTIPLAYER_ClusterController__KubeApi__KubeNodepool: 'kubernetes.io/os
+              : linux'
+            REFLECTMULTIPLAYER_ClusterController__KubeApi__MatchMakerEndpoint: matchmaker
+            REFLECTMULTIPLAYER_ClusterController__KubeApi__Namespace: default
+            REFLECTMULTIPLAYER_ClusterController__KubeApi__NetcodeServerAddress: develop.opr.unity.com
+            REFLECTMULTIPLAYER_Mumble__RestApiUrl: http://mumble-rest.opr-develop.svc.cluster.local:8082
+            REFLECTMULTIPLAYER_ProjectServer__Address: http://project:10010
+            REFLECTMULTIPLAYER_ProjectServer__HttpAddress: https://develop.opr.unity.com
+            REFLECTMULTIPLAYER_Prometheus__Enabled: "true"
+            REFLECTMULTIPLAYER_Sentry__Environment: gcp-test
+            URLS: http://+:80
+      cronJob:
+        enabled: false
+      deployment:
+        enabled: true
+        env:
+        - name: REFLECT_POD_NAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.name
+        envFrom:
+        - secretRef:
+            name: matchmaker-secrets
+        - configMapRef:
+            name: matchmaker-config
+        initContainers: []
+        livenessProbe:
+          exec:
+            command:
+            - /bin/grpc_health_probe
+            - -addr=:10042
+        ports:
+        - containerPort: 10042
+          name: grpc
+        - containerPort: 80
+          name: http
+        - containerPort: 1234
+          name: prom-publisher
+        readinessProbe:
+          exec:
+            command:
+            - /bin/grpc_health_probe
+            - -addr=:10042
+        volumeMounts:
+        - mountPath: /app/netcode-manifests
+          name: netcode-manifests
+          readOnly: true
+      externalSecrets:
+        enabled: false
+      fullnameOverride: matchmaker
+      global: {}
+      image:
+        pullPolicy: Always
+        repository: us-east1-docker.pkg.dev/unity-solutions-tyndall-prd/docker/reflect-matchmaker
+        tag: develop-latest
+      imagePullSecrets:
+      - name: regcred-gcp
+      ingress:
+        matchmaker-grpc:
+          annotations:
+            cert-manager.io/cluster-issuer: letsencrypt
+            nginx.ingress.kubernetes.io/backend-protocol: GRPC
+            nginx.ingress.kubernetes.io/proxy-body-size: 1024m
+          hosts:
+          - host: matchmaker-develop.opr.unity.com
+            http:
+              paths:
+              - backend:
+                  service:
+                    name: matchmaker
+                    port:
+                      name: grpc
+                path: /
+                pathType: ImplementationSpecific
+          ingressClassName: nginx
+          tls:
+          - hosts:
+            - matchmaker-develop.opr.unity.com
+            secretName: matchmaker-reflect-tls
+        matchmaker-http:
+          annotations:
+            cert-manager.io/cluster-issuer: letsencrypt
+          hosts:
+          - host: matchmaker-develop.opr.unity.com
+            http:
+              paths:
+              - backend:
+                  service:
+                    name: matchmaker
+                    port:
+                      name: http
+                path: /api
+                pathType: ImplementationSpecific
+          ingressClassName: nginx
+          tls:
+          - hosts:
+            - matchmaker-develop.opr.unity.com
+            secretName: matchmaker-reflect-tls
+      nameOverride: ""
+      nodeSelector: {}
+      overprovisioning:
+        count: 2
+        enabled: false
+      podAnnotations: {}
+      podMonitor:
+        enabled: false
+        endpoints: []
+        labels: {}
+        namespaceSelector:
+          matchNames:
+          - default
+      podSecurityContext: {}
+      replicaCount: 1
+      resources:
+        limits:
+          cpu: 500m
+          memory: 1000Mi
+        requests:
+          cpu: 500m
+          memory: 1000Mi
+      secrets:
+        matchmaker-secrets:
+          data:
+            REFLECTMULTIPLAYER_ConnectionStrings__MatchmakerDatabase: Host=opr-postgresql;Database=Matchmaker;Username=matchmaker_service;Password=reflect
+            REFLECTMULTIPLAYER_Mumble__RestApiPassword: murmur-rest-secret-key
+            REFLECTMULTIPLAYER_Mumble__RestApiUsername: reflect
+          type: Opaque
+      securityContext: {}
+      service:
+        enabled: true
+        port: 80
+        ports:
+        - name: http
+          port: 80
+          protocol: TCP
+        - name: prom-publisher
+          port: 1234
+          protocol: TCP
+        - name: grpc
+          port: 10042
+          protocol: TCP
+          targetPort: 10042
+        type: ClusterIP
+      serviceAccount:
+        annotations: {}
+        create: true
+        name: matchmaker-sa
+      serviceMonitor:
+        enabled: false
+        endpoints:
+        - interval: 5s
+          port: prom-publisher
+        labels: {}
+        namespaceSelector:
+          matchNames:
+          - default
+      sidecarContainers:
+        enabled: false
+      statefulSet:
+        enabled: false
+      tolerations: []
+      volumes:
+      - name: cloudsql-credentials
+        secret:
+          defaultMode: 420
+          secretName: cloudsql
+      - configMap:
+          name: netcode-manifests
+        name: netcode-manifests
+      workloadIdentity:
+        enabled: false
+  netcode:
+    global: {}
+    reflect-common-chart:
+      affinity: {}
+      autoscaling:
+        enabled: false
+      cloudSqlSidecar:
+        enabled: false
+      clusterRole:
+        create: true
+        name: netcode-clusterrole
+        rules:
+        - apiGroups:
+          - ""
+          resources:
+          - services
+          - nodes
+          - secrets
+          verbs:
+          - get
+          - watch
+          - list
+      clusterRoleBinding:
+        create: true
+        name: netcode-rb
+        roleRef:
+          apiGroup: rbac.authorization.k8s.io
+          kind: ClusterRole
+          name: netcode-clusterrole
+        subjects:
+        - kind: ServiceAccount
+          name: netcode-sa
+          namespace: opr-develop
+      configMaps: {}
+      cronJob:
+        enabled: false
+      deployment:
+        enabled: false
+        envFrom: []
+        initContainers: []
+        livenessProbe: {}
+        ports:
+        - containerPort: 80
+          name: http
+          protocol: TCP
+        readinessProbe: {}
+      externalSecrets:
+        enabled: false
+      fullnameOverride: ""
+      global: {}
+      image:
+        pullPolicy: IfNotPresent
+        repository: nginx
+        tag: ""
+      imagePullSecrets: []
+      ingress: {}
+      nameOverride: ""
+      nodeSelector: {}
+      overprovisioning:
+        count: 2
+        enabled: false
+      podAnnotations: {}
+      podMonitor:
+        enabled: false
+        endpoints: []
+        labels: {}
+        namespaceSelector:
+          matchNames:
+          - default
+      podSecurityContext: {}
+      replicaCount: 1
+      resources: {}
+      secrets: {}
+      securityContext: {}
+      service:
+        enabled: false
+        port: 80
+        type: ClusterIP
+      serviceAccount:
+        annotations: {}
+        create: true
+        name: netcode-sa
+      serviceMonitor:
+        enabled: false
+        endpoints: []
+        labels: {}
+        namespaceSelector:
+          matchNames:
+          - default
+      sidecarContainers:
+        enabled: false
+      statefulSet:
+        enabled: false
+      tolerations: []
+      workloadIdentity:
+        enabled: false
+postgres-integration-svc:
+  global: {}
+  reflect-common-chart:
+    affinity: {}
+    autoscaling:
+      enabled: false
+    cloudSqlSidecar:
+      enabled: false
+    clusterRole:
+      create: false
+    clusterRoleBinding:
+      create: false
+    configMaps: {}
+    cronJob:
+      enabled: false
+    deployment:
+      envFrom: []
+      initContainers: []
+      livenessProbe: {}
+      ports:
+      - containerPort: 80
+        name: http
+        protocol: TCP
+      readinessProbe: {}
+    externalSecrets:
+      enabled: false
+    fullnameOverride: postgres-integration-svc
+    global: {}
+    image:
+      pullPolicy: IfNotPresent
+      repository: nginx
+      tag: ""
+    imagePullSecrets: []
+    ingress: {}
+    nameOverride: ""
+    nodeSelector: {}
+    overprovisioning:
+      count: 2
+      enabled: false
+    podAnnotations: {}
+    podMonitor:
+      enabled: false
+      endpoints: []
+      labels: {}
+      namespaceSelector:
+        matchNames:
+        - default
+    podSecurityContext: {}
+    replicaCount: 1
+    resources: {}
+    secrets: {}
+    securityContext: {}
+    service:
+      enabled: true
+      port: 80
+      ports:
+      - name: postrgres-integration-test-svc
+        nodePort: 30432
+        port: 5432
+        protocol: TCP
+        targetPort: 5432
+      selectorLabel:
+        app.kubernetes.io/component: primary
+        app.kubernetes.io/name: postgresql
+      type: NodePort
+    serviceAccount:
+      annotations: {}
+      create: false
+      name: ""
+    serviceMonitor:
+      enabled: false
+      endpoints: []
+      labels: {}
+      namespaceSelector:
+        matchNames:
+        - default
+    sidecarContainers:
+      enabled: false
+    statefulSet:
+      enabled: false
+    tolerations: []
+    workloadIdentity:
+      enabled: false
+postgresql:
+  architecture: standalone
+  audit:
+    clientMinMessages: error
+    logConnections: false
+    logDisconnections: false
+    logHostname: false
+    logLinePrefix: ""
+    logTimezone: ""
+    pgAuditLog: ""
+    pgAuditLogCatalog: "off"
+  auth:
+    database: ""
+    enablePostgresUser: true
+    existingSecret: ""
+    password: ""
+    postgresPassword: reflect
+    replicationPassword: ""
+    replicationUsername: repl_user
+    secretKeys:
+      adminPasswordKey: postgres-password
+      replicationPasswordKey: replication-password
+      userPasswordKey: password
+    usePasswordFiles: false
+    username: ""
+  backup:
+    cronjob:
+      annotations: {}
+      command:
+      - /bin/sh
+      - -c
+      - pg_dumpall --clean --if-exists --load-via-partition-root --quote-all-identifiers
+        --no-password --file=${PGDUMP_DIR}/pg_dumpall-$(date '+%Y-%m-%d-%H-%M').pgdump
+      concurrencyPolicy: Allow
+      containerSecurityContext:
+        allowPrivilegeEscalation: false
+        capabilities:
+          drop:
+          - ALL
+        readOnlyRootFilesystem: true
+        runAsGroup: 0
+        runAsNonRoot: true
+        runAsUser: 1001
+        seccompProfile:
+          type: RuntimeDefault
+      failedJobsHistoryLimit: 1
+      labels: {}
+      restartPolicy: OnFailure
+      schedule: '@daily'
+      startingDeadlineSeconds: ""
+      storage:
+        accessModes:
+        - ReadWriteOnce
+        annotations: {}
+        existingClaim: ""
+        mountPath: /backup/pgdump
+        resourcePolicy: ""
+        size: 8Gi
+        storageClass: ""
+        subPath: ""
+        volumeClaimTemplates:
+          selector: {}
+      successfulJobsHistoryLimit: 3
+      ttlSecondsAfterFinished: ""
+    enabled: false
+  clusterDomain: cluster.local
+  common:
+    exampleValue: common-chart
+    global:
+      auth:
+        postgresPassword: reflect
+      imagePullSecrets: []
+      imageRegistry: ""
+      postgresql:
+        auth:
+          database: ""
+          existingSecret: ""
+          password: ""
+          postgresPassword: ""
+          secretKeys:
+            adminPasswordKey: ""
+            replicationPasswordKey: ""
+            userPasswordKey: ""
+          username: ""
+        service:
+          ports:
+            postgresql: ""
+      storageClass: ""
+  commonAnnotations: {}
+  commonLabels: {}
+  containerPorts:
+    postgresql: 5432
+  diagnosticMode:
+    args:
+    - infinity
+    command:
+    - sleep
+    enabled: false
+  extraDeploy: []
+  fullnameOverride: ""
+  global:
+    auth:
+      postgresPassword: reflect
+    imagePullSecrets:
+    - regcred-ironbank
+    imageRegistry: ""
+    postgresql:
+      auth:
+        database: ""
+        existingSecret: ""
+        password: ""
+        postgresPassword: ""
+        secretKeys:
+          adminPasswordKey: ""
+          replicationPasswordKey: ""
+          userPasswordKey: ""
+        username: ""
+      service:
+        ports:
+          postgresql: ""
+    storageClass: ""
+  image:
+    debug: false
+    digest: ""
+    pullPolicy: IfNotPresent
+    pullSecrets:
+    - name: regcred-ironbank
+    registry: registry1.dso.mil
+    repository: ironbank/bitnami/postgres/postgresql11
+    tag: 11.19.0
+  kubeVersion: ""
+  ldap:
+    basedn: ""
+    binddn: ""
+    bindpw: ""
+    enabled: false
+    port: ""
+    prefix: ""
+    scheme: ""
+    searchAttribute: ""
+    searchFilter: ""
+    server: ""
+    suffix: ""
+    tls:
+      enabled: false
+    uri: ""
+  metrics:
+    containerPorts:
+      metrics: 9187
+    containerSecurityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+        - ALL
+      enabled: true
+      runAsGroup: 0
+      runAsNonRoot: true
+      runAsUser: 1001
+      seccompProfile:
+        type: RuntimeDefault
+    customLivenessProbe: {}
+    customMetrics: {}
+    customReadinessProbe: {}
+    customStartupProbe: {}
+    enabled: false
+    extraEnvVars: []
+    image:
+      digest: ""
+      pullPolicy: IfNotPresent
+      pullSecrets: []
+      registry: docker.io
+      repository: bitnami/postgres-exporter
+      tag: 0.13.2-debian-11-r4
+    livenessProbe:
+      enabled: true
+      failureThreshold: 6
+      initialDelaySeconds: 5
+      periodSeconds: 10
+      successThreshold: 1
+      timeoutSeconds: 5
+    prometheusRule:
+      enabled: false
+      labels: {}
+      namespace: ""
+      rules: []
+    readinessProbe:
+      enabled: true
+      failureThreshold: 6
+      initialDelaySeconds: 5
+      periodSeconds: 10
+      successThreshold: 1
+      timeoutSeconds: 5
+    resources:
+      limits: {}
+      requests: {}
+    service:
+      annotations:
+        prometheus.io/port: '{{ .Values.metrics.service.ports.metrics }}'
+        prometheus.io/scrape: "true"
+      clusterIP: ""
+      ports:
+        metrics: 9187
+      sessionAffinity: None
+    serviceMonitor:
+      enabled: false
+      honorLabels: false
+      interval: ""
+      jobLabel: ""
+      labels: {}
+      metricRelabelings: []
+      namespace: ""
+      relabelings: []
+      scrapeTimeout: ""
+      selector: {}
+    startupProbe:
+      enabled: false
+      failureThreshold: 15
+      initialDelaySeconds: 10
+      periodSeconds: 10
+      successThreshold: 1
+      timeoutSeconds: 1
+  nameOverride: ""
+  networkPolicy:
+    egressRules:
+      customRules: []
+      denyConnectionsToExternal: false
+    enabled: false
+    ingressRules:
+      primaryAccessOnlyFrom:
+        customRules: []
+        enabled: false
+        namespaceSelector: {}
+        podSelector: {}
+      readReplicasAccessOnlyFrom:
+        customRules: []
+        enabled: false
+        namespaceSelector: {}
+        podSelector: {}
+    metrics:
+      enabled: false
+      namespaceSelector: {}
+      podSelector: {}
+  postgresqlDataDir: /bitnami/postgresql/data
+  postgresqlSharedPreloadLibraries: pgaudit
+  primary:
+    affinity: {}
+    annotations: {}
+    args: []
+    command: []
+    configuration: ""
+    containerSecurityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+        - ALL
+      enabled: true
+      runAsGroup: 0
+      runAsNonRoot: true
+      runAsUser: 1001
+      seccompProfile:
+        type: RuntimeDefault
+    customLivenessProbe: {}
+    customReadinessProbe: {}
+    customStartupProbe: {}
+    existingConfigmap: ""
+    existingExtendedConfigmap: ""
+    extendedConfiguration: |
+      max_connections = 400
+    extraEnvVars:
+    - name: POSTGRES_USER
+      value: postgres
+    - name: PROJECT_SERVICE_DB_PASSWORD
+      value: reflect
+    - name: SYNC_SERVICE_DB_PASSWORD
+      value: reflect
+    - name: ANNOTATIONS_DB_PASSWORD
+      value: reflect
+    - name: MATCHMAKER_DB_PASSWORD
+      value: reflect
+    - name: MURMUR_DB_PASSWORD
+      value: reflect
+    extraEnvVarsCM: ""
+    extraEnvVarsSecret: ""
+    extraPodSpec: {}
+    extraVolumeMounts: []
+    extraVolumes: []
+    hostAliases: []
+    hostIPC: false
+    hostNetwork: false
+    initContainers: []
+    initdb:
+      args: ""
+      password: ""
+      postgresqlWalDir: ""
+      scripts:
+        create_users.sql: |
+          CREATE USER project_service WITH ENCRYPTED PASSWORD 'reflect';
+          CREATE DATABASE "ProjectService" WITH TEMPLATE = template0 ENCODING = 'UTF8' LC_COLLATE = 'en_US.utf8' LC_CTYPE = 'en_US.utf8' OWNER project_service;
+          CREATE USER sync_service WITH ENCRYPTED PASSWORD 'reflect';
+          CREATE DATABASE "SyncService" WITH TEMPLATE = template0 ENCODING = 'UTF8' LC_COLLATE = 'en_US.utf8' LC_CTYPE = 'en_US.utf8' OWNER sync_service;
+          CREATE DATABASE "SyncService_Hangfire" WITH OWNER sync_service;
+          CREATE USER annotations WITH ENCRYPTED PASSWORD 'reflect';
+          CREATE DATABASE "Annotations" WITH TEMPLATE = template0 ENCODING = 'UTF8' LC_COLLATE = 'en_US.utf8' LC_CTYPE = 'en_US.utf8' OWNER annotations;
+      scriptsConfigMap: db-init
+      scriptsSecret: ""
+      user: ""
+    labels: {}
+    lifecycleHooks: {}
+    livenessProbe:
+      enabled: true
+      failureThreshold: 6
+      initialDelaySeconds: 30
+      periodSeconds: 10
+      successThreshold: 1
+      timeoutSeconds: 5
+    name: primary
+    nodeAffinityPreset:
+      key: ""
+      type: ""
+      values: []
+    nodeSelector: {}
+    persistence:
+      accessModes:
+      - ReadWriteOnce
+      annotations: {}
+      dataSource: {}
+      enabled: true
+      existingClaim: ""
+      labels: {}
+      mountPath: /bitnami/postgresql
+      selector: {}
+      size: 10Gi
+      storageClass: ""
+      subPath: ""
+    pgHbaConfiguration: ""
+    podAffinityPreset: ""
+    podAnnotations: {}
+    podAntiAffinityPreset: soft
+    podLabels: {}
+    podSecurityContext:
+      enabled: true
+      fsGroup: 1001
+    priorityClassName: ""
+    readinessProbe:
+      enabled: true
+      failureThreshold: 6
+      initialDelaySeconds: 5
+      periodSeconds: 10
+      successThreshold: 1
+      timeoutSeconds: 5
+    resources:
+      limits: {}
+      requests:
+        cpu: 250m
+        memory: 256Mi
+    schedulerName: ""
+    service:
+      annotations: {}
+      clusterIP: ""
+      externalTrafficPolicy: Cluster
+      extraPorts: []
+      headless:
+        annotations: {}
+      loadBalancerIP: ""
+      loadBalancerSourceRanges: []
+      nodePorts:
+        postgresql: ""
+      ports:
+        postgresql: 5432
+      sessionAffinity: None
+      sessionAffinityConfig: {}
+      type: ClusterIP
+    sidecars: []
+    standby:
+      enabled: false
+      primaryHost: ""
+      primaryPort: ""
+    startupProbe:
+      enabled: false
+      failureThreshold: 15
+      initialDelaySeconds: 30
+      periodSeconds: 10
+      successThreshold: 1
+      timeoutSeconds: 1
+    terminationGracePeriodSeconds: ""
+    tolerations: []
+    topologySpreadConstraints: []
+    updateStrategy:
+      rollingUpdate: {}
+      type: RollingUpdate
+  psp:
+    create: false
+  rbac:
+    create: false
+    rules: []
+  readReplicas:
+    affinity: {}
+    annotations: {}
+    args: []
+    command: []
+    containerSecurityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+        - ALL
+      enabled: true
+      runAsGroup: 0
+      runAsNonRoot: true
+      runAsUser: 1001
+      seccompProfile:
+        type: RuntimeDefault
+    customLivenessProbe: {}
+    customReadinessProbe: {}
+    customStartupProbe: {}
+    extendedConfiguration: ""
+    extraEnvVars: []
+    extraEnvVarsCM: ""
+    extraEnvVarsSecret: ""
+    extraPodSpec: {}
+    extraVolumeMounts: []
+    extraVolumes: []
+    hostAliases: []
+    hostIPC: false
+    hostNetwork: false
+    initContainers: []
+    labels: {}
+    lifecycleHooks: {}
+    livenessProbe:
+      enabled: true
+      failureThreshold: 6
+      initialDelaySeconds: 30
+      periodSeconds: 10
+      successThreshold: 1
+      timeoutSeconds: 5
+    name: read
+    nodeAffinityPreset:
+      key: ""
+      type: ""
+      values: []
+    nodeSelector: {}
+    persistence:
+      accessModes:
+      - ReadWriteOnce
+      annotations: {}
+      dataSource: {}
+      enabled: true
+      existingClaim: ""
+      labels: {}
+      mountPath: /bitnami/postgresql
+      selector: {}
+      size: 8Gi
+      storageClass: ""
+      subPath: ""
+    podAffinityPreset: ""
+    podAnnotations: {}
+    podAntiAffinityPreset: soft
+    podLabels: {}
+    podSecurityContext:
+      enabled: true
+      fsGroup: 1001
+    priorityClassName: ""
+    readinessProbe:
+      enabled: true
+      failureThreshold: 6
+      initialDelaySeconds: 5
+      periodSeconds: 10
+      successThreshold: 1
+      timeoutSeconds: 5
+    replicaCount: 1
+    resources:
+      limits: {}
+      requests:
+        cpu: 250m
+        memory: 256Mi
+    schedulerName: ""
+    service:
+      annotations: {}
+      clusterIP: ""
+      externalTrafficPolicy: Cluster
+      extraPorts: []
+      headless:
+        annotations: {}
+      loadBalancerIP: ""
+      loadBalancerSourceRanges: []
+      nodePorts:
+        postgresql: ""
+      ports:
+        postgresql: 5432
+      sessionAffinity: None
+      sessionAffinityConfig: {}
+      type: ClusterIP
+    sidecars: []
+    startupProbe:
+      enabled: false
+      failureThreshold: 15
+      initialDelaySeconds: 30
+      periodSeconds: 10
+      successThreshold: 1
+      timeoutSeconds: 1
+    terminationGracePeriodSeconds: ""
+    tolerations: []
+    topologySpreadConstraints: []
+    updateStrategy:
+      rollingUpdate: {}
+      type: RollingUpdate
+  replication:
+    applicationName: my_application
+    numSynchronousReplicas: 0
+    synchronousCommit: "off"
+  serviceAccount:
+    annotations: {}
+    automountServiceAccountToken: true
+    create: false
+    name: ""
+  serviceBindings:
+    enabled: false
+  shmVolume:
+    enabled: true
+    sizeLimit: ""
+  tls:
+    autoGenerated: false
+    certCAFilename: ""
+    certFilename: ""
+    certKeyFilename: ""
+    certificatesSecret: ""
+    crlFilename: ""
+    enabled: false
+    preferServerCiphers: true
+  volumePermissions:
+    containerSecurityContext:
+      runAsGroup: 0
+      runAsNonRoot: false
+      runAsUser: 0
+      seccompProfile:
+        type: RuntimeDefault
+    enabled: false
+    image:
+      digest: ""
+      pullPolicy: IfNotPresent
+      pullSecrets: []
+      registry: docker.io
+      repository: bitnami/os-shell
+      tag: 11-debian-11-r22
+    resources:
+      limits: {}
+      requests: {}
+project:
+  global: {}
+  reflect-common-chart:
+    affinity: {}
+    autoscaling:
+      enabled: false
+      maxReplicas: 10
+      metrics:
+      - resource:
+          name: cpu
+          target:
+            averageUtilization: 75
+            type: Utilization
+        type: Resource
+      - resource:
+          name: memory
+          target:
+            averageUtilization: 75
+            type: Utilization
+        type: Resource
+      minReplicas: 1
+    cloudSqlSidecar:
+      enabled: false
+    clusterRole:
+      create: false
+    clusterRoleBinding:
+      create: false
+    configMaps:
+      project-config:
+        data:
+          ASPNETCORE_URLS: http://+:80
+          OTEL_EXPORTER_OTLP_ENDPOINT: http://apm-server-apm-http:8200
+          OTEL_EXPORTER_OTLP_HEADERS: Authorization=Bearer 4113wNO7AFYO336Yn3vj2yvP
+          OTEL_RESOURCE_ATTRIBUTES: deployment.environment=production
+          OTEL_SERVICE_NAME: project
+          REFLECT_CLOUD: OnPrem
+          REFLECT_COMPONENT: project
+          REFLECT_DOMAIN: BAH OPR
+          REFLECT_ENVIRONMENT: Production
+          REFLECT_GATEWAY: unity.project-service.local
+          REFLECT_TESTRUNNER_WAIT: "1"
+          REFLECTPROJECT_LinkSharing__Domain: https://links-develop.opr.unity.com
+          REFLECTPROJECT_LinkSharing__Path: p/
+          REFLECTPROJECT_Prometheus__Enabled: "true"
+          REFLECTPROJECT_Security__LicenseValidationStartDate: "2019-11-01T00:00:00Z"
+          REFLECTPROJECT_Security__OnPrem__AuthorizeEndpoint: https://keycloak-develop.opr.unity.com/realms/reflect/protocol/openid-connect/auth
+          REFLECTPROJECT_Security__OnPrem__ClientId: reflect
+          REFLECTPROJECT_Security__OnPrem__ClientIdClaim: azp
+          REFLECTPROJECT_Security__OnPrem__Domain: BAH OPR
+          REFLECTPROJECT_Security__OnPrem__NameClaim: preferred_username
+          REFLECTPROJECT_Security__OnPrem__OAuthJwkUrl: https://keycloak-develop.opr.unity.com/realms/reflect/protocol/openid-connect/certs
+          REFLECTPROJECT_Security__OnPrem__OrganizationName: Tyndall Air Force Base
+          REFLECTPROJECT_Security__OnPrem__RealmAccessRoleListOwnerOrManagerRole: ReflectOwnerManagerRole
+          REFLECTPROJECT_Security__OnPrem__RealmAccessRoleListUserRole: ReflectUserRole
+          REFLECTPROJECT_Security__OnPrem__RefreshEndpoint: https://keycloak-develop.opr.unity.com/realms/reflect/protocol/openid-connect/token
+          REFLECTPROJECT_Security__OnPrem__RevokeEndpoint: https://keycloak-develop.opr.unity.com/realms/reflect/protocol/openid-connect/revoke
+          REFLECTPROJECT_Security__OnPrem__Scope: openid
+          REFLECTPROJECT_Security__OnPrem__TokenEndpoint: https://keycloak-develop.opr.unity.com/realms/reflect/protocol/openid-connect/token
+          REFLECTPROJECT_Security__OnPrem__UserInfoEndpoint: https://keycloak-develop.opr.unity.com/realms/reflect/protocol/openid-connect/userinfo
+          REFLECTPROJECT_Security__OnPrem__ValidIssuer: https://keycloak-develop.opr.unity.com/realms/reflect
+          REFLECTPROJECT_Security__OnPrem__ViewerProtocol: reflect
+          REFLECTPROJECT_ServerEndpoint__Host: 0.0.0.0
+          REFLECTPROJECT_ServiceEndpoints__Annotations__HttpAddress: https://annotations-develop.opr.unity.com
+          REFLECTPROJECT_ServiceEndpoints__MatchMaker__GrpcAddress: https://matchmaker-develop.opr.unity.com
+          REFLECTPROJECT_ServiceEndpoints__MatchMaker__HttpAddress: https://matchmaker-develop.opr.unity.com
+          REFLECTPROJECT_ServiceEndpoints__ProjectServer__GrpcAddress: https://develop.opr.unity.com
+          REFLECTPROJECT_ServiceEndpoints__ProjectServer__GrpcWebAddress: https://web-develop.opr.unity.com
+          REFLECTPROJECT_ServiceEndpoints__ProjectServer__HttpAddress: https://develop.opr.unity.com
+          REFLECTPROJECT_ServiceEndpoints__VoipServer__OtherServerAddress: mumble://voip-develop.opr.unity.com:30000
+          REFLECTPROJECT_SyncServer__Cloud__Address: https://sync-develop.opr.unity.com
+          REFLECTPROJECT_SyncServer__Cloud__SupportsDecimation: "true"
+          URLS: http://+:80
+    cronJob:
+      enabled: false
+    deployment:
+      enabled: true
+      envFrom:
+      - secretRef:
+          name: project-external-secrets
+      - configMapRef:
+          name: project-config
+      initContainers: []
+      livenessProbe:
+        exec:
+          command:
+          - /bin/grpc_health_probe
+          - -addr=:10010
+      ports:
+      - containerPort: 10010
+        name: grpc
+      - containerPort: 80
+        name: http
+      - containerPort: 1234
+        name: prom-publisher
+      readinessProbe:
+        exec:
+          command:
+          - /bin/grpc_health_probe
+          - -addr=:10010
+      volumeMounts: []
+    externalSecrets:
+      enabled: false
+    fullnameOverride: project
+    global: {}
+    hostname: reflect-project
+    image:
+      pullPolicy: Always
+      repository: us-east1-docker.pkg.dev/unity-solutions-tyndall-prd/docker/reflect-project
+      tag: develop-latest
+    imagePullSecrets:
+    - name: regcred-gcp
+    ingress:
+      project-grpc:
+        annotations:
+          cert-manager.io/cluster-issuer: letsencrypt
+          nginx.ingress.kubernetes.io/backend-protocol: GRPC
+          nginx.ingress.kubernetes.io/cors-allow-headers: x-user-agent,x-grpc-web,x-reflect-appid,x-reflect-clienttrace,authorization,content-type
+          nginx.ingress.kubernetes.io/cors-allow-origin: https://dashboard-develop.opr.unity.com
+          nginx.ingress.kubernetes.io/cors-expose-headers: '*'
+          nginx.ingress.kubernetes.io/enable-cors: "true"
+          nginx.ingress.kubernetes.io/proxy-body-size: 1024m
+          nginx.ingress.kubernetes.io/use-regex: "true"
+        hosts:
+        - host: develop.opr.unity.com
+          http:
+            paths:
+            - backend:
+                service:
+                  name: project
+                  port:
+                    name: grpc
+              path: /
+              pathType: ImplementationSpecific
+        - host: web-develop.opr.unity.com
+          http:
+            paths:
+            - backend:
+                service:
+                  name: project
+                  port:
+                    name: grpc-web
+              path: /
+              pathType: ImplementationSpecific
+        ingressClassName: nginx
+        tls:
+        - hosts:
+          - develop.opr.unity.com
+          secretName: develop-tls
+        - hosts:
+          - web-develop.opr.unity.com
+          secretName: web-develop-tls
+      project-http:
+        annotations:
+          cert-manager.io/cluster-issuer: letsencrypt
+          nginx.ingress.kubernetes.io/use-regex: "true"
+        hosts:
+        - host: develop.opr.unity.com
+          http:
+            paths:
+            - backend:
+                service:
+                  name: project
+                  port:
+                    name: http
+              path: /(api|swagger|v1)
+              pathType: Prefix
+        ingressClassName: nginx
+        tls:
+        - hosts:
+          - develop.opr.unity.com
+          secretName: develop-tls
+    nameOverride: ""
+    nodeSelector: {}
+    overprovisioning:
+      count: 2
+      enabled: false
+    podAnnotations: {}
+    podMonitor:
+      enabled: false
+      endpoints: []
+      labels: {}
+      namespaceSelector:
+        matchNames:
+        - default
+    podSecurityContext: {}
+    replicaCount: 1
+    resources: {}
+    secrets:
+      project-external-secrets:
+        data:
+          REFLECTPROJECT_ConnectionStrings__ProjectServiceDatabase: Host=opr-postgresql;Database=ProjectService;Username=project_service;Password=reflect
+          REFLECTPROJECT_SyncServer__Cloud__ClientId: syncid
+          REFLECTPROJECT_SyncServer__Cloud__ClientSecret: syncsecret
+        type: Opaque
+    securityContext: {}
+    service:
+      enabled: true
+      port: 80
+      ports:
+      - name: prom-publisher
+        port: 1234
+        protocol: TCP
+      - name: grpc
+        port: 10010
+        protocol: TCP
+        targetPort: 10010
+      - name: grpc-web
+        port: 8080
+        protocol: TCP
+        targetPort: 8080
+      - name: http
+        port: 80
+        protocol: TCP
+        targetPort: 80
+      - name: grpc-web-admin
+        port: 9901
+        protocol: TCP
+        targetPort: 9901
+      type: ClusterIP
+    serviceAccount:
+      annotations: {}
+      create: true
+      name: reflect-project-sa
+    serviceMonitor:
+      enabled: false
+      endpoints:
+      - interval: 5s
+        port: prom-publisher
+      labels: {}
+      namespaceSelector:
+        matchNames:
+        - default
+    sidecarContainers:
+      containers:
+      - image: us-east1-docker.pkg.dev/unity-solutions-tyndall-prd/docker/reflect-envoy-k8s:develop-latest
+        imagePullPolicy: Always
+        name: envoy
+        resources: {}
+        securityContext:
+          allowPrivilegeEscalation: false
+          runAsUser: 2
+      enabled: true
+    statefulSet:
+      enabled: false
+    tolerations: []
+    volumes:
+    - name: cert
+      secret:
+        secretName: project-cert
+    workloadIdentity:
+      enabled: false
+  testrunner:
+    global: {}
+    reflect-common-chart:
+      cloudSqlSidecar:
+        enabled: false
+      configMaps:
+        project-testrunner-config:
+          data:
+            REFLECT_COMPONENT: project-tests
+      deployment:
+        enabled: false
+        envFrom:
+        - secretRef:
+            name: project-test-settings
+        - configMapRef:
+            name: project-testrunner-config
+        livenessProbe:
+          httpGet:
+            path: /metrics
+            port: prom-publisher
+        ports:
+        - containerPort: 8082
+          name: http
+          protocol: TCP
+        readinessProbe:
+          httpGet:
+            path: /metrics
+            port: prom-publisher
+      fullnameOverride: project-test-runner
+      image:
+        repository: gcr.io/unity-vert-reflect-prd/reflect-project-tests
+      imagePullSecrets:
+      - name: regcred
+      service:
+        enabled: false
+        ports:
+        - name: prom-publisher
+          port: 1234
+          protocol: TCP
+      serviceMonitor:
+        enabled: false
+        endpoints:
+        - interval: 5s
+          port: prom-publisher
+      volumes:
+      - name: cloudsql-credentials
+        secret:
+          defaultMode: 420
+          secretName: cloudsql
+project-grpc-nodeport:
+  global: {}
+  reflect-common-chart:
+    affinity: {}
+    autoscaling:
+      enabled: false
+    cloudSqlSidecar:
+      enabled: false
+    clusterRole:
+      create: false
+    clusterRoleBinding:
+      create: false
+    configMaps: {}
+    cronJob:
+      enabled: false
+    deployment:
+      envFrom: []
+      initContainers: []
+      livenessProbe: {}
+      ports:
+      - containerPort: 80
+        name: http
+        protocol: TCP
+      readinessProbe: {}
+    externalSecrets:
+      enabled: false
+    fullnameOverride: project-grpc
+    global: {}
+    image:
+      pullPolicy: IfNotPresent
+      repository: nginx
+      tag: ""
+    imagePullSecrets: []
+    ingress: {}
+    nameOverride: ""
+    nodeSelector: {}
+    overprovisioning:
+      count: 2
+      enabled: false
+    podAnnotations: {}
+    podMonitor:
+      enabled: false
+      endpoints: []
+      labels: {}
+      namespaceSelector:
+        matchNames:
+        - default
+    podSecurityContext: {}
+    replicaCount: 1
+    resources: {}
+    secrets: {}
+    securityContext: {}
+    service:
+      enabled: true
+      port: 80
+      ports:
+      - name: project-grpc
+        nodePort: 30010
+        port: 10010
+        protocol: TCP
+        targetPort: 10010
+      selectorLabel:
+        app.kubernetes.io/name: project
+      type: NodePort
+    serviceAccount:
+      annotations: {}
+      create: false
+      name: ""
+    serviceMonitor:
+      enabled: false
+      endpoints: []
+      labels: {}
+      namespaceSelector:
+        matchNames:
+        - default
+    sidecarContainers:
+      enabled: false
+    statefulSet:
+      enabled: false
+    tolerations: []
+    workloadIdentity:
+      enabled: false
+rabbitmq:
+  advancedConfiguration: ""
+  advancedConfigurationExistingSecret: ""
+  affinity: {}
+  args: []
+  auth:
+    enableLoopbackUser: false
+    erlangCookie: ""
+    existingErlangSecret: ""
+    existingPasswordSecret: ""
+    password: rabbitmq-secret-key
+    securePassword: false
+    tls:
+      autoGenerated: false
+      caCertificate: ""
+      enabled: false
+      existingSecret: ""
+      existingSecretFullChain: false
+      failIfNoPeerCert: true
+      overrideCaCertificate: ""
+      serverCertificate: ""
+      serverKey: ""
+      sslOptionsPassword:
+        enabled: false
+        existingSecret: ""
+        key: ""
+        password: ""
+      sslOptionsVerify: verify_peer
+    username: admin
+  clusterDomain: cluster.local
+  clustering:
+    addressType: hostname
+    enabled: true
+    forceBoot: false
+    partitionHandling: autoheal
+    rebalance: false
+  command: []
+  common:
+    exampleValue: common-chart
+    global:
+      imagePullSecrets: []
+      imageRegistry: ""
+      storageClass: ""
+  commonAnnotations: {}
+  commonLabels: {}
+  communityPlugins: ""
+  configuration: |-
+    ## Username and password
+    ##
+    default_user = {{ .Values.auth.username }}
+    {{- if and (not .Values.auth.securePassword) .Values.auth.password }}
+    default_pass = {{ .Values.auth.password }}
+    {{- end }}
+    {{- if .Values.clustering.enabled }}
+    ## Clustering
+    ##
+    cluster_formation.peer_discovery_backend  = rabbit_peer_discovery_k8s
+    cluster_formation.k8s.host = kubernetes.default
+    cluster_formation.node_cleanup.interval = 10
+    cluster_formation.node_cleanup.only_log_warning = true
+    cluster_partition_handling = {{ .Values.clustering.partitionHandling }}
+    {{- end }}
+    {{ if and .Values.clustering.enabled .Values.loadDefinition.enabled }}
+    cluster_formation.target_cluster_size_hint = {{ .Values.replicaCount }}
+    {{ end }}
+    {{- if .Values.loadDefinition.enabled }}
+    load_definitions = {{ .Values.loadDefinition.file }}
+    {{- end }}
+    # queue master locator
+    queue_master_locator = min-masters
+    # enable loopback user
+    {{- if not (empty .Values.auth.username) }}
+    loopback_users.{{ .Values.auth.username }} = {{ .Values.auth.enableLoopbackUser }}
+    {{- else}}
+    loopback_users.guest = {{ .Values.auth.enableLoopbackUser }}
+    {{- end }}
+    {{ template "rabbitmq.extraConfiguration" . }}
+    {{- if .Values.auth.tls.enabled }}
+    ssl_options.verify = {{ .Values.auth.tls.sslOptionsVerify }}
+    listeners.ssl.default = {{ .Values.service.ports.amqpTls }}
+    ssl_options.fail_if_no_peer_cert = {{ .Values.auth.tls.failIfNoPeerCert }}
+    ssl_options.cacertfile = /opt/bitnami/rabbitmq/certs/ca_certificate.pem
+    ssl_options.certfile = /opt/bitnami/rabbitmq/certs/server_certificate.pem
+    ssl_options.keyfile = /opt/bitnami/rabbitmq/certs/server_key.pem
+    {{- if .Values.auth.tls.sslOptionsPassword.enabled }}
+    ssl_options.password = {{ template "rabbitmq.tlsSslOptionsPassword" . }}
+    {{- end }}
+    {{- end }}
+    {{- if .Values.ldap.enabled }}
+    auth_backends.1.authn = ldap
+    auth_backends.1.authz = {{ ternary "ldap" "internal" .Values.ldap.authorisationEnabled }}
+    auth_backends.2 = internal
+    {{- $host :=  list }}
+    {{- $port :=  ternary 636 389 .Values.ldap.tls.enabled }}
+    {{- if .Values.ldap.uri }}
+    {{- $hostPort := get (urlParse .Values.ldap.uri) "host" }}
+    {{- $host = list (index (splitList ":" $hostPort) 0) -}}
+    {{- if (contains ":" $hostPort) }}
+    {{- $port = index (splitList ":" $hostPort) 1 -}}
+    {{- end }}
+    {{- end }}
+    {{- range $index, $server := concat $host .Values.ldap.servers }}
+    auth_ldap.servers.{{ add $index 1 }} = {{ $server }}
+    {{- end }}
+    auth_ldap.port = {{ coalesce .Values.ldap.port $port }}
+    {{- if or .Values.ldap.user_dn_pattern .Values.ldap.userDnPattern }}
+    auth_ldap.user_dn_pattern = {{ coalesce .Values.ldap.user_dn_pattern .Values.ldap.userDnPattern }}
+    {{- end }}
+    {{- if .Values.ldap.basedn }}
+    auth_ldap.dn_lookup_base = {{ .Values.ldap.basedn }}
+    {{- end }}
+    {{- if .Values.ldap.uidField }}
+    auth_ldap.dn_lookup_attribute = {{ .Values.ldap.uidField }}
+    {{- end }}
+    {{- if .Values.ldap.binddn }}
+    auth_ldap.dn_lookup_bind.user_dn = {{ .Values.ldap.binddn }}
+    auth_ldap.dn_lookup_bind.password = {{ required "'ldap.bindpw' is required when 'ldap.binddn' is defined" .Values.ldap.bindpw }}
+    {{- end }}
+    {{- if .Values.ldap.tls.enabled }}
+    auth_ldap.use_ssl = {{ not .Values.ldap.tls.startTls }}
+    auth_ldap.use_starttls = {{ .Values.ldap.tls.startTls }}
+    {{- if .Values.ldap.tls.CAFilename }}
+    auth_ldap.ssl_options.cacertfile = {{ .Values.ldap.tls.certificatesMountPath }}/{{ .Values.ldap.tls.CAFilename }}
+    {{- end }}
+    {{- if .Values.ldap.tls.certFilename }}
+    auth_ldap.ssl_options.certfile = {{ .Values.ldap.tls.certificatesMountPath }}/{{ .Values.ldap.tls.certFilename }}
+    auth_ldap.ssl_options.keyfile = {{ .Values.ldap.tls.certificatesMountPath }}/{{ required "'ldap.tls.certKeyFilename' is required when 'ldap.tls.certFilename' is defined" .Values.ldap.tls.certKeyFilename }}
+    {{- end }}
+    {{- if .Values.ldap.tls.skipVerify }}
+    auth_ldap.ssl_options.verify = verify_none
+    auth_ldap.ssl_options.fail_if_no_peer_cert = false
+    {{- else if .Values.ldap.tls.verify }}
+    auth_ldap.ssl_options.verify = {{ .Values.ldap.tls.verify }}
+    {{- end }}
+    {{- end }}
+    {{- end }}
+    {{- if .Values.metrics.enabled }}
+    ## Prometheus metrics
+    ##
+    prometheus.tcp.port = {{ .Values.containerPorts.metrics }}
+    {{- end }}
+    {{- if .Values.memoryHighWatermark.enabled }}
+    ## Memory Threshold
+    ##
+    total_memory_available_override_value = {{ include "rabbitmq.toBytes" .Values.resources.limits.memory }}
+    vm_memory_high_watermark.{{ .Values.memoryHighWatermark.type }} = {{ .Values.memoryHighWatermark.value }}
+    ## TCP Listen Options
+    ##
+    tcp_listen_options.backlog = {{ .Values.tcpListenOptions.backlog }}
+    tcp_listen_options.nodelay = {{ .Values.tcpListenOptions.nodelay }}
+    tcp_listen_options.linger.on      = {{ .Values.tcpListenOptions.linger.lingerOn }}
+    tcp_listen_options.linger.timeout = {{ .Values.tcpListenOptions.linger.timeout }}
+    tcp_listen_options.keepalive = {{ .Values.tcpListenOptions.keepalive }}
+    {{- end }}
+  configurationExistingSecret: ""
+  containerPorts:
+    amqp: 5672
+    amqpTls: 5671
+    dist: 25672
+    epmd: 4369
+    manager: 15672
+    metrics: 9419
+  containerSecurityContext:
+    enabled: true
+    runAsNonRoot: true
+    runAsUser: 1001
+  customLivenessProbe: {}
+  customReadinessProbe: {}
+  customStartupProbe: {}
+  diagnosticMode:
+    args:
+    - infinity
+    command:
+    - sleep
+    enabled: false
+  dnsConfig: {}
+  dnsPolicy: ""
+  extraConfiguration: |-
+    #default_vhost = {{ .Release.Namespace }}-vhost
+    #disk_free_limit.absolute = 50MB
+  extraConfigurationExistingSecret: ""
+  extraContainerPorts: []
+  extraDeploy: []
+  extraEnvVars: []
+  extraEnvVarsCM: ""
+  extraEnvVarsSecret: ""
+  extraPlugins: rabbitmq_auth_backend_ldap
+  extraSecrets: {}
+  extraSecretsPrependReleaseName: false
+  extraVolumeMounts: []
+  extraVolumes: []
+  featureFlags: ""
+  fullnameOverride: ""
+  global:
+    imagePullSecrets: []
+    imageRegistry: ""
+    storageClass: ""
+  hostAliases: []
+  image:
+    debug: false
+    digest: ""
+    pullPolicy: IfNotPresent
+    pullSecrets: []
+    registry: docker.io
+    repository: bitnami/rabbitmq
+    tag: 3.12.2-debian-11-r8
+  ingress:
+    annotations:
+      cert-manager.io/cluster-issuer: letsencrypt
+    enabled: true
+    existingSecret: ""
+    extraHosts: []
+    extraPaths: []
+    extraRules: []
+    extraTls: []
+    hostname: rabbitmq-develop.opr.unity.com
+    ingressClassName: nginx
+    path: /
+    pathType: ImplementationSpecific
+    secrets: []
+    selfSigned: false
+    tls: true
+  initContainers: []
+  initScripts: {}
+  initScriptsCM: ""
+  initScriptsSecret: ""
+  kubeVersion: ""
+  ldap:
+    authorisationEnabled: false
+    basedn: ""
+    binddn: ""
+    bindpw: ""
+    enabled: false
+    port: ""
+    servers: []
+    tls:
+      CAFilename: ""
+      certFilename: ""
+      certKeyFilename: ""
+      certificatesMountPath: /opt/bitnami/rabbitmq/ldap/certs
+      certificatesSecret: ""
+      enabled: false
+      skipVerify: false
+      startTls: false
+      verify: verify_peer
+    uidField: ""
+    uri: ""
+    userDnPattern: ""
+  lifecycleHooks: {}
+  livenessProbe:
+    enabled: true
+    failureThreshold: 6
+    initialDelaySeconds: 120
+    periodSeconds: 30
+    successThreshold: 1
+    timeoutSeconds: 20
+  loadDefinition:
+    enabled: false
+    existingSecret: ""
+    file: /app/load_definition.json
+  logs: '-'
+  maxAvailableSchedulers: ""
+  memoryHighWatermark:
+    enabled: false
+    type: relative
+    value: 0.4
+  metrics:
+    enabled: false
+    plugins: rabbitmq_prometheus
+    podAnnotations:
+      prometheus.io/port: '{{ .Values.service.ports.metrics }}'
+      prometheus.io/scrape: "true"
+    prometheusRule:
+      additionalLabels: {}
+      enabled: false
+      namespace: ""
+      rules: []
+    serviceMonitor:
+      annotations: {}
+      enabled: false
+      honorLabels: false
+      interval: 30s
+      jobLabel: ""
+      labels: {}
+      metricRelabelings: []
+      namespace: ""
+      params: {}
+      path: ""
+      podTargetLabels: {}
+      relabelings: []
+      scrapeTimeout: ""
+      selector: {}
+      targetLabels: {}
+  nameOverride: ""
+  namespaceOverride: ""
+  networkPolicy:
+    additionalRules: []
+    allowExternal: true
+    enabled: false
+  nodeAffinityPreset:
+    key: ""
+    type: ""
+    values: []
+  nodeSelector: {}
+  onlineSchedulers: ""
+  pdb:
+    create: false
+    maxUnavailable: ""
+    minAvailable: 1
+  persistence:
+    accessModes:
+    - ReadWriteOnce
+    annotations: {}
+    enabled: true
+    existingClaim: ""
+    labels: {}
+    mountPath: /bitnami/rabbitmq/mnesia
+    selector: {}
+    size: 8Gi
+    storageClass: rabbitmq-storage-class
+    subPath: ""
+  plugins: rabbitmq_management rabbitmq_peer_discovery_k8s
+  podAffinityPreset: ""
+  podAnnotations: {}
+  podAntiAffinityPreset: soft
+  podLabels: {}
+  podManagementPolicy: OrderedReady
+  podSecurityContext:
+    enabled: true
+    fsGroup: 1001
+  priorityClassName: ""
+  rbac:
+    create: true
+  readinessProbe:
+    enabled: true
+    failureThreshold: 3
+    initialDelaySeconds: 10
+    periodSeconds: 30
+    successThreshold: 1
+    timeoutSeconds: 20
+  replicaCount: 1
+  resources:
+    limits: {}
+    requests: {}
+  schedulerName: ""
+  service:
+    annotations: {}
+    annotationsHeadless: {}
+    clusterIP: ""
+    distPortEnabled: true
+    epmdPortEnabled: true
+    externalIPs: []
+    externalTrafficPolicy: Cluster
+    extraPorts: []
+    headless:
+      annotations: {}
+    labels: {}
+    loadBalancerIP: ""
+    loadBalancerSourceRanges: []
+    managerPortEnabled: true
+    nodePorts:
+      amqp: ""
+      amqpTls: ""
+      dist: ""
+      epmd: ""
+      manager: ""
+      metrics: ""
+    portEnabled: true
+    portNames:
+      amqp: amqp
+      amqpTls: amqp-tls
+      dist: dist
+      epmd: epmd
+      manager: http-stats
+      metrics: metrics
+    ports:
+      amqp: 5672
+      amqpTls: 5671
+      dist: 25672
+      epmd: 4369
+      manager: 15672
+      metrics: 9419
+    sessionAffinity: None
+    sessionAffinityConfig: {}
+    type: ClusterIP
+  serviceAccount:
+    annotations: {}
+    automountServiceAccountToken: true
+    create: true
+    name: ""
+  serviceBindings:
+    enabled: false
+  servicenameOverride: ""
+  sidecars: []
+  startupProbe:
+    enabled: false
+    failureThreshold: 3
+    initialDelaySeconds: 10
+    periodSeconds: 30
+    successThreshold: 1
+    timeoutSeconds: 20
+  statefulsetAnnotations: {}
+  statefulsetLabels: {}
+  tcpListenOptions:
+    backlog: 128
+    keepalive: false
+    linger:
+      lingerOn: true
+      timeout: 0
+    nodelay: true
+  terminationGracePeriodSeconds: 120
+  tolerations: []
+  topologySpreadConstraints: []
+  ulimitNofiles: "65536"
+  updateStrategy:
+    type: RollingUpdate
+  volumePermissions:
+    containerSecurityContext:
+      runAsUser: 0
+    enabled: false
+    image:
+      digest: ""
+      pullPolicy: IfNotPresent
+      pullSecrets: []
+      registry: docker.io
+      repository: bitnami/os-shell
+      tag: 11-debian-11-r16
+    resources:
+      limits: {}
+      requests: {}
+sync:
+  api:
+    global: {}
+    reflect-common-chart:
+      affinity: {}
+      autoscaling:
+        enabled: false
+        maxReplicas: 10
+        metrics:
+        - resource:
+            name: memory
+            target:
+              averageUtilization: 50
+              type: Utilization
+          type: Resource
+        - pods:
+            metric:
+              name: workload.googleapis.com|reflect_storage_requests_in_progress
+            target:
+              averageValue: 256
+              type: AverageValue
+          type: Pods
+        - resource:
+            name: cpu
+            target:
+              averageUtilization: 50
+              type: Utilization
+          type: Resource
+        minReplicas: 5
+      cloudSqlSidecar:
+        cpu: "1"
+        enabled: false
+        image: gcr.io/cloudsql-docker/gce-proxy:1.28.1
+        memory: 1000Mi
+      clusterRole:
+        create: false
+      clusterRoleBinding:
+        create: false
+      configMaps:
+        sync-api-config:
+          data:
+            GOOGLE_APPLICATION_CREDENTIALS: /secrets/storage/credentials.json
+            OTEL_EXPORTER_OTLP_ENDPOINT: http://apm-server-apm-http:8200
+            OTEL_EXPORTER_OTLP_HEADERS: Authorization=Bearer 4113wNO7AFYO336Yn3vj2yvP
+            OTEL_RESOURCE_ATTRIBUTES: deployment.environment=production
+            REFLECT_COMPONENT: sync
+            REFLECT_ENVIRONMENT: Production
+            REFLECT_TESTRUNNER_WAIT: "1"
+            REFLECTSYNC_HttpServer__ExceptionContextResponseEnabled: "true"
+            REFLECTSYNC_Kestrel__EndpointDefaults__Protocols: Http1AndHttp2
+            REFLECTSYNC_Logging__LogLevel__Default: Debug
+            REFLECTSYNC_MessageBroker__Backend: MassTransit
+            REFLECTSYNC_MessageBroker__MassTransit__RabbitMq__HostName: opr-rabbitmq
+            REFLECTSYNC_MessageBroker__MassTransit__RabbitMq__SyncSessionTopicId: sync-sessions
+            REFLECTSYNC_MessageBroker__MassTransit__Transport: RabbitMQ
+            REFLECTSYNC_PixyzOptimizeSdk__Enabled: "false"
+            REFLECTSYNC_ProjectMetadata__Backend: Database
+            REFLECTSYNC_ProjectServer__Address: https://web-develop.opr.unity.com
+            REFLECTSYNC_ProjectServer__HttpAddress: https://develop.opr.unity.com
+            REFLECTSYNC_Server__MaxSendMessageLengthMb: "512"
+            REFLECTSYNC_Storage__Backend: Bucket
+            REFLECTSYNC_Storage__Bucket__BucketName__Default: sync-service-dev
+            REFLECTSYNC_Storage__Bucket__IntermediateStorage__Root: /storage
+            REFLECTSYNC_Storage__Bucket__ProviderName: AWS
+            REFLECTSYNC_Storage__Bucket__ProviderUrl: https://minio-api-develop.opr.unity.com
+            REFLECTSYNC_Storage__Bucket__RetryPolicy__InitialDelay: "00:00:01"
+            REFLECTSYNC_Storage__Bucket__RetryPolicy__MaxRetries: "10"
+            REFLECTSYNC_Swagger__Enabled: "false"
+      cronJob:
+        enabled: false
+      deployment:
+        args:
+        - --service
+        - api
+        enabled: true
+        envFrom:
+        - secretRef:
+            name: sync-api-secrets
+        - configMapRef:
+            name: sync-api-config
+        initContainers: []
+        livenessProbe:
+          exec:
+            command:
+            - /bin/grpc_health_probe
+            - -addr=:10011
+        ports:
+        - containerPort: 80
+          name: http
+        - containerPort: 10011
+          name: grpc
+        - containerPort: 1234
+          name: prom-publisher
+        readinessProbe:
+          exec:
+            command:
+            - /bin/grpc_health_probe
+            - -addr=:10011
+        volumeMounts:
+        - mountPath: /storage
+          name: scratch-volume
+      externalSecrets:
+        enabled: false
+      fullnameOverride: sync-api
+      global: {}
+      image:
+        pullPolicy: Always
+        repository: us-east1-docker.pkg.dev/unity-solutions-tyndall-prd/docker/reflect-sync
+        tag: develop-latest
+      imagePullSecrets:
+      - name: regcred-gcp
+      ingress:
+        sync-api-grpc:
+          annotations:
+            cert-manager.io/cluster-issuer: letsencrypt
+            nginx.ingress.kubernetes.io/backend-protocol: GRPC
+            nginx.ingress.kubernetes.io/proxy-body-size: 1024m
+          hosts:
+          - host: sync-develop.opr.unity.com
+            http:
+              paths:
+              - backend:
+                  service:
+                    name: sync-api
+                    port:
+                      name: grpc
+                path: /
+                pathType: ImplementationSpecific
+          ingressClassName: nginx
+          tls:
+          - hosts:
+            - sync-develop.opr.unity.com
+            secretName: sync-develop-tls
+        sync-api-http:
+          annotations:
+            cert-manager.io/cluster-issuer: letsencrypt
+            nginx.ingress.kubernetes.io/proxy-body-size: 1024m
+            nginx.ingress.kubernetes.io/use-regex: "true"
+          hosts:
+          - host: sync-develop.opr.unity.com
+            http:
+              paths:
+              - backend:
+                  service:
+                    name: sync-api
+                    port:
+                      name: http
+                path: /api
+                pathType: ImplementationSpecific
+          ingressClassName: nginx
+          tls:
+          - hosts:
+            - sync-develop.opr.unity.com
+            secretName: sync-develop-tls
+      nameOverride: ""
+      nodeSelector: {}
+      overprovisioning:
+        count: 2
+        enabled: false
+      podAnnotations:
+        cluster-autoscaler.kubernetes.io/safe-to-evict: "true"
+      podMonitor:
+        enabled: false
+        endpoints:
+        - interval: 10s
+          port: prom-publisher
+        labels: {}
+        namespaceSelector:
+          matchNames:
+          - default
+      podSecurityContext: {}
+      replicaCount: 1
+      resources: {}
+      secrets:
+        sync-api-secrets:
+          data:
+            REFLECTSYNC_ConnectionStrings__SyncServiceDatabase: Host=opr-postgresql;Database=SyncService;Username=sync_service;Password=reflect
+            REFLECTSYNC_MessageBroker__MassTransit__HangfireConnectionString: Host=opr-postgresql;Database=SyncService_Hangfire;Username=sync_service;Password=reflect
+            REFLECTSYNC_MessageBroker__MassTransit__RabbitMq__Password: rabbitmq-secret-key
+            REFLECTSYNC_MessageBroker__MassTransit__RabbitMq__Username: admin
+            REFLECTSYNC_ProjectServer__ClientId: syncid
+            REFLECTSYNC_ProjectServer__ClientSecret: syncsecret
+            REFLECTSYNC_Storage__Bucket__AccessKeyId: minio
+            REFLECTSYNC_Storage__Bucket__SecretAccessKey: minio123
+          type: Opaque
+      securityContext: {}
+      service:
+        enabled: true
+        port: 80
+        ports:
+        - name: prom-publisher
+          port: 1234
+          protocol: TCP
+        - name: grpc
+          port: 10011
+          protocol: TCP
+          targetPort: 10011
+        - name: http
+          port: 80
+          protocol: TCP
+        type: ClusterIP
+      serviceAccount:
+        annotations: {}
+        create: false
+        name: ""
+      serviceMonitor:
+        enabled: false
+        endpoints:
+        - interval: 5s
+          port: prom-publisher
+        labels: {}
+        namespaceSelector:
+          matchNames:
+          - default
+      sidecarContainers:
+        enabled: false
+      statefulSet:
+        enabled: false
+      tolerations: []
+      volumes:
+      - emptyDir: {}
+        name: scratch-volume
+      workloadIdentity:
+        enabled: false
+  decimator:
+    global: {}
+    reflect-common-chart:
+      affinity: {}
+      autoscaling:
+        behavior:
+          scaleDown:
+            stabilizationWindowSeconds: 60
+        enabled: false
+        maxReplicas: 500
+        metrics:
+        - external:
+            metric:
+              name: pubsub.googleapis.com|subscription|num_undelivered_messages
+              selector:
+                matchLabels:
+                  resource.labels.subscription_id: sync-sessions-decimator
+            target:
+              averageValue: 2048
+              type: AverageValue
+          type: External
+        - resource:
+            name: cpu
+            target:
+              averageUtilization: 40
+              type: Utilization
+          type: Resource
+        minReplicas: 4
+      cloudSqlSidecar:
+        enabled: false
+      clusterRole:
+        create: false
+      clusterRoleBinding:
+        create: false
+      configMaps:
+        sync-decimator-config:
+          data:
+            GOOGLE_APPLICATION_CREDENTIALS: /secrets/storage/credentials.json
+            OTEL_EXPORTER_OTLP_ENDPOINT: http://apm-server-apm-http:8200
+            OTEL_EXPORTER_OTLP_HEADERS: Authorization=Bearer 4113wNO7AFYO336Yn3vj2yvP
+            OTEL_RESOURCE_ATTRIBUTES: deployment.environment=production
+            REFLECT_COMPONENT: sync
+            REFLECT_ENVIRONMENT: Production
+            REFLECT_TESTRUNNER_WAIT: "1"
+            REFLECTSYNC_HttpServer__ExceptionContextResponseEnabled: "true"
+            REFLECTSYNC_Kestrel__EndpointDefaults__Protocols: Http1AndHttp2
+            REFLECTSYNC_MessageBroker__Backend: MassTransit
+            REFLECTSYNC_MessageBroker__GcpPubSub__Listeners__sync-sessions-decimator__ClientCount: "1"
+            REFLECTSYNC_MessageBroker__GcpPubSub__Listeners__sync-sessions-decimator__MaxOutstandingElements: "128"
+            REFLECTSYNC_MessageBroker__MassTransit__RabbitMq__HostName: opr-rabbitmq
+            REFLECTSYNC_MessageBroker__MassTransit__RabbitMq__SyncSessionTopicId: sync-sessions
+            REFLECTSYNC_MessageBroker__MassTransit__Transport: RabbitMQ
+            REFLECTSYNC_PixyzOptimizeSdk__Enabled: "false"
+            REFLECTSYNC_PixyzOptimizeSdk__LicenseFilePath: /app/licenses/license
+            REFLECTSYNC_PixyzOptimizeSdk__LogFileBasePath: /app/log/pixyz
+            REFLECTSYNC_PixyzOptimizeSdk__MaxThreads: "8"
+            REFLECTSYNC_ProjectMetadata__Backend: Database
+            REFLECTSYNC_ProjectServer__Address: https://web-develop.opr.unity.com
+            REFLECTSYNC_ProjectServer__HttpAddress: https://develop.opr.unity.com
+            REFLECTSYNC_Storage__Backend: Bucket
+            REFLECTSYNC_Storage__Bucket__BucketName__Default: sync-service-dev
+            REFLECTSYNC_Storage__Bucket__IntermediateStorage__Root: /storage
+            REFLECTSYNC_Storage__Bucket__ProviderName: AWS
+            REFLECTSYNC_Storage__Bucket__ProviderUrl: https://minio-api-develop.opr.unity.com
+            REFLECTSYNC_Storage__Bucket__RetryPolicy__InitialDelay: "00:00:01"
+            REFLECTSYNC_Storage__Bucket__RetryPolicy__MaxRetries: "10"
+            REFLECTSYNC_Swagger__Enabled: "false"
+      cronJob:
+        enabled: false
+      deployment:
+        args:
+        - --service
+        - decimator
+        enabled: true
+        env:
+        - name: REFLECTSYNC_PixyzOptimizeSdk__ValidationKey
+          valueFrom:
+            secretKeyRef:
+              key: validation-key
+              name: pixyz-license
+        envFrom:
+        - secretRef:
+            name: sync-decimator-secrets
+        - configMapRef:
+            name: sync-decimator-config
+        initContainers: []
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: http
+        ports:
+        - containerPort: 80
+          name: http
+        - containerPort: 1234
+          name: prom-publisher
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: http
+        terminationGracePeriodSeconds: 60
+        volumeMounts:
+        - mountPath: /app/licenses/
+          name: pixyz-license
+          readOnly: true
+        - mountPath: /storage
+          name: scratch-volume
+      externalSecrets:
+        enabled: false
+      fullnameOverride: sync-decimator
+      global: {}
+      image:
+        pullPolicy: Always
+        repository: us-east1-docker.pkg.dev/unity-solutions-tyndall-prd/docker/reflect-sync
+        tag: develop-latest
+      imagePullSecrets:
+      - name: regcred-gcp
+      ingress: {}
+      nameOverride: ""
+      nodeSelector: {}
+      overprovisioning:
+        count: 2
+        enabled: false
+      podAnnotations:
+        cluster-autoscaler.kubernetes.io/safe-to-evict: "true"
+      podMonitor:
+        enabled: false
+        endpoints: []
+        labels: {}
+        namespaceSelector:
+          matchNames:
+          - default
+      podSecurityContext: {}
+      replicaCount: 1
+      resources: {}
+      secrets:
+        sync-decimator-secrets:
+          data:
+            REFLECTSYNC_ConnectionStrings__SyncServiceDatabase: Host=opr-postgresql;Database=SyncService;Username=sync_service;Password=reflect
+            REFLECTSYNC_MessageBroker__MassTransit__HangfireConnectionString: Host=opr-postgresql;Database=SyncService_Hangfire;Username=sync_service;Password=reflect
+            REFLECTSYNC_MessageBroker__MassTransit__RabbitMq__Password: rabbitmq-secret-key
+            REFLECTSYNC_MessageBroker__MassTransit__RabbitMq__Username: admin
+            REFLECTSYNC_ProjectServer__ClientId: syncid
+            REFLECTSYNC_ProjectServer__ClientSecret: syncsecret
+            REFLECTSYNC_Storage__Bucket__AccessKeyId: minio
+            REFLECTSYNC_Storage__Bucket__SecretAccessKey: minio123
+          type: Opaque
+      securityContext: {}
+      service:
+        enabled: true
+        port: 80
+        ports:
+        - name: prom-publisher
+          port: 1234
+          protocol: TCP
+        - name: http
+          port: 80
+          protocol: TCP
+          targetPort: 80
+        type: ClusterIP
+      serviceAccount:
+        annotations: {}
+        create: false
+        name: ""
+      serviceMonitor:
+        enabled: false
+        endpoints:
+        - interval: 5s
+          port: prom-publisher
+        labels: {}
+        namespaceSelector:
+          matchNames:
+          - default
+      sidecarContainers:
+        enabled: false
+      statefulSet:
+        enabled: false
+      tolerations: []
+      volumes:
+      - name: pixyz-license
+        secret:
+          items:
+          - key: license-file
+            path: license
+          secretName: pixyz-license
+      - emptyDir:
+          medium: Memory
+        name: scratch-volume
+      workloadIdentity:
+        enabled: false
+  global: {}
+  hlodbuilder:
+    global: {}
+    reflect-common-chart:
+      affinity: {}
+      autoscaling:
+        enabled: false
+        maxReplicas: 2000
+        metrics:
+        - external:
+            metric:
+              name: pubsub.googleapis.com|subscription|num_undelivered_messages
+              selector:
+                matchLabels:
+                  resource.labels.subscription_id: sync-sessions-hlodbuilder
+            target:
+              averageValue: 64
+              type: AverageValue
+          type: External
+        - resource:
+            name: cpu
+            target:
+              averageUtilization: 50
+              type: Utilization
+          type: Resource
+        minReplicas: 6
+      cloudSqlSidecar:
+        enabled: false
+      clusterRole:
+        create: false
+      clusterRoleBinding:
+        create: false
+      configMaps:
+        sync-hlodbuilder-config:
+          data:
+            GOOGLE_APPLICATION_CREDENTIALS: /secrets/storage/credentials.json
+            OTEL_EXPORTER_OTLP_ENDPOINT: http://apm-server-apm-http:8200
+            OTEL_EXPORTER_OTLP_HEADERS: Authorization=Bearer 4113wNO7AFYO336Yn3vj2yvP
+            OTEL_RESOURCE_ATTRIBUTES: deployment.environment=production
+            REFLECT_COMPONENT: sync
+            REFLECT_ENVIRONMENT: Production
+            REFLECT_TESTRUNNER_WAIT: "1"
+            REFLECTSYNC_HttpServer__ExceptionContextResponseEnabled: "true"
+            REFLECTSYNC_Kestrel__EndpointDefaults__Protocols: Http1AndHttp2
+            REFLECTSYNC_MessageBroker__Backend: MassTransit
+            REFLECTSYNC_MessageBroker__GcpPubSub__Listeners__sync-sessions-hlodbuilder__ClientCount: "1"
+            REFLECTSYNC_MessageBroker__GcpPubSub__Listeners__sync-sessions-hlodbuilder__MaxOutstandingElements: "2"
+            REFLECTSYNC_MessageBroker__MassTransit__RabbitMq__HostName: opr-rabbitmq
+            REFLECTSYNC_MessageBroker__MassTransit__RabbitMq__SyncSessionTopicId: sync-sessions
+            REFLECTSYNC_MessageBroker__MassTransit__Transport: RabbitMQ
+            REFLECTSYNC_PixyzOptimizeSdk__Enabled: "false"
+            REFLECTSYNC_PixyzOptimizeSdk__LicenseFilePath: /app/licenses/license
+            REFLECTSYNC_PixyzOptimizeSdk__LogFileBasePath: /app/pixyzlog/pixyz
+            REFLECTSYNC_PixyzProcessPool__MaxSubProcessCount: "1"
+            REFLECTSYNC_ProjectMetadata__Backend: Database
+            REFLECTSYNC_ProjectServer__Address: https://web-develop.opr.unity.com
+            REFLECTSYNC_ProjectServer__HttpAddress: https://develop.opr.unity.com
+            REFLECTSYNC_Storage__Backend: Bucket
+            REFLECTSYNC_Storage__Bucket__BucketName__Default: sync-service-dev
+            REFLECTSYNC_Storage__Bucket__IntermediateStorage__Root: /storage
+            REFLECTSYNC_Storage__Bucket__ProviderName: AWS
+            REFLECTSYNC_Storage__Bucket__ProviderUrl: https://minio-api-develop.opr.unity.com
+            REFLECTSYNC_Storage__Bucket__RetryPolicy__InitialDelay: "00:00:01"
+            REFLECTSYNC_Storage__Bucket__RetryPolicy__MaxRetries: "10"
+            REFLECTSYNC_Swagger__Enabled: "false"
+      cronJob:
+        enabled: false
+      deployment:
+        args:
+        - --service
+        - hlodbuilder
+        enabled: true
+        env:
+        - name: REFLECTSYNC_PixyzOptimizeSdk__ValidationKey
+          valueFrom:
+            secretKeyRef:
+              key: validation-key
+              name: pixyz-license
+        envFrom:
+        - secretRef:
+            name: sync-hlodbuilder-secrets
+        - configMapRef:
+            name: sync-hlodbuilder-config
+        initContainers: []
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: http
+        ports:
+        - containerPort: 80
+          name: http
+        - containerPort: 1234
+          name: prom-publisher
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: http
+        terminationGracePeriodSeconds: 300
+        volumeMounts:
+        - mountPath: /app/licenses/
+          name: pixyz-license
+          readOnly: true
+        - mountPath: /storage
+          name: scratch-volume
+      externalSecrets:
+        enabled: false
+      fullnameOverride: sync-hlodbuilder
+      global: {}
+      image:
+        pullPolicy: Always
+        repository: us-east1-docker.pkg.dev/unity-solutions-tyndall-prd/docker/reflect-sync
+        tag: develop-latest
+      imagePullSecrets:
+      - name: regcred-gcp
+      ingress: {}
+      nameOverride: ""
+      nodeSelector: {}
+      overprovisioning:
+        count: 2
+        cpu: 63
+        enabled: false
+        name: sync-workers-overprovisioning
+      podAnnotations:
+        cluster-autoscaler.kubernetes.io/safe-to-evict: "true"
+      podMonitor:
+        enabled: false
+        endpoints: []
+        labels: {}
+        namespaceSelector:
+          matchNames:
+          - default
+      podSecurityContext: {}
+      replicaCount: 1
+      resources: {}
+      secrets:
+        sync-hlodbuilder-secrets:
+          data:
+            REFLECTSYNC_ConnectionStrings__SyncServiceDatabase: Host=opr-postgresql;Database=SyncService;Username=sync_service;Password=reflect
+            REFLECTSYNC_MessageBroker__MassTransit__HangfireConnectionString: Host=opr-postgresql;Database=SyncService_Hangfire;Username=sync_service;Password=reflect
+            REFLECTSYNC_MessageBroker__MassTransit__RabbitMq__Password: rabbitmq-secret-key
+            REFLECTSYNC_MessageBroker__MassTransit__RabbitMq__Username: admin
+            REFLECTSYNC_ProjectServer__ClientId: syncid
+            REFLECTSYNC_ProjectServer__ClientSecret: syncsecret
+            REFLECTSYNC_Storage__Bucket__AccessKeyId: minio
+            REFLECTSYNC_Storage__Bucket__SecretAccessKey: minio123
+          type: Opaque
+      securityContext: {}
+      service:
+        enabled: true
+        port: 80
+        ports:
+        - name: prom-publisher
+          port: 1234
+          protocol: TCP
+        - name: http
+          port: 80
+          protocol: TCP
+          targetPort: 80
+        type: ClusterIP
+      serviceAccount:
+        annotations: {}
+        create: false
+        name: ""
+      serviceMonitor:
+        enabled: false
+        endpoints:
+        - interval: 5s
+          port: prom-publisher
+        labels: {}
+        namespaceSelector:
+          matchNames:
+          - default
+      sidecarContainers:
+        enabled: false
+      statefulSet:
+        enabled: false
+      tolerations: []
+      volumes:
+      - name: pixyz-license
+        secret:
+          items:
+          - key: license-file
+            path: license
+          secretName: pixyz-license
+      - emptyDir:
+          medium: Memory
+        name: scratch-volume
+      workloadIdentity:
+        enabled: false
+  modelprocessor:
+    global: {}
+    reflect-common-chart:
+      affinity: {}
+      autoscaling:
+        behavior:
+          scaleDown:
+            stabilizationWindowSeconds: 60
+        enabled: false
+        maxReplicas: 200
+        metrics:
+        - external:
+            metric:
+              name: pubsub.googleapis.com|subscription|num_undelivered_messages
+              selector:
+                matchLabels:
+                  resource.labels.subscription_id: sync-sessions-default
+            target:
+              averageValue: 2048
+              type: AverageValue
+          type: External
+        - resource:
+            name: cpu
+            target:
+              averageUtilization: 40
+              type: Utilization
+          type: Resource
+        minReplicas: 4
+      cloudSqlSidecar:
+        cpu: "1"
+        enabled: false
+        image: gcr.io/cloudsql-docker/gce-proxy:1.28.1
+        memory: 1000Mi
+      clusterRole:
+        create: false
+      clusterRoleBinding:
+        create: false
+      configMaps:
+        sync-modelprocessor-config:
+          data:
+            GOOGLE_APPLICATION_CREDENTIALS: /secrets/storage/credentials.json
+            OTEL_EXPORTER_OTLP_ENDPOINT: http://apm-server-apm-http:8200
+            OTEL_EXPORTER_OTLP_HEADERS: Authorization=Bearer 4113wNO7AFYO336Yn3vj2yvP
+            OTEL_RESOURCE_ATTRIBUTES: deployment.environment=production
+            REFLECT_COMPONENT: sync
+            REFLECT_ENVIRONMENT: Production
+            REFLECT_TESTRUNNER_WAIT: "1"
+            REFLECTSYNC_HttpServer__ExceptionContextResponseEnabled: "true"
+            REFLECTSYNC_Kestrel__EndpointDefaults__Protocols: Http1AndHttp2
+            REFLECTSYNC_MessageBroker__Backend: MassTransit
+            REFLECTSYNC_MessageBroker__GcpPubSub__Listeners__sync-sessions-default__ClientCount: "2"
+            REFLECTSYNC_MessageBroker__GcpPubSub__Listeners__sync-sessions-default__MaxOutstandingElements: "128"
+            REFLECTSYNC_MessageBroker__MassTransit__RabbitMq__HostName: opr-rabbitmq
+            REFLECTSYNC_MessageBroker__MassTransit__RabbitMq__SyncSessionTopicId: sync-sessions
+            REFLECTSYNC_MessageBroker__MassTransit__Transport: RabbitMQ
+            REFLECTSYNC_PixyzOptimizeSdk__Enabled: "false"
+            REFLECTSYNC_ProjectMetadata__Backend: Database
+            REFLECTSYNC_ProjectServer__Address: https://web-develop.opr.unity.com
+            REFLECTSYNC_ProjectServer__HttpAddress: https://develop.opr.unity.com
+            REFLECTSYNC_Storage__Backend: Bucket
+            REFLECTSYNC_Storage__Bucket__BucketName__Default: sync-service-dev
+            REFLECTSYNC_Storage__Bucket__IntermediateStorage__Root: /storage
+            REFLECTSYNC_Storage__Bucket__ProviderName: AWS
+            REFLECTSYNC_Storage__Bucket__ProviderUrl: https://minio-api-develop.opr.unity.com
+            REFLECTSYNC_Storage__Bucket__RetryPolicy__InitialDelay: "00:00:01"
+            REFLECTSYNC_Storage__Bucket__RetryPolicy__MaxRetries: "10"
+            REFLECTSYNC_Swagger__Enabled: "false"
+      cronJob:
+        enabled: false
+      deployment:
+        args:
+        - --service
+        - modelprocessor
+        enabled: true
+        envFrom:
+        - secretRef:
+            name: sync-modelprocessor-secrets
+        - configMapRef:
+            name: sync-modelprocessor-config
+        initContainers: []
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: http
+        ports:
+        - containerPort: 80
+          name: http
+        - containerPort: 1234
+          name: prom-publisher
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: http
+        terminationGracePeriodSeconds: 60
+        volumeMounts:
+        - mountPath: /storage
+          name: scratch-volume
+      externalSecrets:
+        enabled: false
+      fullnameOverride: sync-modelprocessor
+      global: {}
+      image:
+        pullPolicy: Always
+        repository: us-east1-docker.pkg.dev/unity-solutions-tyndall-prd/docker/reflect-sync
+        tag: develop-latest
+      imagePullSecrets:
+      - name: regcred-gcp
+      ingress: {}
+      nameOverride: ""
+      nodeSelector: {}
+      overprovisioning:
+        count: 2
+        enabled: false
+      podAnnotations:
+        cluster-autoscaler.kubernetes.io/safe-to-evict: "true"
+      podMonitor:
+        enabled: false
+        endpoints: []
+        labels: {}
+        namespaceSelector:
+          matchNames:
+          - default
+      podSecurityContext: {}
+      replicaCount: 1
+      resources: {}
+      secrets:
+        sync-modelprocessor-secrets:
+          data:
+            REFLECTSYNC_ConnectionStrings__SyncServiceDatabase: Host=opr-postgresql;Database=SyncService;Username=sync_service;Password=reflect
+            REFLECTSYNC_MessageBroker__MassTransit__HangfireConnectionString: Host=opr-postgresql;Database=SyncService_Hangfire;Username=sync_service;Password=reflect
+            REFLECTSYNC_MessageBroker__MassTransit__RabbitMq__Password: rabbitmq-secret-key
+            REFLECTSYNC_MessageBroker__MassTransit__RabbitMq__Username: admin
+            REFLECTSYNC_ProjectServer__ClientId: syncid
+            REFLECTSYNC_ProjectServer__ClientSecret: syncsecret
+            REFLECTSYNC_Storage__Bucket__AccessKeyId: minio
+            REFLECTSYNC_Storage__Bucket__SecretAccessKey: minio123
+          type: Opaque
+      securityContext: {}
+      service:
+        enabled: true
+        port: 80
+        ports:
+        - name: prom-publisher
+          port: 1234
+          protocol: TCP
+        - name: http
+          port: 80
+          protocol: TCP
+          targetPort: 80
+        type: ClusterIP
+      serviceAccount:
+        annotations: {}
+        create: false
+        name: ""
+      serviceMonitor:
+        enabled: false
+        endpoints:
+        - interval: 5s
+          port: prom-publisher
+        labels: {}
+        namespaceSelector:
+          matchNames:
+          - default
+      sidecarContainers:
+        enabled: false
+      statefulSet:
+        enabled: false
+      tolerations: []
+      volumes:
+      - emptyDir:
+          medium: Memory
+        name: scratch-volume
+      workloadIdentity:
+        enabled: false
+  modelprocessor-safemode:
+    global: {}
+    reflect-common-chart:
+      affinity: {}
+      autoscaling:
+        behavior:
+          scaleDown:
+            stabilizationWindowSeconds: 60
+        enabled: false
+        maxReplicas: 10
+        metrics:
+        - external:
+            metric:
+              name: pubsub.googleapis.com|subscription|num_undelivered_messages
+              selector:
+                matchLabels:
+                  resource.labels.subscription_id: sync-sessions-default-safemode
+            target:
+              averageValue: 1
+              type: AverageValue
+          type: External
+        - resource:
+            name: cpu
+            target:
+              averageUtilization: 40
+              type: Utilization
+          type: Resource
+        minReplicas: 1
+      cloudSqlSidecar:
+        cpu: "1"
+        enabled: false
+        image: gcr.io/cloudsql-docker/gce-proxy:1.28.1
+        memory: 1000Mi
+      clusterRole:
+        create: false
+      clusterRoleBinding:
+        create: false
+      configMaps:
+        sync-modelprocessor-safemode-config:
+          data:
+            GOOGLE_APPLICATION_CREDENTIALS: /secrets/storage/credentials.json
+            OTEL_EXPORTER_OTLP_ENDPOINT: http://apm-server-apm-http:8200
+            OTEL_EXPORTER_OTLP_HEADERS: Authorization=Bearer 4113wNO7AFYO336Yn3vj2yvP
+            OTEL_RESOURCE_ATTRIBUTES: deployment.environment=production
+            REFLECT_COMPONENT: sync
+            REFLECT_ENVIRONMENT: Production
+            REFLECT_TESTRUNNER_WAIT: "1"
+            REFLECTSYNC_HttpServer__ExceptionContextResponseEnabled: "true"
+            REFLECTSYNC_Kestrel__EndpointDefaults__Protocols: Http1AndHttp2
+            REFLECTSYNC_MessageBroker__Backend: MassTransit
+            REFLECTSYNC_MessageBroker__MassTransit__RabbitMq__HostName: opr-rabbitmq
+            REFLECTSYNC_MessageBroker__MassTransit__RabbitMq__SyncSessionTopicId: sync-sessions
+            REFLECTSYNC_MessageBroker__MassTransit__Transport: RabbitMQ
+            REFLECTSYNC_PixyzOptimizeSdk__Enabled: "false"
+            REFLECTSYNC_PixyzOptimizeSdk__LicenseFilePath: /app/licenses/license
+            REFLECTSYNC_PixyzOptimizeSdk__LogFileBasePath: /app/pixyzlog/pixyz
+            REFLECTSYNC_ProjectMetadata__Backend: Database
+            REFLECTSYNC_ProjectServer__Address: https://web-develop.opr.unity.com
+            REFLECTSYNC_ProjectServer__HttpAddress: https://develop.opr.unity.com
+            REFLECTSYNC_Storage__Backend: Bucket
+            REFLECTSYNC_Storage__Bucket__BucketName__Default: sync-service-dev
+            REFLECTSYNC_Storage__Bucket__IntermediateStorage__Root: /storage
+            REFLECTSYNC_Storage__Bucket__ProviderName: AWS
+            REFLECTSYNC_Storage__Bucket__ProviderUrl: https://minio-api-develop.opr.unity.com
+            REFLECTSYNC_Storage__Bucket__RetryPolicy__InitialDelay: "00:00:01"
+            REFLECTSYNC_Storage__Bucket__RetryPolicy__MaxRetries: "10"
+            REFLECTSYNC_Swagger__Enabled: "false"
+      cronJob:
+        enabled: false
+      deployment:
+        args:
+        - --service
+        - modelprocessorsafemode
+        enabled: true
+        env:
+        - name: REFLECTSYNC_PixyzOptimizeSdk__ValidationKey
+          valueFrom:
+            secretKeyRef:
+              key: validation-key
+              name: pixyz-license
+        envFrom:
+        - secretRef:
+            name: sync-modelprocessor-safemode-secrets
+        - configMapRef:
+            name: sync-modelprocessor-safemode-config
+        initContainers: []
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: http
+        ports:
+        - containerPort: 80
+          name: http
+        - containerPort: 1234
+          name: prom-publisher
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: http
+        terminationGracePeriodSeconds: 60
+        volumeMounts:
+        - mountPath: /app/licenses/
+          name: pixyz-license
+          readOnly: true
+        - mountPath: /storage
+          name: scratch-volume
+      externalSecrets:
+        enabled: false
+      fullnameOverride: sync-modelprocessor-safemode
+      global: {}
+      image:
+        pullPolicy: Always
+        repository: us-east1-docker.pkg.dev/unity-solutions-tyndall-prd/docker/reflect-sync
+        tag: develop-latest
+      imagePullSecrets:
+      - name: regcred-gcp
+      ingress: {}
+      nameOverride: ""
+      nodeSelector: {}
+      overprovisioning:
+        count: 2
+        enabled: false
+      podAnnotations:
+        cluster-autoscaler.kubernetes.io/safe-to-evict: "true"
+      podMonitor:
+        enabled: false
+        endpoints: []
+        labels: {}
+        namespaceSelector:
+          matchNames:
+          - default
+      podSecurityContext: {}
+      replicaCount: 1
+      resources: {}
+      secrets:
+        sync-modelprocessor-safemode-secrets:
+          data:
+            REFLECTSYNC_ConnectionStrings__SyncServiceDatabase: Host=opr-postgresql;Database=SyncService;Username=sync_service;Password=reflect
+            REFLECTSYNC_MessageBroker__MassTransit__HangfireConnectionString: Host=opr-postgresql;Database=SyncService_Hangfire;Username=sync_service;Password=reflect
+            REFLECTSYNC_MessageBroker__MassTransit__RabbitMq__Password: rabbitmq-secret-key
+            REFLECTSYNC_MessageBroker__MassTransit__RabbitMq__Username: admin
+            REFLECTSYNC_ProjectServer__ClientId: syncid
+            REFLECTSYNC_ProjectServer__ClientSecret: syncsecret
+            REFLECTSYNC_Storage__Bucket__AccessKeyId: minio
+            REFLECTSYNC_Storage__Bucket__SecretAccessKey: minio123
+          type: Opaque
+      securityContext: {}
+      service:
+        enabled: true
+        port: 80
+        ports:
+        - name: prom-publisher
+          port: 1234
+          protocol: TCP
+        - name: http
+          port: 80
+          protocol: TCP
+          targetPort: 80
+        type: ClusterIP
+      serviceAccount:
+        annotations: {}
+        create: false
+        name: ""
+      serviceMonitor:
+        enabled: false
+        endpoints:
+        - interval: 5s
+          port: prom-publisher
+        labels: {}
+        namespaceSelector:
+          matchNames:
+          - default
+      sidecarContainers:
+        enabled: false
+      statefulSet:
+        enabled: false
+      tolerations: []
+      volumes:
+      - name: pixyz-license
+        secret:
+          items:
+          - key: license-file
+            path: license
+          secretName: pixyz-license
+      - emptyDir:
+          medium: Memory
+        name: scratch-volume
+      workloadIdentity:
+        enabled: false
+  testrunner:
+    global: {}
+    reflect-common-chart:
+      affinity: {}
+      autoscaling:
+        enabled: false
+      cloudSqlSidecar:
+        enabled: false
+      clusterRole:
+        create: false
+      clusterRoleBinding:
+        create: false
+      configMaps:
+        sync-testrunner-config:
+          data:
+            REFLECT_COMPONENT: sync-tests
+      cronJob:
+        enabled: false
+      deployment:
+        enabled: false
+        envFrom:
+        - secretRef:
+            name: sync-testrunner-secrets
+        - configMapRef:
+            name: sync-testrunner-config
+        initContainers: []
+        livenessProbe:
+          httpGet:
+            path: /metrics
+            port: prom-publisher
+        ports:
+        - containerPort: 1234
+          name: prom-publisher
+          protocol: TCP
+        readinessProbe:
+          httpGet:
+            path: /metrics
+            port: prom-publisher
+      externalSecrets:
+        enabled: false
+      fullnameOverride: sync-test-runner
+      global: {}
+      image:
+        pullPolicy: IfNotPresent
+        repository: gcr.io/unity-vert-reflect-prd/reflect-sync-tests
+        tag: ""
+      imagePullSecrets:
+      - name: regcred
+      ingress: {}
+      nameOverride: ""
+      nodeSelector: {}
+      overprovisioning:
+        count: 2
+        enabled: false
+      podAnnotations: {}
+      podMonitor:
+        enabled: false
+        endpoints: []
+        labels: {}
+        namespaceSelector:
+          matchNames:
+          - default
+      podSecurityContext: {}
+      replicaCount: 1
+      resources: {}
+      secrets:
+        sync-testrunner-secrets:
+          data:
+            SYNC_TESTSETTINGS: ""
+          type: Opaque
+      securityContext: {}
+      service:
+        enabled: false
+        port: 80
+        ports:
+        - name: prom-publisher
+          port: 1234
+          protocol: TCP
+        type: ClusterIP
+      serviceAccount:
+        annotations: {}
+        create: false
+        name: ""
+      serviceMonitor:
+        enabled: false
+        endpoints:
+        - interval: 5s
+          port: prom-publisher
+        labels: {}
+        namespaceSelector:
+          matchNames:
+          - default
+      sidecarContainers:
+        enabled: false
+      statefulSet:
+        enabled: false
+      tolerations: []
+      volumes: []
+      workloadIdentity:
+        enabled: false
+  worker:
+    global: {}
+    reflect-common-chart:
+      affinity: {}
+      autoscaling:
+        enabled: false
+        maxReplicas: 25
+        metrics:
+        - pods:
+            metric:
+              name: workload.googleapis.com|reflect_sync_workers
+            target:
+              averageValue: 6
+              type: AverageValue
+          type: Pods
+        minReplicas: 2
+      cloudSqlSidecar:
+        cpu: "1"
+        enabled: false
+        image: gcr.io/cloudsql-docker/gce-proxy:1.28.1
+        memory: 1000Mi
+      clusterRole:
+        create: false
+      clusterRoleBinding:
+        create: false
+      configMaps:
+        sync-worker-config:
+          data:
+            GOOGLE_APPLICATION_CREDENTIALS: /secrets/storage/credentials.json
+            OTEL_EXPORTER_OTLP_ENDPOINT: http://apm-server-apm-http:8200
+            OTEL_EXPORTER_OTLP_HEADERS: Authorization=Bearer 4113wNO7AFYO336Yn3vj2yvP
+            OTEL_RESOURCE_ATTRIBUTES: deployment.environment=production
+            REFLECT_COMPONENT: sync
+            REFLECT_ENVIRONMENT: Production
+            REFLECT_TESTRUNNER_WAIT: "1"
+            REFLECTSYNC_HttpServer__ExceptionContextResponseEnabled: "true"
+            REFLECTSYNC_Kestrel__EndpointDefaults__Protocols: Http1AndHttp2
+            REFLECTSYNC_MessageBroker__Backend: MassTransit
+            REFLECTSYNC_MessageBroker__MassTransit__RabbitMq__HostName: opr-rabbitmq
+            REFLECTSYNC_MessageBroker__MassTransit__RabbitMq__SyncSessionTopicId: sync-sessions
+            REFLECTSYNC_MessageBroker__MassTransit__Transport: RabbitMQ
+            REFLECTSYNC_PixyzOptimizeSdk__Enabled: "false"
+            REFLECTSYNC_ProjectMetadata__Backend: Database
+            REFLECTSYNC_ProjectServer__Address: https://web-develop.opr.unity.com
+            REFLECTSYNC_ProjectServer__HttpAddress: https://develop.opr.unity.com
+            REFLECTSYNC_SessionManager__MaxWorkers: "8"
+            REFLECTSYNC_Storage__Backend: Bucket
+            REFLECTSYNC_Storage__Bucket__BucketName__Default: sync-service-dev
+            REFLECTSYNC_Storage__Bucket__IntermediateStorage__Root: /storage
+            REFLECTSYNC_Storage__Bucket__ProviderName: AWS
+            REFLECTSYNC_Storage__Bucket__ProviderUrl: https://minio-api-develop.opr.unity.com
+            REFLECTSYNC_Storage__Bucket__RetryPolicy__InitialDelay: "00:00:01"
+            REFLECTSYNC_Storage__Bucket__RetryPolicy__MaxRetries: "10"
+            REFLECTSYNC_Swagger__Enabled: "false"
+      cronJob:
+        enabled: false
+      deployment:
+        args:
+        - --service
+        - worker
+        enabled: true
+        envFrom:
+        - secretRef:
+            name: sync-worker-secrets
+        - configMapRef:
+            name: sync-worker-config
+        initContainers: []
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: http
+        ports:
+        - containerPort: 80
+          name: http
+        - containerPort: 1234
+          name: prom-publisher
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: http
+        volumeMounts: []
+      externalSecrets:
+        enabled: false
+      fullnameOverride: sync-worker
+      global: {}
+      image:
+        pullPolicy: Always
+        repository: us-east1-docker.pkg.dev/unity-solutions-tyndall-prd/docker/reflect-sync
+        tag: develop-latest
+      imagePullSecrets:
+      - name: regcred-gcp
+      ingress: {}
+      nameOverride: ""
+      nodeSelector: {}
+      overprovisioning:
+        count: 2
+        enabled: false
+      podAnnotations:
+        cluster-autoscaler.kubernetes.io/safe-to-evict: "true"
+      podMonitor:
+        enabled: false
+        endpoints:
+        - interval: 10s
+          port: prom-publisher
+        labels: {}
+        namespaceSelector:
+          matchNames:
+          - default
+      podSecurityContext: {}
+      replicaCount: 1
+      resources: {}
+      secrets:
+        sync-worker-secrets:
+          data:
+            REFLECTSYNC_ConnectionStrings__SyncServiceDatabase: Host=opr-postgresql;Database=SyncService;Username=sync_service;Password=reflect
+            REFLECTSYNC_MessageBroker__MassTransit__HangfireConnectionString: Host=opr-postgresql;Database=SyncService_Hangfire;Username=sync_service;Password=reflect
+            REFLECTSYNC_MessageBroker__MassTransit__RabbitMq__Password: rabbitmq-secret-key
+            REFLECTSYNC_MessageBroker__MassTransit__RabbitMq__Username: admin
+            REFLECTSYNC_ProjectServer__ClientId: syncid
+            REFLECTSYNC_ProjectServer__ClientSecret: syncsecret
+            REFLECTSYNC_Storage__Bucket__AccessKeyId: minio
+            REFLECTSYNC_Storage__Bucket__SecretAccessKey: minio123
+          type: Opaque
+      securityContext: {}
+      service:
+        enabled: true
+        port: 80
+        ports:
+        - name: prom-publisher
+          port: 1234
+          protocol: TCP
+        - name: http
+          port: 80
+          protocol: TCP
+          targetPort: 80
+        type: ClusterIP
+      serviceAccount:
+        annotations: {}
+        create: false
+        name: ""
+      serviceMonitor:
+        enabled: false
+        endpoints:
+        - interval: 5s
+          port: prom-publisher
+        labels: {}
+        namespaceSelector:
+          matchNames:
+          - default
+      sidecarContainers:
+        enabled: false
+      statefulSet:
+        enabled: false
+      tolerations: []
+      volumes: null
+      workloadIdentity:
+        enabled: false
+voip:
+  global: {}
+  mumble-rest:
+    global: {}
+    reflect-common-chart:
+      affinity: {}
+      autoscaling:
+        enabled: false
+      cloudSqlSidecar:
+        enabled: false
+      clusterRole:
+        create: false
+      clusterRoleBinding:
+        create: false
+      configMaps:
+        mumble-rest-config:
+          data:
+            APP_DEBUG: "False"
+            APP_HOST: 0.0.0.0
+            APP_PORT: "8082"
+            AUTH_JWK_URL: https://keycloak-develop.opr.unity.com/realms/reflect/protocol/openid-connect/certs
+            AUTH_JWT_VALID_ISSUER: https://keycloak-develop.opr.unity.com/realms/reflect
+            AUTH_NAME_CLAIM: preferred_username
+            AUTH_UID_OFFSET: "1000"
+            ENABLE_AUTH: "True"
+            MURMUR_ICE_HOST: murmur.opr-develop.svc.cluster.local
+            MURMUR_ICE_PORT: "6502"
+            REFLECT_COMPONENT: mumble-rest
+      cronJob:
+        enabled: false
+      deployment:
+        enabled: true
+        envFrom:
+        - secretRef:
+            name: mumble-rest-secrets
+        - configMapRef:
+            name: mumble-rest-config
+        initContainers: []
+        livenessProbe: {}
+        ports:
+        - containerPort: 8082
+          name: http
+          protocol: TCP
+        readinessProbe: {}
+      externalSecrets:
+        enabled: false
+      fullnameOverride: mumble-rest
+      global: {}
+      image:
+        pullPolicy: Always
+        repository: us-east1-docker.pkg.dev/unity-solutions-tyndall-prd/docker/reflect-mumble-rest
+        tag: develop-latest
+      imagePullSecrets:
+      - name: regcred-gcp
+      ingress: {}
+      nameOverride: ""
+      networkPolicy:
+        enabled: false
+      nodeSelector: {}
+      overprovisioning:
+        count: 2
+        enabled: false
+      podAnnotations: {}
+      podMonitor:
+        enabled: false
+        endpoints: []
+        labels: {}
+        namespaceSelector:
+          matchNames:
+          - default
+      podSecurityContext: {}
+      replicaCount: 1
+      resources: {}
+      secrets:
+        mumble-rest-secrets:
+          data:
+            APP_SECRET_KEY: supersecret
+            ICE_SECRET: murmur-ice-secret-key
+            USERS: reflect:murmur-rest-secret-key
+          type: Opaque
+      securityContext: {}
+      service:
+        enabled: true
+        port: 80
+        ports:
+        - name: http
+          port: 8082
+          protocol: TCP
+        type: ClusterIP
+      serviceAccount:
+        annotations: {}
+        create: false
+        name: ""
+      serviceMonitor:
+        enabled: false
+        endpoints: []
+        labels: {}
+        namespaceSelector:
+          matchNames:
+          - default
+      sidecarContainers:
+        enabled: false
+      statefulSet:
+        enabled: false
+      tolerations: []
+      workloadIdentity:
+        enabled: false
+  murmur:
+    global: {}
+    reflect-common-chart:
+      affinity: {}
+      autoscaling:
+        enabled: false
+      cloudSqlSidecar:
+        enabled: false
+      clusterRole:
+        create: false
+      clusterRoleBinding:
+        create: false
+      configMaps:
+        murmur-config:
+          data:
+            REFLECT_COMPONENT: murmur
+      cronJob:
+        enabled: false
+      deployment:
+        enabled: true
+        envFrom:
+        - configMapRef:
+            name: murmur-config
+        initContainers: []
+        livenessProbe: {}
+        ports:
+        - containerPort: 64738
+          name: murmur-tcp
+          protocol: TCP
+        - containerPort: 64738
+          name: murmur-udp
+          protocol: UDP
+        - containerPort: 6502
+          name: murmur-ice
+          protocol: TCP
+        readinessProbe: {}
+        volumeMounts:
+        - mountPath: /etc/murmur
+          name: murmur-files
+          readOnly: true
+        - mountPath: /etc/opr/murmur-cert
+          name: murmur-ssl-cert
+          readOnly: true
+      externalSecrets:
+        enabled: false
+      fullnameOverride: murmur
+      global: {}
+      image:
+        pullPolicy: Always
+        repository: us-east1-docker.pkg.dev/unity-solutions-tyndall-prd/docker/reflect-murmur
+        tag: develop-latest
+      imagePullSecrets:
+      - name: regcred-gcp
+      ingress: {}
+      nameOverride: ""
+      networkPolicy:
+        enabled: true
+        ingressRules:
+        - from:
+          - podSelector:
+              matchLabels:
+                app.kubernetes.io/name: mumble-rest
+          ports:
+          - port: 6502
+            protocol: TCP
+        - from:
+          - ipBlock:
+              cidr: 0.0.0.0/0
+          ports:
+          - port: 64738
+            protocol: TCP
+          - port: 64738
+            protocol: UDP
+        podSelector:
+          matchLabels:
+            app.kubernetes.io/name: murmur
+      nodeSelector: {}
+      overprovisioning:
+        count: 2
+        enabled: false
+      podAnnotations: {}
+      podMonitor:
+        enabled: false
+        endpoints: []
+        labels: {}
+        namespaceSelector:
+          matchNames:
+          - default
+      podSecurityContext: {}
+      replicaCount: 1
+      resources: {}
+      secrets: {}
+      securityContext: {}
+      service:
+        enabled: true
+        port: 80
+        ports:
+        - name: murmur-ice
+          nodePort: 30001
+          port: 6502
+          protocol: TCP
+          targetPort: 6502
+        - name: murmur-tcp
+          nodePort: 30000
+          port: 64738
+          protocol: TCP
+          targetPort: 64738
+        - name: murmur-udp
+          nodePort: 30000
+          port: 64738
+          protocol: UDP
+          targetPort: 64738
+        type: NodePort
+      serviceAccount:
+        annotations: {}
+        create: false
+        name: ""
+      serviceMonitor:
+        enabled: false
+        endpoints: []
+        labels: {}
+        namespaceSelector:
+          matchNames:
+          - default
+      sidecarContainers:
+        enabled: false
+      statefulSet:
+        enabled: false
+      tolerations: []
+      volumes:
+      - configMap:
+          name: murmur-files
+        name: murmur-files
+      - name: murmur-ssl-cert
+        secret:
+          defaultMode: 420
+          secretName: voip-develop-tls
+      workloadIdentity:
+        enabled: false
+  reflect-common-chart:
+    affinity: {}
+    autoscaling:
+      enabled: false
+    cloudSqlSidecar:
+      enabled: false
+    clusterRole:
+      create: false
+    clusterRoleBinding:
+      create: false
+    configMaps: {}
+    cronJob:
+      enabled: false
+    deployment:
+      envFrom: []
+      initContainers: []
+      livenessProbe: {}
+      ports:
+      - containerPort: 80
+        name: http
+        protocol: TCP
+      readinessProbe: {}
+    externalSecrets:
+      enabled: false
+    fullnameOverride: ""
+    global: {}
+    image:
+      pullPolicy: IfNotPresent
+      repository: nginx
+      tag: ""
+    imagePullSecrets: []
+    ingress: {}
+    nameOverride: ""
+    networkPolicy:
+      enabled: false
+    nodeSelector: {}
+    overprovisioning:
+      count: 2
+      enabled: false
+    podAnnotations: {}
+    podMonitor:
+      enabled: false
+      endpoints: []
+      labels: {}
+      namespaceSelector:
+        matchNames:
+        - default
+    podSecurityContext: {}
+    replicaCount: 1
+    resources: {}
+    secrets: {}
+    securityContext: {}
+    service:
+      port: 80
+      type: ClusterIP
+    serviceAccount:
+      annotations: {}
+      create: false
+      name: ""
+    serviceMonitor:
+      enabled: false
+      endpoints: []
+      labels: {}
+      namespaceSelector:
+        matchNames:
+        - default
+    sidecarContainers:
+      enabled: false
+    statefulSet:
+      enabled: false
+    tolerations: []
+    workloadIdentity:
+      enabled: false

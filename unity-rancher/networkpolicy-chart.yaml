@@ -1,0 +1,25 @@
+---
+# Source: networkpolicy/templates/networkpolicy.yaml
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: networkpolicy
+  labels:
+    app: networkpolicy
+    chart: networkpolicy
+    release: networkpolicy
+    heritage: Helm
+spec:
+  podSelector:
+    matchLabels:
+       app.kubernetes.io/instance: opr
+       app.kubernetes.io/name: murmur
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+       null
+      ports:
+         - port: 6502
+           protocol: TCP
+

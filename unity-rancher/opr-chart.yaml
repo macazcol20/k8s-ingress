@@ -1,0 +1,4013 @@
+---
+# Source: opr/charts/voip/charts/murmur/charts/reflect-common-chart/templates/networkpolicy.yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: murmur-network-policy
+  labels:
+    helm.sh/chart: reflect-common-chart-2.0.5
+    
+    app.kubernetes.io/name: murmur
+    app.kubernetes.io/instance: opr
+    app.kubernetes.io/managed-by: Helm
+spec:
+  podSelector:
+    matchLabels:
+
+       app.kubernetes.io/name: murmur
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+
+       - podSelector:
+           matchLabels:
+             app.kubernetes.io/name: mumble-rest
+      ports:
+
+         - port: 6502
+           protocol: TCP
+    - from:
+
+       - ipBlock:
+           cidr: 0.0.0.0/0
+      ports:
+
+         - port: 64738
+           protocol: TCP
+         - port: 64738
+           protocol: UDP
+---
+# Source: opr/charts/keycloak/templates/serviceaccount.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: opr-keycloak
+  labels:
+    helm.sh/chart: keycloak-18.4.3
+    app.kubernetes.io/name: keycloak
+    app.kubernetes.io/instance: opr
+    app.kubernetes.io/version: "21.1.2"
+    app.kubernetes.io/managed-by: Helm
+imagePullSecrets:
+    []
+---
+# Source: opr/charts/multiplayer/charts/matchmaker/charts/reflect-common-chart/templates/serviceaccount.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: matchmaker-sa
+  labels:
+    helm.sh/chart: reflect-common-chart-1.0.0
+    
+    app.kubernetes.io/name: matchmaker
+    app.kubernetes.io/instance: opr
+    app.kubernetes.io/managed-by: Helm
+---
+# Source: opr/charts/multiplayer/charts/netcode/charts/reflect-common-chart/templates/serviceaccount.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: netcode-sa
+  labels:
+    helm.sh/chart: reflect-common-chart-1.0.0
+    
+    app.kubernetes.io/name: opr-reflect-common-chart
+    app.kubernetes.io/instance: opr
+    app.kubernetes.io/managed-by: Helm
+---
+# Source: opr/charts/project/charts/reflect-common-chart/templates/serviceaccount.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: reflect-project-sa
+  labels:
+    helm.sh/chart: reflect-common-chart-1.0.0
+    
+    app.kubernetes.io/name: project
+    app.kubernetes.io/instance: opr
+    app.kubernetes.io/managed-by: Helm
+---
+# Source: opr/charts/rabbitmq/templates/serviceaccount.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: opr-rabbitmq
+  namespace: "opr-develop"
+  labels:
+    app.kubernetes.io/name: rabbitmq
+    helm.sh/chart: rabbitmq-12.0.9
+    app.kubernetes.io/instance: opr
+    app.kubernetes.io/managed-by: Helm
+automountServiceAccountToken: true
+secrets:
+  - name: opr-rabbitmq
+---
+# Source: opr/charts/annotations/charts/reflect-common-chart/templates/secret.yaml
+apiVersion: v1
+kind: Secret
+type: Opaque
+data:
+  REFLECTANNOTATIONS_ConnectionStrings__AnnotationsDatabase:
+    SG9zdD1vcHItcG9zdGdyZXNxbDtEYXRhYmFzZT1Bbm5vdGF0aW9ucztVc2VybmFtZT1hbm5vdGF0aW9ucztQYXNzd29yZD1yZWZsZWN0
+metadata:
+  name: annotations-secret
+  labels:
+    helm.sh/chart: reflect-common-chart-1.0.0
+    
+    app.kubernetes.io/name: annotations
+    app.kubernetes.io/instance: opr
+    app.kubernetes.io/managed-by: Helm
+  annotations:
+---
+# Source: opr/charts/keycloak/templates/secrets.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: opr-keycloak-env
+  labels:
+    helm.sh/chart: keycloak-18.4.3
+    app.kubernetes.io/name: keycloak
+    app.kubernetes.io/instance: opr
+    app.kubernetes.io/version: "21.1.2"
+    app.kubernetes.io/managed-by: Helm
+type: Opaque
+stringData:
+  KEYCLOAK_ADMIN: "admin"
+  KEYCLOAK_ADMIN_PASSWORD: "admin"
+  KEYCLOAK_REFLECT_TEST_ANONYMOUS_USERNAME: "reflect-anonymous"
+  KEYCLOAK_REFLECT_TEST_MANAGER_USERNAME: "reflect-admin"
+  KEYCLOAK_REFLECT_TEST_USERNAME: "reflect-user"
+---
+# Source: opr/charts/multiplayer/charts/matchmaker/charts/reflect-common-chart/templates/secret.yaml
+apiVersion: v1
+kind: Secret
+type: Opaque
+data:
+  REFLECTMULTIPLAYER_ConnectionStrings__MatchmakerDatabase:
+    SG9zdD1vcHItcG9zdGdyZXNxbDtEYXRhYmFzZT1NYXRjaG1ha2VyO1VzZXJuYW1lPW1hdGNobWFrZXJfc2VydmljZTtQYXNzd29yZD1yZWZsZWN0
+  REFLECTMULTIPLAYER_Mumble__RestApiPassword:
+    bXVybXVyLXJlc3Qtc2VjcmV0LWtleQ==
+  REFLECTMULTIPLAYER_Mumble__RestApiUsername:
+    cmVmbGVjdA==
+metadata:
+  name: matchmaker-secrets
+  labels:
+    helm.sh/chart: reflect-common-chart-1.0.0
+    
+    app.kubernetes.io/name: matchmaker
+    app.kubernetes.io/instance: opr
+    app.kubernetes.io/managed-by: Helm
+  annotations:
+---
+# Source: opr/charts/postgresql/templates/secrets.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: opr-postgresql
+  namespace: "opr-develop"
+  labels:
+    app.kubernetes.io/name: postgresql
+    helm.sh/chart: postgresql-12.8.0
+    app.kubernetes.io/instance: opr
+    app.kubernetes.io/managed-by: Helm
+type: Opaque
+data:
+  postgres-password: "cmVmbGVjdA=="
+  # We don't auto-generate LDAP password when it's not provided as we do for other passwords
+---
+# Source: opr/charts/project/charts/reflect-common-chart/templates/secret.yaml
+apiVersion: v1
+kind: Secret
+type: Opaque
+data:
+  REFLECTPROJECT_ConnectionStrings__ProjectServiceDatabase:
+    SG9zdD1vcHItcG9zdGdyZXNxbDtEYXRhYmFzZT1Qcm9qZWN0U2VydmljZTtVc2VybmFtZT1wcm9qZWN0X3NlcnZpY2U7UGFzc3dvcmQ9cmVmbGVjdA==
+  REFLECTPROJECT_SyncServer__Cloud__ClientId:
+    c3luY2lk
+  REFLECTPROJECT_SyncServer__Cloud__ClientSecret:
+    c3luY3NlY3JldA==
+metadata:
+  name: project-external-secrets
+  labels:
+    helm.sh/chart: reflect-common-chart-1.0.0
+    
+    app.kubernetes.io/name: project
+    app.kubernetes.io/instance: opr
+    app.kubernetes.io/managed-by: Helm
+  annotations:
+---
+# Source: opr/charts/rabbitmq/templates/config-secret.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: opr-rabbitmq-config
+  namespace: "opr-develop"
+  labels:
+    app.kubernetes.io/name: rabbitmq
+    helm.sh/chart: rabbitmq-12.0.9
+    app.kubernetes.io/instance: opr
+    app.kubernetes.io/managed-by: Helm
+type: Opaque
+data:
+  rabbitmq.conf: |-
+    IyMgVXNlcm5hbWUgYW5kIHBhc3N3b3JkCiMjCmRlZmF1bHRfdXNlciA9IGFkbWluCmRlZmF1bHRfcGFzcyA9IHJhYmJpdG1xLXNlY3JldC1rZXkKIyMgQ2x1c3RlcmluZwojIwpjbHVzdGVyX2Zvcm1hdGlvbi5wZWVyX2Rpc2NvdmVyeV9iYWNrZW5kICA9IHJhYmJpdF9wZWVyX2Rpc2NvdmVyeV9rOHMKY2x1c3Rlcl9mb3JtYXRpb24uazhzLmhvc3QgPSBrdWJlcm5ldGVzLmRlZmF1bHQKY2x1c3Rlcl9mb3JtYXRpb24ubm9kZV9jbGVhbnVwLmludGVydmFsID0gMTAKY2x1c3Rlcl9mb3JtYXRpb24ubm9kZV9jbGVhbnVwLm9ubHlfbG9nX3dhcm5pbmcgPSB0cnVlCmNsdXN0ZXJfcGFydGl0aW9uX2hhbmRsaW5nID0gYXV0b2hlYWwKCiMgcXVldWUgbWFzdGVyIGxvY2F0b3IKcXVldWVfbWFzdGVyX2xvY2F0b3IgPSBtaW4tbWFzdGVycwojIGVuYWJsZSBsb29wYmFjayB1c2VyCmxvb3BiYWNrX3VzZXJzLmFkbWluID0gZmFsc2UKI2RlZmF1bHRfdmhvc3QgPSBvcHItZGV2ZWxvcC12aG9zdAojZGlza19mcmVlX2xpbWl0LmFic29sdXRlID0gNTBNQg==
+---
+# Source: opr/charts/rabbitmq/templates/secrets.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: opr-rabbitmq
+  namespace: "opr-develop"
+  labels:
+    app.kubernetes.io/name: rabbitmq
+    helm.sh/chart: rabbitmq-12.0.9
+    app.kubernetes.io/instance: opr
+    app.kubernetes.io/managed-by: Helm
+type: Opaque
+data:
+  rabbitmq-password: "cmFiYml0bXEtc2VjcmV0LWtleQ=="
+  rabbitmq-erlang-cookie: "ckM0MTBncERVWVNZdjZYbnE5YVE="
+---
+# Source: opr/charts/sync/charts/api/charts/reflect-common-chart/templates/secret.yaml
+apiVersion: v1
+kind: Secret
+type: Opaque
+data:
+  REFLECTSYNC_ConnectionStrings__SyncServiceDatabase:
+    SG9zdD1vcHItcG9zdGdyZXNxbDtEYXRhYmFzZT1TeW5jU2VydmljZTtVc2VybmFtZT1zeW5jX3NlcnZpY2U7UGFzc3dvcmQ9cmVmbGVjdA==
+  REFLECTSYNC_MessageBroker__MassTransit__HangfireConnectionString:
+    SG9zdD1vcHItcG9zdGdyZXNxbDtEYXRhYmFzZT1TeW5jU2VydmljZV9IYW5nZmlyZTtVc2VybmFtZT1zeW5jX3NlcnZpY2U7UGFzc3dvcmQ9cmVmbGVjdA==
+  REFLECTSYNC_MessageBroker__MassTransit__RabbitMq__Password:
+    cmFiYml0bXEtc2VjcmV0LWtleQ==
+  REFLECTSYNC_MessageBroker__MassTransit__RabbitMq__Username:
+    YWRtaW4=
+  REFLECTSYNC_ProjectServer__ClientId:
+    c3luY2lk
+  REFLECTSYNC_ProjectServer__ClientSecret:
+    c3luY3NlY3JldA==
+  REFLECTSYNC_Storage__Bucket__AccessKeyId:
+    bWluaW8=
+  REFLECTSYNC_Storage__Bucket__SecretAccessKey:
+    bWluaW8xMjM=
+metadata:
+  name: sync-api-secrets
+  labels:
+    helm.sh/chart: reflect-common-chart-1.0.0
+    
+    app.kubernetes.io/name: sync-api
+    app.kubernetes.io/instance: opr
+    app.kubernetes.io/managed-by: Helm
+  annotations:
+---
+# Source: opr/charts/sync/charts/decimator/charts/reflect-common-chart/templates/secret.yaml
+apiVersion: v1
+kind: Secret
+type: Opaque
+data:
+  REFLECTSYNC_ConnectionStrings__SyncServiceDatabase:
+    SG9zdD1vcHItcG9zdGdyZXNxbDtEYXRhYmFzZT1TeW5jU2VydmljZTtVc2VybmFtZT1zeW5jX3NlcnZpY2U7UGFzc3dvcmQ9cmVmbGVjdA==
+  REFLECTSYNC_MessageBroker__MassTransit__HangfireConnectionString:
+    SG9zdD1vcHItcG9zdGdyZXNxbDtEYXRhYmFzZT1TeW5jU2VydmljZV9IYW5nZmlyZTtVc2VybmFtZT1zeW5jX3NlcnZpY2U7UGFzc3dvcmQ9cmVmbGVjdA==
+  REFLECTSYNC_MessageBroker__MassTransit__RabbitMq__Password:
+    cmFiYml0bXEtc2VjcmV0LWtleQ==
+  REFLECTSYNC_MessageBroker__MassTransit__RabbitMq__Username:
+    YWRtaW4=
+  REFLECTSYNC_ProjectServer__ClientId:
+    c3luY2lk
+  REFLECTSYNC_ProjectServer__ClientSecret:
+    c3luY3NlY3JldA==
+  REFLECTSYNC_Storage__Bucket__AccessKeyId:
+    bWluaW8=
+  REFLECTSYNC_Storage__Bucket__SecretAccessKey:
+    bWluaW8xMjM=
+metadata:
+  name: sync-decimator-secrets
+  labels:
+    helm.sh/chart: reflect-common-chart-1.0.0
+    
+    app.kubernetes.io/name: sync-decimator
+    app.kubernetes.io/instance: opr
+    app.kubernetes.io/managed-by: Helm
+  annotations:
+---
+# Source: opr/charts/sync/charts/hlodbuilder/charts/reflect-common-chart/templates/secret.yaml
+apiVersion: v1
+kind: Secret
+type: Opaque
+data:
+  REFLECTSYNC_ConnectionStrings__SyncServiceDatabase:
+    SG9zdD1vcHItcG9zdGdyZXNxbDtEYXRhYmFzZT1TeW5jU2VydmljZTtVc2VybmFtZT1zeW5jX3NlcnZpY2U7UGFzc3dvcmQ9cmVmbGVjdA==
+  REFLECTSYNC_MessageBroker__MassTransit__HangfireConnectionString:
+    SG9zdD1vcHItcG9zdGdyZXNxbDtEYXRhYmFzZT1TeW5jU2VydmljZV9IYW5nZmlyZTtVc2VybmFtZT1zeW5jX3NlcnZpY2U7UGFzc3dvcmQ9cmVmbGVjdA==
+  REFLECTSYNC_MessageBroker__MassTransit__RabbitMq__Password:
+    cmFiYml0bXEtc2VjcmV0LWtleQ==
+  REFLECTSYNC_MessageBroker__MassTransit__RabbitMq__Username:
+    YWRtaW4=
+  REFLECTSYNC_ProjectServer__ClientId:
+    c3luY2lk
+  REFLECTSYNC_ProjectServer__ClientSecret:
+    c3luY3NlY3JldA==
+  REFLECTSYNC_Storage__Bucket__AccessKeyId:
+    bWluaW8=
+  REFLECTSYNC_Storage__Bucket__SecretAccessKey:
+    bWluaW8xMjM=
+metadata:
+  name: sync-hlodbuilder-secrets
+  labels:
+    helm.sh/chart: reflect-common-chart-1.0.0
+    
+    app.kubernetes.io/name: sync-hlodbuilder
+    app.kubernetes.io/instance: opr
+    app.kubernetes.io/managed-by: Helm
+  annotations:
+---
+# Source: opr/charts/sync/charts/modelprocessor-safemode/charts/reflect-common-chart/templates/secret.yaml
+apiVersion: v1
+kind: Secret
+type: Opaque
+data:
+  REFLECTSYNC_ConnectionStrings__SyncServiceDatabase:
+    SG9zdD1vcHItcG9zdGdyZXNxbDtEYXRhYmFzZT1TeW5jU2VydmljZTtVc2VybmFtZT1zeW5jX3NlcnZpY2U7UGFzc3dvcmQ9cmVmbGVjdA==
+  REFLECTSYNC_MessageBroker__MassTransit__HangfireConnectionString:
+    SG9zdD1vcHItcG9zdGdyZXNxbDtEYXRhYmFzZT1TeW5jU2VydmljZV9IYW5nZmlyZTtVc2VybmFtZT1zeW5jX3NlcnZpY2U7UGFzc3dvcmQ9cmVmbGVjdA==
+  REFLECTSYNC_MessageBroker__MassTransit__RabbitMq__Password:
+    cmFiYml0bXEtc2VjcmV0LWtleQ==
+  REFLECTSYNC_MessageBroker__MassTransit__RabbitMq__Username:
+    YWRtaW4=
+  REFLECTSYNC_ProjectServer__ClientId:
+    c3luY2lk
+  REFLECTSYNC_ProjectServer__ClientSecret:
+    c3luY3NlY3JldA==
+  REFLECTSYNC_Storage__Bucket__AccessKeyId:
+    bWluaW8=
+  REFLECTSYNC_Storage__Bucket__SecretAccessKey:
+    bWluaW8xMjM=
+metadata:
+  name: sync-modelprocessor-safemode-secrets
+  labels:
+    helm.sh/chart: reflect-common-chart-1.0.0
+    
+    app.kubernetes.io/name: sync-modelprocessor-safemode
+    app.kubernetes.io/instance: opr
+    app.kubernetes.io/managed-by: Helm
+  annotations:
+---
+# Source: opr/charts/sync/charts/modelprocessor/charts/reflect-common-chart/templates/secret.yaml
+apiVersion: v1
+kind: Secret
+type: Opaque
+data:
+  REFLECTSYNC_ConnectionStrings__SyncServiceDatabase:
+    SG9zdD1vcHItcG9zdGdyZXNxbDtEYXRhYmFzZT1TeW5jU2VydmljZTtVc2VybmFtZT1zeW5jX3NlcnZpY2U7UGFzc3dvcmQ9cmVmbGVjdA==
+  REFLECTSYNC_MessageBroker__MassTransit__HangfireConnectionString:
+    SG9zdD1vcHItcG9zdGdyZXNxbDtEYXRhYmFzZT1TeW5jU2VydmljZV9IYW5nZmlyZTtVc2VybmFtZT1zeW5jX3NlcnZpY2U7UGFzc3dvcmQ9cmVmbGVjdA==
+  REFLECTSYNC_MessageBroker__MassTransit__RabbitMq__Password:
+    cmFiYml0bXEtc2VjcmV0LWtleQ==
+  REFLECTSYNC_MessageBroker__MassTransit__RabbitMq__Username:
+    YWRtaW4=
+  REFLECTSYNC_ProjectServer__ClientId:
+    c3luY2lk
+  REFLECTSYNC_ProjectServer__ClientSecret:
+    c3luY3NlY3JldA==
+  REFLECTSYNC_Storage__Bucket__AccessKeyId:
+    bWluaW8=
+  REFLECTSYNC_Storage__Bucket__SecretAccessKey:
+    bWluaW8xMjM=
+metadata:
+  name: sync-modelprocessor-secrets
+  labels:
+    helm.sh/chart: reflect-common-chart-1.0.0
+    
+    app.kubernetes.io/name: sync-modelprocessor
+    app.kubernetes.io/instance: opr
+    app.kubernetes.io/managed-by: Helm
+  annotations:
+---
+# Source: opr/charts/sync/charts/testrunner/charts/reflect-common-chart/templates/secret.yaml
+apiVersion: v1
+kind: Secret
+type: Opaque
+data:
+  SYNC_TESTSETTINGS:
+    IiI=
+metadata:
+  name: sync-testrunner-secrets
+  labels:
+    helm.sh/chart: reflect-common-chart-1.0.0
+    
+    app.kubernetes.io/name: sync-test-runner
+    app.kubernetes.io/instance: opr
+    app.kubernetes.io/managed-by: Helm
+  annotations:
+---
+# Source: opr/charts/sync/charts/worker/charts/reflect-common-chart/templates/secret.yaml
+apiVersion: v1
+kind: Secret
+type: Opaque
+data:
+  REFLECTSYNC_ConnectionStrings__SyncServiceDatabase:
+    SG9zdD1vcHItcG9zdGdyZXNxbDtEYXRhYmFzZT1TeW5jU2VydmljZTtVc2VybmFtZT1zeW5jX3NlcnZpY2U7UGFzc3dvcmQ9cmVmbGVjdA==
+  REFLECTSYNC_MessageBroker__MassTransit__HangfireConnectionString:
+    SG9zdD1vcHItcG9zdGdyZXNxbDtEYXRhYmFzZT1TeW5jU2VydmljZV9IYW5nZmlyZTtVc2VybmFtZT1zeW5jX3NlcnZpY2U7UGFzc3dvcmQ9cmVmbGVjdA==
+  REFLECTSYNC_MessageBroker__MassTransit__RabbitMq__Password:
+    cmFiYml0bXEtc2VjcmV0LWtleQ==
+  REFLECTSYNC_MessageBroker__MassTransit__RabbitMq__Username:
+    YWRtaW4=
+  REFLECTSYNC_ProjectServer__ClientId:
+    c3luY2lk
+  REFLECTSYNC_ProjectServer__ClientSecret:
+    c3luY3NlY3JldA==
+  REFLECTSYNC_Storage__Bucket__AccessKeyId:
+    bWluaW8=
+  REFLECTSYNC_Storage__Bucket__SecretAccessKey:
+    bWluaW8xMjM=
+metadata:
+  name: sync-worker-secrets
+  labels:
+    helm.sh/chart: reflect-common-chart-1.0.0
+    
+    app.kubernetes.io/name: sync-worker
+    app.kubernetes.io/instance: opr
+    app.kubernetes.io/managed-by: Helm
+  annotations:
+---
+# Source: opr/charts/voip/charts/mumble-rest/charts/reflect-common-chart/templates/secret.yaml
+apiVersion: v1
+kind: Secret
+type: Opaque
+data:
+  APP_SECRET_KEY:
+    c3VwZXJzZWNyZXQ=
+  ICE_SECRET:
+    bXVybXVyLWljZS1zZWNyZXQta2V5
+  USERS:
+    cmVmbGVjdDptdXJtdXItcmVzdC1zZWNyZXQta2V5
+metadata:
+  name: mumble-rest-secrets
+  labels:
+    helm.sh/chart: reflect-common-chart-2.0.5
+    
+    app.kubernetes.io/name: mumble-rest
+    app.kubernetes.io/instance: opr
+    app.kubernetes.io/managed-by: Helm
+  annotations:
+---
+# Source: opr/charts/annotations/charts/reflect-common-chart/templates/configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: annotations-config
+  labels:
+    helm.sh/chart: reflect-common-chart-1.0.0
+    
+    app.kubernetes.io/name: annotations
+    app.kubernetes.io/instance: opr
+    app.kubernetes.io/managed-by: Helm
+  annotations:
+data:
+  OTEL_EXPORTER_OTLP_ENDPOINT:     http://apm-server-apm-http:8200
+  OTEL_EXPORTER_OTLP_HEADERS:     Authorization=Bearer 4113wNO7AFYO336Yn3vj2yvP
+  OTEL_RESOURCE_ATTRIBUTES:     deployment.environment=production
+  OTEL_SERVICE_NAME:     annotations
+  REFLECTANNOTATIONS_Multiplayer__Address:     https://multiplayer-develop.opr.unity.com
+  REFLECTANNOTATIONS_ProjectServer__Address:     https://web-develop.opr.unity.com
+  REFLECTANNOTATIONS_ProjectServer__HttpAddress:     https://develop.opr.unity.com
+  REFLECTANNOTATIONS_Prometheus__Enabled:     "true"
+  REFLECTANNOTATIONS_Swagger__Enabled:     "false"
+  REFLECT_COMPONENT:     annotations
+  REFLECT_ENVIRONMENT:     Production
+---
+# Source: opr/charts/commonui/charts/reflect-common-chart/templates/configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: commonui-config
+  labels:
+    helm.sh/chart: reflect-common-chart-1.0.0
+    
+    app.kubernetes.io/name: commonui
+    app.kubernetes.io/instance: opr
+    app.kubernetes.io/managed-by: Helm
+  annotations:
+data:
+  REACT_APP_BIM360_SERVER_ENV:     local
+  REACT_APP_CLOUD_PROVIDER:     gcp
+  REACT_APP_COMPONENT_NAME:     WebDashboard
+  REACT_APP_ENABLE_APRIL_2021_FEATURES:     "true"
+  REACT_APP_IS_ON_PREM_REFLECT:     "true"
+  REACT_APP_ON_PREM_REFLECT_ENTERPRISE_DOMAIN:     BAH OPR
+  REACT_APP_PROJECT_SERVER_ADDRESS:     https://develop.opr.unity.com
+  REACT_APP_PROJECT_SERVER_ENV:     develop
+  REACT_APP_PROJECT_SERVER_HTTP_ADDRESS:     https://develop.opr.unity.com
+  REACT_APP_SENTRY_ENABLED:     "false"
+  REACT_APP_UNITY_API_ADDRESS:     ""
+  REACT_APP_UNITY_ID_ADDRESS:     ""
+  REFLECT_DOMAIN:     BAH OPR
+---
+# Source: opr/charts/keycloak/templates/configmap-startup.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: opr-keycloak-startup
+  labels:
+    helm.sh/chart: keycloak-18.4.3
+    app.kubernetes.io/name: keycloak
+    app.kubernetes.io/instance: opr
+    app.kubernetes.io/version: "21.1.2"
+    app.kubernetes.io/managed-by: Helm
+data:
+  keycloak.cli: |
+    embed-server --server-config=standalone-ha.xml --std-out=echo
+    batch
+    
+    echo Configuring node identifier
+    
+    ## Sets the node identifier to the node name (= pod name). Node identifiers have to be unique. They can have a
+    ## maximum length of 23 characters. Thus, the chart's fullname template truncates its length accordingly.
+    /subsystem=transactions:write-attribute(name=node-identifier, value=${jboss.node.name})
+    
+    echo Finished configuring node identifier
+    
+    run-batch
+    stop-embedded-server
+---
+# Source: opr/charts/links/charts/reflect-common-chart/templates/configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: links-config
+  labels:
+    helm.sh/chart: reflect-common-chart-1.0.0
+    
+    app.kubernetes.io/name: links
+    app.kubernetes.io/instance: opr
+    app.kubernetes.io/managed-by: Helm
+  annotations:
+data:
+  OTEL_EXPORTER_OTLP_ENDPOINT:     http://apm-server-apm-http:8200
+  OTEL_EXPORTER_OTLP_HEADERS:     Authorization=Bearer 4113wNO7AFYO336Yn3vj2yvP
+  OTEL_RESOURCE_ATTRIBUTES:     deployment.environment=production
+  OTEL_SERVICE_NAME:     links
+  REFLECTLINKS_LinkSharing__Domain:     links-develop.opr.unity.com
+  REFLECTLINKS_Prometheus__Enabled:     "true"
+  REFLECT_COMPONENT:     links
+  REFLECT_ENVIRONMENT:     Production
+---
+# Source: opr/charts/multiplayer/charts/matchmaker/charts/reflect-common-chart/templates/configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: matchmaker-config
+  labels:
+    helm.sh/chart: reflect-common-chart-1.0.0
+    
+    app.kubernetes.io/name: matchmaker
+    app.kubernetes.io/instance: opr
+    app.kubernetes.io/managed-by: Helm
+  annotations:
+data:
+  ASPNETCORE_URLS:     http://+:80
+  OTEL_EXPORTER_OTLP_ENDPOINT:     http://apm-server-apm-http:8200
+  OTEL_EXPORTER_OTLP_HEADERS:     Authorization=Bearer 4113wNO7AFYO336Yn3vj2yvP
+  OTEL_RESOURCE_ATTRIBUTES:     deployment.environment=production
+  OTEL_SERVICE_NAME:     matchmaker
+  REFLECTMULTIPLAYER_ClusterController__AllocationPool__PoolSize:     "0"
+  REFLECTMULTIPLAYER_ClusterController__KubeApi__CertsSecretName:     matchmaker-reflect-tls
+  REFLECTMULTIPLAYER_ClusterController__KubeApi__Images__Init:     us-east1-docker.pkg.dev/unity-solutions-tyndall-prd/docker/reflect-netcode-init:develop-latest
+  REFLECTMULTIPLAYER_ClusterController__KubeApi__Images__Netcode:     us-east1-docker.pkg.dev/unity-solutions-tyndall-prd/docker/reflect-netcode:develop-latest
+  REFLECTMULTIPLAYER_ClusterController__KubeApi__KubeNamespace:     opr-develop
+  REFLECTMULTIPLAYER_ClusterController__KubeApi__KubeNodepool:     'kubernetes.io/os : linux'
+  REFLECTMULTIPLAYER_ClusterController__KubeApi__MatchMakerEndpoint:     matchmaker
+  REFLECTMULTIPLAYER_ClusterController__KubeApi__Namespace:     default
+  REFLECTMULTIPLAYER_ClusterController__KubeApi__NetcodeServerAddress:     develop.opr.unity.com
+  REFLECTMULTIPLAYER_Mumble__RestApiUrl:     http://mumble-rest.opr-develop.svc.cluster.local:8082
+  REFLECTMULTIPLAYER_ProjectServer__Address:     http://project:10010
+  REFLECTMULTIPLAYER_ProjectServer__HttpAddress:     https://develop.opr.unity.com
+  REFLECTMULTIPLAYER_Prometheus__Enabled:     "true"
+  REFLECTMULTIPLAYER_Sentry__Environment:     gcp-test
+  REFLECT_COMPONENT:     matchmaker
+  REFLECT_ENVIRONMENT:     Production
+  URLS:     http://+:80
+---
+# Source: opr/charts/multiplayer/charts/matchmaker/templates/netcode-configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: netcode-manifests
+data:
+  job.yml: |
+    apiVersion: batch/v1
+    kind: Job
+    metadata:
+      name: netcode-job-{{ Ident }}
+      namespace: {{ Namespace }}
+    spec:
+      template:
+        metadata:
+          labels:
+            app: netcode-job-{{ Ident }}
+        spec:
+          restartPolicy: Never
+          nodeSelector:
+            {{ NodeSelector }}
+          serviceAccountName: netcode-sa
+          volumes:
+          - name: netcode-config
+            emptyDir: {}
+          initContainers:
+            - name: netcode-init
+              image: {{ InitImage }}
+              imagePullPolicy: "Always"
+              volumeMounts:
+              - name: netcode-config
+                mountPath: /etc/reflect
+              env:
+                  - name: REFLECT_NETCODE_NODE_NAME
+                    valueFrom:
+                      fieldRef:
+                        fieldPath: spec.nodeName
+                  - name: CERTS_SECRET_NAME
+                    value: {{ CertsSecretName }}
+                  - name: REFLECT_SENTRY_DSN
+                    value: {{ SentryDSN }}
+                  - name: NAMESPACE
+                    value: {{ Namespace }}
+          imagePullSecrets:
+            - name: regcred-gcp
+          containers:
+            - name: netcode-server
+              image: {{ NetcodeImage }}
+              imagePullPolicy: "Always"
+              ports:
+                - containerPort: 30303
+                  name: mlapi
+                  protocol: UDP
+              env:
+                  - name: REFLECT_NETCODE_NODE_NAME
+                    valueFrom:
+                      fieldRef:
+                        fieldPath: spec.nodeName
+                  - name: REFLECT_NETCODE_POD_NAME
+                    valueFrom:
+                      fieldRef:
+                        fieldPath: metadata.name
+                  - name: MATCHMAKER_ENABLE
+                    value: "true"
+                  - name: MATCHMAKER_HOST
+                    value: {{ MatchMakerEndpoint }}
+                  - name: MATCHMAKER_PORT
+                    value: "10042"
+                  - name: REFLECT_NETCODE_IP
+                    value: {{ NetcodeServerAddress }}
+                  - name: REFLECT_SENTRY_DSN
+                    value: {{ SentryDSN }}
+              volumeMounts:
+              - name: netcode-config
+                mountPath: /etc/reflect
+              resources:
+                requests:
+                  memory: "400Mi"
+                  cpu: "2000m"
+                limits:
+                  memory: "800Mi"
+                  cpu: "2000m"
+  service.yml: |
+    apiVersion: v1
+    kind: Service
+    metadata:
+      name: netcode-svc-{{ Ident }}
+      namespace: {{ Namespace }}
+      labels:
+        app: netcode-svc-{{ Ident }}
+        reflectComponent: netcode
+    spec:
+      type: NodePort
+      selector:
+        app: netcode-job-{{ Ident }}
+      ports:
+        - port: 30303
+          targetPort: mlapi
+          name: mlapi
+          protocol: UDP
+---
+# Source: opr/charts/postgresql/templates/primary/extended-configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: opr-postgresql-extended-configuration
+  namespace: "opr-develop"
+  labels:
+    app.kubernetes.io/name: postgresql
+    helm.sh/chart: postgresql-12.8.0
+    app.kubernetes.io/instance: opr
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/component: primary
+data:
+  override.conf: |-
+    max_connections = 400
+---
+# Source: opr/charts/project/charts/reflect-common-chart/templates/configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: project-config
+  labels:
+    helm.sh/chart: reflect-common-chart-1.0.0
+    
+    app.kubernetes.io/name: project
+    app.kubernetes.io/instance: opr
+    app.kubernetes.io/managed-by: Helm
+  annotations:
+data:
+  ASPNETCORE_URLS:     http://+:80
+  OTEL_EXPORTER_OTLP_ENDPOINT:     http://apm-server-apm-http:8200
+  OTEL_EXPORTER_OTLP_HEADERS:     Authorization=Bearer 4113wNO7AFYO336Yn3vj2yvP
+  OTEL_RESOURCE_ATTRIBUTES:     deployment.environment=production
+  OTEL_SERVICE_NAME:     project
+  REFLECTPROJECT_LinkSharing__Domain:     https://links-develop.opr.unity.com
+  REFLECTPROJECT_LinkSharing__Path:     p/
+  REFLECTPROJECT_Prometheus__Enabled:     "true"
+  REFLECTPROJECT_Security__LicenseValidationStartDate:     "2019-11-01T00:00:00Z"
+  REFLECTPROJECT_Security__OnPrem__AuthorizeEndpoint:     https://keycloak-develop.opr.unity.com/realms/reflect/protocol/openid-connect/auth
+  REFLECTPROJECT_Security__OnPrem__ClientId:     reflect
+  REFLECTPROJECT_Security__OnPrem__ClientIdClaim:     azp
+  REFLECTPROJECT_Security__OnPrem__Domain:     BAH OPR
+  REFLECTPROJECT_Security__OnPrem__NameClaim:     preferred_username
+  REFLECTPROJECT_Security__OnPrem__OAuthJwkUrl:     https://keycloak-develop.opr.unity.com/realms/reflect/protocol/openid-connect/certs
+  REFLECTPROJECT_Security__OnPrem__OrganizationName:     Tyndall Air Force Base
+  REFLECTPROJECT_Security__OnPrem__RealmAccessRoleListOwnerOrManagerRole:     ReflectOwnerManagerRole
+  REFLECTPROJECT_Security__OnPrem__RealmAccessRoleListUserRole:     ReflectUserRole
+  REFLECTPROJECT_Security__OnPrem__RefreshEndpoint:     https://keycloak-develop.opr.unity.com/realms/reflect/protocol/openid-connect/token
+  REFLECTPROJECT_Security__OnPrem__RevokeEndpoint:     https://keycloak-develop.opr.unity.com/realms/reflect/protocol/openid-connect/revoke
+  REFLECTPROJECT_Security__OnPrem__Scope:     openid
+  REFLECTPROJECT_Security__OnPrem__TokenEndpoint:     https://keycloak-develop.opr.unity.com/realms/reflect/protocol/openid-connect/token
+  REFLECTPROJECT_Security__OnPrem__UserInfoEndpoint:     https://keycloak-develop.opr.unity.com/realms/reflect/protocol/openid-connect/userinfo
+  REFLECTPROJECT_Security__OnPrem__ValidIssuer:     https://keycloak-develop.opr.unity.com/realms/reflect
+  REFLECTPROJECT_Security__OnPrem__ViewerProtocol:     reflect
+  REFLECTPROJECT_ServerEndpoint__Host:     0.0.0.0
+  REFLECTPROJECT_ServiceEndpoints__Annotations__HttpAddress:     https://annotations-develop.opr.unity.com
+  REFLECTPROJECT_ServiceEndpoints__MatchMaker__GrpcAddress:     https://matchmaker-develop.opr.unity.com
+  REFLECTPROJECT_ServiceEndpoints__MatchMaker__HttpAddress:     https://matchmaker-develop.opr.unity.com
+  REFLECTPROJECT_ServiceEndpoints__ProjectServer__GrpcAddress:     https://develop.opr.unity.com
+  REFLECTPROJECT_ServiceEndpoints__ProjectServer__GrpcWebAddress:     https://web-develop.opr.unity.com
+  REFLECTPROJECT_ServiceEndpoints__ProjectServer__HttpAddress:     https://develop.opr.unity.com
+  REFLECTPROJECT_ServiceEndpoints__VoipServer__OtherServerAddress:     mumble://voip-develop.opr.unity.com:30000
+  REFLECTPROJECT_SyncServer__Cloud__Address:     https://sync-develop.opr.unity.com
+  REFLECTPROJECT_SyncServer__Cloud__SupportsDecimation:     "true"
+  REFLECT_CLOUD:     OnPrem
+  REFLECT_COMPONENT:     project
+  REFLECT_DOMAIN:     BAH OPR
+  REFLECT_ENVIRONMENT:     Production
+  REFLECT_GATEWAY:     unity.project-service.local
+  REFLECT_TESTRUNNER_WAIT:     "1"
+  URLS:     http://+:80
+---
+# Source: opr/charts/sync/charts/api/charts/reflect-common-chart/templates/configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: sync-api-config
+  labels:
+    helm.sh/chart: reflect-common-chart-1.0.0
+    
+    app.kubernetes.io/name: sync-api
+    app.kubernetes.io/instance: opr
+    app.kubernetes.io/managed-by: Helm
+  annotations:
+data:
+  GOOGLE_APPLICATION_CREDENTIALS:     /secrets/storage/credentials.json
+  OTEL_EXPORTER_OTLP_ENDPOINT:     http://apm-server-apm-http:8200
+  OTEL_EXPORTER_OTLP_HEADERS:     Authorization=Bearer 4113wNO7AFYO336Yn3vj2yvP
+  OTEL_RESOURCE_ATTRIBUTES:     deployment.environment=production
+  REFLECTSYNC_HttpServer__ExceptionContextResponseEnabled:     "true"
+  REFLECTSYNC_Kestrel__EndpointDefaults__Protocols:     Http1AndHttp2
+  REFLECTSYNC_Logging__LogLevel__Default:     Debug
+  REFLECTSYNC_MessageBroker__Backend:     MassTransit
+  REFLECTSYNC_MessageBroker__MassTransit__RabbitMq__HostName:     opr-rabbitmq
+  REFLECTSYNC_MessageBroker__MassTransit__RabbitMq__SyncSessionTopicId:     sync-sessions
+  REFLECTSYNC_MessageBroker__MassTransit__Transport:     RabbitMQ
+  REFLECTSYNC_PixyzOptimizeSdk__Enabled:     "false"
+  REFLECTSYNC_ProjectMetadata__Backend:     Database
+  REFLECTSYNC_ProjectServer__Address:     https://web-develop.opr.unity.com
+  REFLECTSYNC_ProjectServer__HttpAddress:     https://develop.opr.unity.com
+  REFLECTSYNC_Server__MaxSendMessageLengthMb:     "512"
+  REFLECTSYNC_Storage__Backend:     Bucket
+  REFLECTSYNC_Storage__Bucket__BucketName__Default:     sync-service-dev
+  REFLECTSYNC_Storage__Bucket__IntermediateStorage__Root:     /storage
+  REFLECTSYNC_Storage__Bucket__ProviderName:     AWS
+  REFLECTSYNC_Storage__Bucket__ProviderUrl:     https://minio-api-develop.opr.unity.com
+  REFLECTSYNC_Storage__Bucket__RetryPolicy__InitialDelay:     "00:00:01"
+  REFLECTSYNC_Storage__Bucket__RetryPolicy__MaxRetries:     "10"
+  REFLECTSYNC_Swagger__Enabled:     "false"
+  REFLECT_COMPONENT:     sync
+  REFLECT_ENVIRONMENT:     Production
+  REFLECT_TESTRUNNER_WAIT:     "1"
+---
+# Source: opr/charts/sync/charts/decimator/charts/reflect-common-chart/templates/configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: sync-decimator-config
+  labels:
+    helm.sh/chart: reflect-common-chart-1.0.0
+    
+    app.kubernetes.io/name: sync-decimator
+    app.kubernetes.io/instance: opr
+    app.kubernetes.io/managed-by: Helm
+  annotations:
+data:
+  GOOGLE_APPLICATION_CREDENTIALS:     /secrets/storage/credentials.json
+  OTEL_EXPORTER_OTLP_ENDPOINT:     http://apm-server-apm-http:8200
+  OTEL_EXPORTER_OTLP_HEADERS:     Authorization=Bearer 4113wNO7AFYO336Yn3vj2yvP
+  OTEL_RESOURCE_ATTRIBUTES:     deployment.environment=production
+  REFLECTSYNC_HttpServer__ExceptionContextResponseEnabled:     "true"
+  REFLECTSYNC_Kestrel__EndpointDefaults__Protocols:     Http1AndHttp2
+  REFLECTSYNC_MessageBroker__Backend:     MassTransit
+  REFLECTSYNC_MessageBroker__GcpPubSub__Listeners__sync-sessions-decimator__ClientCount:     "1"
+  REFLECTSYNC_MessageBroker__GcpPubSub__Listeners__sync-sessions-decimator__MaxOutstandingElements:     "128"
+  REFLECTSYNC_MessageBroker__MassTransit__RabbitMq__HostName:     opr-rabbitmq
+  REFLECTSYNC_MessageBroker__MassTransit__RabbitMq__SyncSessionTopicId:     sync-sessions
+  REFLECTSYNC_MessageBroker__MassTransit__Transport:     RabbitMQ
+  REFLECTSYNC_PixyzOptimizeSdk__Enabled:     "false"
+  REFLECTSYNC_PixyzOptimizeSdk__LicenseFilePath:     /app/licenses/license
+  REFLECTSYNC_PixyzOptimizeSdk__LogFileBasePath:     /app/log/pixyz
+  REFLECTSYNC_PixyzOptimizeSdk__MaxThreads:     "8"
+  REFLECTSYNC_ProjectMetadata__Backend:     Database
+  REFLECTSYNC_ProjectServer__Address:     https://web-develop.opr.unity.com
+  REFLECTSYNC_ProjectServer__HttpAddress:     https://develop.opr.unity.com
+  REFLECTSYNC_Storage__Backend:     Bucket
+  REFLECTSYNC_Storage__Bucket__BucketName__Default:     sync-service-dev
+  REFLECTSYNC_Storage__Bucket__IntermediateStorage__Root:     /storage
+  REFLECTSYNC_Storage__Bucket__ProviderName:     AWS
+  REFLECTSYNC_Storage__Bucket__ProviderUrl:     https://minio-api-develop.opr.unity.com
+  REFLECTSYNC_Storage__Bucket__RetryPolicy__InitialDelay:     "00:00:01"
+  REFLECTSYNC_Storage__Bucket__RetryPolicy__MaxRetries:     "10"
+  REFLECTSYNC_Swagger__Enabled:     "false"
+  REFLECT_COMPONENT:     sync
+  REFLECT_ENVIRONMENT:     Production
+  REFLECT_TESTRUNNER_WAIT:     "1"
+---
+# Source: opr/charts/sync/charts/hlodbuilder/charts/reflect-common-chart/templates/configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: sync-hlodbuilder-config
+  labels:
+    helm.sh/chart: reflect-common-chart-1.0.0
+    
+    app.kubernetes.io/name: sync-hlodbuilder
+    app.kubernetes.io/instance: opr
+    app.kubernetes.io/managed-by: Helm
+  annotations:
+data:
+  GOOGLE_APPLICATION_CREDENTIALS:     /secrets/storage/credentials.json
+  OTEL_EXPORTER_OTLP_ENDPOINT:     http://apm-server-apm-http:8200
+  OTEL_EXPORTER_OTLP_HEADERS:     Authorization=Bearer 4113wNO7AFYO336Yn3vj2yvP
+  OTEL_RESOURCE_ATTRIBUTES:     deployment.environment=production
+  REFLECTSYNC_HttpServer__ExceptionContextResponseEnabled:     "true"
+  REFLECTSYNC_Kestrel__EndpointDefaults__Protocols:     Http1AndHttp2
+  REFLECTSYNC_MessageBroker__Backend:     MassTransit
+  REFLECTSYNC_MessageBroker__GcpPubSub__Listeners__sync-sessions-hlodbuilder__ClientCount:     "1"
+  REFLECTSYNC_MessageBroker__GcpPubSub__Listeners__sync-sessions-hlodbuilder__MaxOutstandingElements:     "2"
+  REFLECTSYNC_MessageBroker__MassTransit__RabbitMq__HostName:     opr-rabbitmq
+  REFLECTSYNC_MessageBroker__MassTransit__RabbitMq__SyncSessionTopicId:     sync-sessions
+  REFLECTSYNC_MessageBroker__MassTransit__Transport:     RabbitMQ
+  REFLECTSYNC_PixyzOptimizeSdk__Enabled:     "false"
+  REFLECTSYNC_PixyzOptimizeSdk__LicenseFilePath:     /app/licenses/license
+  REFLECTSYNC_PixyzOptimizeSdk__LogFileBasePath:     /app/pixyzlog/pixyz
+  REFLECTSYNC_PixyzProcessPool__MaxSubProcessCount:     "1"
+  REFLECTSYNC_ProjectMetadata__Backend:     Database
+  REFLECTSYNC_ProjectServer__Address:     https://web-develop.opr.unity.com
+  REFLECTSYNC_ProjectServer__HttpAddress:     https://develop.opr.unity.com
+  REFLECTSYNC_Storage__Backend:     Bucket
+  REFLECTSYNC_Storage__Bucket__BucketName__Default:     sync-service-dev
+  REFLECTSYNC_Storage__Bucket__IntermediateStorage__Root:     /storage
+  REFLECTSYNC_Storage__Bucket__ProviderName:     AWS
+  REFLECTSYNC_Storage__Bucket__ProviderUrl:     https://minio-api-develop.opr.unity.com
+  REFLECTSYNC_Storage__Bucket__RetryPolicy__InitialDelay:     "00:00:01"
+  REFLECTSYNC_Storage__Bucket__RetryPolicy__MaxRetries:     "10"
+  REFLECTSYNC_Swagger__Enabled:     "false"
+  REFLECT_COMPONENT:     sync
+  REFLECT_ENVIRONMENT:     Production
+  REFLECT_TESTRUNNER_WAIT:     "1"
+---
+# Source: opr/charts/sync/charts/modelprocessor-safemode/charts/reflect-common-chart/templates/configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: sync-modelprocessor-safemode-config
+  labels:
+    helm.sh/chart: reflect-common-chart-1.0.0
+    
+    app.kubernetes.io/name: sync-modelprocessor-safemode
+    app.kubernetes.io/instance: opr
+    app.kubernetes.io/managed-by: Helm
+  annotations:
+data:
+  GOOGLE_APPLICATION_CREDENTIALS:     /secrets/storage/credentials.json
+  OTEL_EXPORTER_OTLP_ENDPOINT:     http://apm-server-apm-http:8200
+  OTEL_EXPORTER_OTLP_HEADERS:     Authorization=Bearer 4113wNO7AFYO336Yn3vj2yvP
+  OTEL_RESOURCE_ATTRIBUTES:     deployment.environment=production
+  REFLECTSYNC_HttpServer__ExceptionContextResponseEnabled:     "true"
+  REFLECTSYNC_Kestrel__EndpointDefaults__Protocols:     Http1AndHttp2
+  REFLECTSYNC_MessageBroker__Backend:     MassTransit
+  REFLECTSYNC_MessageBroker__MassTransit__RabbitMq__HostName:     opr-rabbitmq
+  REFLECTSYNC_MessageBroker__MassTransit__RabbitMq__SyncSessionTopicId:     sync-sessions
+  REFLECTSYNC_MessageBroker__MassTransit__Transport:     RabbitMQ
+  REFLECTSYNC_PixyzOptimizeSdk__Enabled:     "false"
+  REFLECTSYNC_PixyzOptimizeSdk__LicenseFilePath:     /app/licenses/license
+  REFLECTSYNC_PixyzOptimizeSdk__LogFileBasePath:     /app/pixyzlog/pixyz
+  REFLECTSYNC_ProjectMetadata__Backend:     Database
+  REFLECTSYNC_ProjectServer__Address:     https://web-develop.opr.unity.com
+  REFLECTSYNC_ProjectServer__HttpAddress:     https://develop.opr.unity.com
+  REFLECTSYNC_Storage__Backend:     Bucket
+  REFLECTSYNC_Storage__Bucket__BucketName__Default:     sync-service-dev
+  REFLECTSYNC_Storage__Bucket__IntermediateStorage__Root:     /storage
+  REFLECTSYNC_Storage__Bucket__ProviderName:     AWS
+  REFLECTSYNC_Storage__Bucket__ProviderUrl:     https://minio-api-develop.opr.unity.com
+  REFLECTSYNC_Storage__Bucket__RetryPolicy__InitialDelay:     "00:00:01"
+  REFLECTSYNC_Storage__Bucket__RetryPolicy__MaxRetries:     "10"
+  REFLECTSYNC_Swagger__Enabled:     "false"
+  REFLECT_COMPONENT:     sync
+  REFLECT_ENVIRONMENT:     Production
+  REFLECT_TESTRUNNER_WAIT:     "1"
+---
+# Source: opr/charts/sync/charts/modelprocessor/charts/reflect-common-chart/templates/configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: sync-modelprocessor-config
+  labels:
+    helm.sh/chart: reflect-common-chart-1.0.0
+    
+    app.kubernetes.io/name: sync-modelprocessor
+    app.kubernetes.io/instance: opr
+    app.kubernetes.io/managed-by: Helm
+  annotations:
+data:
+  GOOGLE_APPLICATION_CREDENTIALS:     /secrets/storage/credentials.json
+  OTEL_EXPORTER_OTLP_ENDPOINT:     http://apm-server-apm-http:8200
+  OTEL_EXPORTER_OTLP_HEADERS:     Authorization=Bearer 4113wNO7AFYO336Yn3vj2yvP
+  OTEL_RESOURCE_ATTRIBUTES:     deployment.environment=production
+  REFLECTSYNC_HttpServer__ExceptionContextResponseEnabled:     "true"
+  REFLECTSYNC_Kestrel__EndpointDefaults__Protocols:     Http1AndHttp2
+  REFLECTSYNC_MessageBroker__Backend:     MassTransit
+  REFLECTSYNC_MessageBroker__GcpPubSub__Listeners__sync-sessions-default__ClientCount:     "2"
+  REFLECTSYNC_MessageBroker__GcpPubSub__Listeners__sync-sessions-default__MaxOutstandingElements:     "128"
+  REFLECTSYNC_MessageBroker__MassTransit__RabbitMq__HostName:     opr-rabbitmq
+  REFLECTSYNC_MessageBroker__MassTransit__RabbitMq__SyncSessionTopicId:     sync-sessions
+  REFLECTSYNC_MessageBroker__MassTransit__Transport:     RabbitMQ
+  REFLECTSYNC_PixyzOptimizeSdk__Enabled:     "false"
+  REFLECTSYNC_ProjectMetadata__Backend:     Database
+  REFLECTSYNC_ProjectServer__Address:     https://web-develop.opr.unity.com
+  REFLECTSYNC_ProjectServer__HttpAddress:     https://develop.opr.unity.com
+  REFLECTSYNC_Storage__Backend:     Bucket
+  REFLECTSYNC_Storage__Bucket__BucketName__Default:     sync-service-dev
+  REFLECTSYNC_Storage__Bucket__IntermediateStorage__Root:     /storage
+  REFLECTSYNC_Storage__Bucket__ProviderName:     AWS
+  REFLECTSYNC_Storage__Bucket__ProviderUrl:     https://minio-api-develop.opr.unity.com
+  REFLECTSYNC_Storage__Bucket__RetryPolicy__InitialDelay:     "00:00:01"
+  REFLECTSYNC_Storage__Bucket__RetryPolicy__MaxRetries:     "10"
+  REFLECTSYNC_Swagger__Enabled:     "false"
+  REFLECT_COMPONENT:     sync
+  REFLECT_ENVIRONMENT:     Production
+  REFLECT_TESTRUNNER_WAIT:     "1"
+---
+# Source: opr/charts/sync/charts/testrunner/charts/reflect-common-chart/templates/configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: sync-testrunner-config
+  labels:
+    helm.sh/chart: reflect-common-chart-1.0.0
+    
+    app.kubernetes.io/name: sync-test-runner
+    app.kubernetes.io/instance: opr
+    app.kubernetes.io/managed-by: Helm
+  annotations:
+data:
+  REFLECT_COMPONENT:     sync-tests
+---
+# Source: opr/charts/sync/charts/worker/charts/reflect-common-chart/templates/configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: sync-worker-config
+  labels:
+    helm.sh/chart: reflect-common-chart-1.0.0
+    
+    app.kubernetes.io/name: sync-worker
+    app.kubernetes.io/instance: opr
+    app.kubernetes.io/managed-by: Helm
+  annotations:
+data:
+  GOOGLE_APPLICATION_CREDENTIALS:     /secrets/storage/credentials.json
+  OTEL_EXPORTER_OTLP_ENDPOINT:     http://apm-server-apm-http:8200
+  OTEL_EXPORTER_OTLP_HEADERS:     Authorization=Bearer 4113wNO7AFYO336Yn3vj2yvP
+  OTEL_RESOURCE_ATTRIBUTES:     deployment.environment=production
+  REFLECTSYNC_HttpServer__ExceptionContextResponseEnabled:     "true"
+  REFLECTSYNC_Kestrel__EndpointDefaults__Protocols:     Http1AndHttp2
+  REFLECTSYNC_MessageBroker__Backend:     MassTransit
+  REFLECTSYNC_MessageBroker__MassTransit__RabbitMq__HostName:     opr-rabbitmq
+  REFLECTSYNC_MessageBroker__MassTransit__RabbitMq__SyncSessionTopicId:     sync-sessions
+  REFLECTSYNC_MessageBroker__MassTransit__Transport:     RabbitMQ
+  REFLECTSYNC_PixyzOptimizeSdk__Enabled:     "false"
+  REFLECTSYNC_ProjectMetadata__Backend:     Database
+  REFLECTSYNC_ProjectServer__Address:     https://web-develop.opr.unity.com
+  REFLECTSYNC_ProjectServer__HttpAddress:     https://develop.opr.unity.com
+  REFLECTSYNC_SessionManager__MaxWorkers:     "8"
+  REFLECTSYNC_Storage__Backend:     Bucket
+  REFLECTSYNC_Storage__Bucket__BucketName__Default:     sync-service-dev
+  REFLECTSYNC_Storage__Bucket__IntermediateStorage__Root:     /storage
+  REFLECTSYNC_Storage__Bucket__ProviderName:     AWS
+  REFLECTSYNC_Storage__Bucket__ProviderUrl:     https://minio-api-develop.opr.unity.com
+  REFLECTSYNC_Storage__Bucket__RetryPolicy__InitialDelay:     "00:00:01"
+  REFLECTSYNC_Storage__Bucket__RetryPolicy__MaxRetries:     "10"
+  REFLECTSYNC_Swagger__Enabled:     "false"
+  REFLECT_COMPONENT:     sync
+  REFLECT_ENVIRONMENT:     Production
+  REFLECT_TESTRUNNER_WAIT:     "1"
+---
+# Source: opr/charts/voip/charts/mumble-rest/charts/reflect-common-chart/templates/configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mumble-rest-config
+  labels:
+    helm.sh/chart: reflect-common-chart-2.0.5
+    
+    app.kubernetes.io/name: mumble-rest
+    app.kubernetes.io/instance: opr
+    app.kubernetes.io/managed-by: Helm
+  annotations:
+data:
+  APP_DEBUG:     "False"
+  APP_HOST:     0.0.0.0
+  APP_PORT:     "8082"
+  AUTH_JWK_URL:     https://keycloak-develop.opr.unity.com/realms/reflect/protocol/openid-connect/certs
+  AUTH_JWT_VALID_ISSUER:     https://keycloak-develop.opr.unity.com/realms/reflect
+  AUTH_NAME_CLAIM:     preferred_username
+  AUTH_UID_OFFSET:     "1000"
+  ENABLE_AUTH:     "True"
+  MURMUR_ICE_HOST:     murmur.opr-develop.svc.cluster.local
+  MURMUR_ICE_PORT:     "6502"
+  REFLECT_COMPONENT:     mumble-rest
+---
+# Source: opr/charts/voip/charts/murmur/charts/reflect-common-chart/templates/configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: murmur-config
+  labels:
+    helm.sh/chart: reflect-common-chart-2.0.5
+    
+    app.kubernetes.io/name: murmur
+    app.kubernetes.io/instance: opr
+    app.kubernetes.io/managed-by: Helm
+  annotations:
+data:
+  REFLECT_COMPONENT:     murmur
+---
+# Source: opr/charts/voip/charts/murmur/templates/murmur-configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: murmur-files
+data:
+  murmur.ini: |
+    ; Murmur configuration file.
+    ;
+    ; General notes:
+    ; * Settings in this file are default settings and many of them can be overridden
+    ;   with virtual server specific configuration via the Ice or DBus interface.
+    ; * Due to the way this configuration file is read some rules have to be
+    ;   followed when specifying variable values (as in variable = value):
+    ;     * Make sure to quote the value when using commas in strings or passwords.
+    ;        NOT variable = super,secret BUT variable = "super,secret"
+    ;     * Make sure to escape special characters like '\' or '"' correctly
+    ;        NOT variable = """ BUT variable = "\""
+    ;        NOT regex = \w* BUT regex = \\w*
+  
+    ; Path to database. If blank, will search for
+    ; murmur.sqlite in default locations or create it if not found.
+    database=/var/lib/murmur/murmur.sqlite
+  
+    ; Murmur defaults to using SQLite with its default rollback journal.
+    ; In some situations, using SQLite's write-ahead log (WAL) can be
+    ; advantageous.
+    ; If you encounter slowdowns when moving between channels and similar
+    ; operations, enabling the SQLite write-ahead log might help.
+    ;
+    ; To use SQLite's write-ahead log, set sqlite_wal to one of the following
+    ; values:
+    ;
+    ; 0 - Use SQLite's default rollback journal.
+    ; 1 - Use write-ahead log with synchronous=NORMAL.
+    ;     If Murmur crashes, the database will be in a consistent state, but
+    ;     the most recent changes might be lost if the operating system did
+    ;     not write them to disk yet. This option can improve Murmur's
+    ;     interactivity on busy servers, or servers with slow storage.
+    ; 2 - Use write-ahead log with synchronous=FULL.
+    ;     All database writes are synchronized to disk when they are made.
+    ;     If Murmur crashes, the database will be include all completed writes.
+    ;sqlite_wal=0
+  
+    ; If you wish to use something other than SQLite, you'll need to set the name
+    ; of the database above, and also uncomment the below.
+    ; Sticking with SQLite is strongly recommended, as it's the most well tested
+    ; and by far the fastest solution.
+    ;
+    ;dbDriver=QMYSQL
+    ;dbUsername=
+    ;dbPassword=
+    ;dbHost=
+    ;dbPort=
+    ;dbPrefix=murmur_
+    ;dbOpts=
+  
+    database=Murmur
+    dbDriver=QPSQL
+    dbUsername=murmur_service
+    dbPassword=reflect
+    dbHost=opr-postgresql
+    dbPort=5432
+    dbPrefix=murmur_
+  
+    ; Murmur defaults to not using D-Bus. If you wish to use dbus, which is one of the
+    ; RPC methods available in Murmur, please specify so here.
+    ;
+    ;dbus=session
+  
+    ; Alternate D-Bus service name. Only use if you are running distinct
+    ; murmurd processes connected to the same D-Bus daemon.
+    ;dbusservice=net.sourceforge.mumble.murmur
+  
+    ; If you want to use ZeroC Ice to communicate with Murmur, you need
+    ; to specify the endpoint to use. Since there is no authentication
+    ; with ICE, you should only use it if you trust all the users who have
+    ; shell access to your machine.
+    ; Please see the ICE documentation on how to specify endpoints.
+    ice="tcp -h 0.0.0.0 -p 6502"
+  
+    ; Ice primarily uses local sockets. This means anyone who has a
+    ; user account on your machine can connect to the Ice services.
+    ; You can set a plaintext "secret" on the Ice connection, and
+    ; any script attempting to access must then have this secret
+    ; (as context with name "secret").
+    ; Access is split in read (look only) and write (modify)
+    ; operations. Write access always includes read access,
+    ; unless read is explicitly denied (see note below).
+    ;
+    ; Note that if this is uncommented and with empty content,
+    ; access will be denied.
+  
+    ;icesecretread=
+    icesecretwrite=murmur-ice-secret-key
+  
+    ; If you want to expose Murmur's experimental gRPC API, you
+    ; need to specify an address to bind on.
+    ; Note: not all builds of Murmur support gRPC. If gRPC is not
+    ; available, Murmur will warn you in its log output.
+    ;grpc="127.0.0.1:50051"
+    ; Specifying both a certificate and key file below will cause gRPC to use
+    ; secured, TLS connections.
+    ;grpccert=""
+    ;grpckey=""
+  
+    ; Specifies the file Murmur should log to. By default, Murmur
+    ; logs to the file 'murmur.log'. If you leave this field blank
+    ; on Unix-like systems, Murmur will force itself into foreground
+    ; mode which logs to the console.
+    ;logfile=murmur.log
+  
+    ; If set, Murmur will write its process ID to this file
+    ; when running in daemon mode (when the -fg flag is not
+    ; specified on the command line). Only available on
+    ; Unix-like systems.
+    ;pidfile=
+  
+    ; The below will be used as defaults for new configured servers.
+    ; If you're just running one server (the default), it's easier to
+    ; configure it here than through D-Bus or Ice.
+    ;
+    ; Welcome message sent to clients when they connect.
+    ; If the welcome message is set to an empty string,
+    ; no welcome message will be sent to clients.
+    welcometext="<br />Welcome to this server running <b>Murmur</b>.<br />Enjoy your stay!<br />"
+  
+    ; Port to bind TCP and UDP sockets to.
+    port=64738
+  
+    ; Specific IP or hostname to bind to.
+    ; If this is left blank (default), Murmur will bind to all available addresses.
+    ;host=
+  
+    ; Password to join server.
+    serverpassword=
+  
+    ; Maximum bandwidth (in bits per second) clients are allowed
+    ; to send speech at.
+    bandwidth=72000
+  
+    ; Murmur and Mumble are usually pretty good about cleaning up hung clients, but
+    ; occasionally one will get stuck on the server. The timeout setting will cause
+    ; a periodic check of all clients who haven't communicated with the server in
+    ; this many seconds - causing zombie clients to be disconnected.
+    ;
+    ; Note that this has no effect on idle clients or people who are AFK. It will
+    ; only affect people who are already disconnected, and just haven't told the
+    ; server.
+    ;timeout=30
+  
+    ; Maximum number of concurrent clients allowed.
+    users=100
+  
+    ; Where users sets a blanket limit on the number of clients per virtual server,
+    ; usersperchannel sets a limit on the number per channel. The default is 0, for
+    ; no limit.
+    ;usersperchannel=0
+  
+    ; Per-user rate limiting
+    ;
+    ; These two settings allow to configure the per-user rate limiter for some
+    ; command messages sent from the client to the server. The messageburst setting
+    ; specifies an amount of messages which are allowed in short bursts. The
+    ; messagelimit setting specifies the number of messages per second allowed over
+    ; a longer period. If a user hits the rate limit, his packages are then ignored
+    ; for some time. Both of these settings have a minimum of 1 as setting either to
+    ; 0 could render the server unusable.
+    messageburst=5
+    messagelimit=1
+  
+    ; Respond to UDP ping packets.
+    ;
+    ; Setting to true exposes the current user count, the maximum user count, and
+    ; the server's maximum bandwidth per client to unauthenticated users. In the
+    ; Mumble client, this information is shown in the Connect dialog.
+    allowping=true
+  
+    ; Amount of users with Opus support needed to force Opus usage, in percent.
+    ; 0 = Always enable Opus, 100 = enable Opus if it's supported by all clients.
+    ;opusthreshold=100
+  
+    ; Maximum depth of channel nesting. Note that some databases like MySQL using
+    ; InnoDB will fail when operating on deeply nested channels.
+    ;channelnestinglimit=10
+  
+    ; Maximum number of channels per server. 0 for unlimited. Note that an
+    ; excessive number of channels will impact server performance
+    ;channelcountlimit=1000
+  
+    ; Regular expression used to validate channel names.
+    ; (Note that you have to escape backslashes with \ )
+    ;channelname=[ \\-=\\w\\#\\[\\]\\{\\}\\(\\)\\@\\|]+
+  
+    ; Regular expression used to validate user names.
+    ; (Note that you have to escape backslashes with \ )
+    ;username=[-=\\w\\[\\]\\{\\}\\(\\)\\@\\|\\.]+
+  
+    ; If a user has no stored channel (they've never been connected to the server
+    ; before, or rememberchannel is set to false) and the client hasn't been given
+    ; a URL that includes a channel path, the default behavior is that they will
+    ; end up in the root channel.
+    ;
+    ; You can set this setting to a channel ID, and the user will automatically be
+    ; moved into that channel instead. Note that this is the numeric ID of the
+    ; channel, which can be a little tricky to get (you'll either need to use an
+    ; RPC mechanism, watch the console of a debug client, or root around through
+    ; the Murmur Database to get it).
+    ;
+    ;defaultchannel=0
+  
+    ; When a user connects to a server they've already been on, by default the
+    ; server will remember the last channel they were in and move them to it
+    ; automatically. Toggling this setting to false will disable that feature.
+    ;
+    ;rememberchannel=true
+  
+    ; Maximum length of text messages in characters. 0 for no limit.
+    ;textmessagelength=5000
+  
+    ; Maximum length of text messages in characters, with image data. 0 for no limit.
+    ;imagemessagelength=131072
+  
+    ; Allow clients to use HTML in messages, user comments and channel descriptions?
+    ;allowhtml=true
+  
+    ; Murmur retains the per-server log entries in an internal database which
+    ; allows it to be accessed over D-Bus/ICE.
+    ; How many days should such entries be kept?
+    ; Set to 0 to keep forever, or -1 to disable logging to the DB.
+    ;logdays=31
+  
+    ; To enable public server registration, the serverpassword must be blank, and
+    ; this must all be filled out.
+    ; The password here is used to create a registry for the server name; subsequent
+    ; updates will need the same password. Don't lose your password.
+    ; The URL is your own website, and only set the registerHostname for static IP
+    ; addresses.
+    ; Location is typically the country of typical users of the server, in
+    ; two-letter TLD style (ISO 3166-1 alpha-2 country code)
+    ;
+    ; If you only wish to give your "Root" channel a custom name, then only
+    ; uncomment the 'registerName' parameter.
+    ;
+    ;registerName=Mumble Server
+    ;registerPassword=secret
+    ;registerUrl=http://www.mumble.info/
+    ;registerHostname=
+    ;registerLocation=
+  
+    ; If this option is enabled, the server will announce its presence via the
+    ; bonjour service discovery protocol. To change the name announced by bonjour
+    ; adjust the registerName variable.
+    ; See http://developer.apple.com/networking/bonjour/index.html for more information
+    ; about bonjour.
+    ;bonjour=True
+  
+    ; If you have a proper SSL certificate, you can provide the filenames here.
+    ; Otherwise, Murmur will create its own certificate automatically.
+    sslCert=/etc/opr/murmur-cert/tls.crt
+    sslKey=/etc/opr/murmur-cert/tls.key
+  
+    ; If the keyfile specified above is encrypted with a passphrase, you can enter
+    ; it in this setting. It must be plaintext, so you may wish to adjust the
+    ; permissions on your murmur.ini file accordingly.
+    ;sslPassPhrase=
+  
+    ; If your certificate is signed by an authority that uses a sub-signed or
+    ; "intermediate" certificate, you probably need to bundle it with your
+    ; certificate in order to get Murmur to accept it. You can either concatenate
+    ; the two certificates into one file, or you can put it in a file by itself and
+    ; put the path to that PEM-file in sslCA.
+    ;sslCA=
+  
+    ; The sslDHParams option allows you to specify a PEM-encoded file with
+    ; Diffie-Hellman parameters, which will be used as the default Diffie-
+    ; Hellman parameters for all virtual servers.
+    ;
+    ; Instead of pointing sslDHParams to a file, you can also use the option
+    ; to specify a named set of Diffie-Hellman parameters for Murmur to use.
+    ; Murmur comes bundled with the Diffie-Hellman parameters from RFC 7919.
+    ; These parameters are available by using the following names:
+    ;
+    ; @ffdhe2048, @ffdhe3072, @ffdhe4096, @ffdhe6144, @ffdhe8192
+    ;
+    ; By default, Murmur uses @ffdhe2048.
+    ;sslDHParams=@ffdhe2048
+  
+    ; The sslCiphers option chooses the cipher suites to make available for use
+    ; in SSL/TLS. This option is server-wide, and cannot be set on a
+    ; per-virtual-server basis.
+    ;
+    ; This option is specified using OpenSSL cipher list notation (see
+    ; https://www.openssl.org/docs/apps/ciphers.html#CIPHER-LIST-FORMAT).
+    ;
+    ; It is recommended that you try your cipher string using 'openssl ciphers <string>'
+    ; before setting it here, to get a feel for which cipher suites you will get.
+    ;
+    ; After setting this option, it is recommend that you inspect your Murmur log
+    ; to ensure that Murmur is using the cipher suites that you expected it to.
+    ;
+    ; Note: Changing this option may impact the backwards compatibility of your
+    ; Murmur server, and can remove the ability for older Mumble clients to be able
+    ; to connect to it.
+    ;sslCiphers=EECDH+AESGCM:EDH+aRSA+AESGCM:DHE-RSA-AES256-SHA:DHE-RSA-AES128-SHA:AES256-SHA:AES128-SHA
+  
+    ; If Murmur is started as root, which user should it switch to?
+    ; This option is ignored if Murmur isn't started with root privileges.
+    ;uname=
+  
+    ; By default, in log files and in the user status window for privileged users,
+    ; Mumble will show IP addresses - in some situations you may find this unwanted
+    ; behavior. If obfuscate is set to true, Murmur will randomize the IP addresses
+    ; of connecting users.
+    ;
+    ; The obfuscate function only affects the log file and DOES NOT effect the user
+    ; information section in the client window.
+    ;obfuscate=false
+  
+    ; If this options is enabled, only clients which have a certificate are allowed
+    ; to connect.
+    ;certrequired=False
+  
+    ; If enabled, clients are sent information about the servers version and operating
+    ; system.
+    ;sendversion=True
+  
+    ; You can set a recommended minimum version for your server, and clients will
+    ; be notified in their log when they connect if their client does not meet the
+    ; minimum requirements. suggestVersion expects the version in the format X.X.X.
+    ;
+    ; Note that the suggest* options appeared after 1.2.3 and will have no effect
+    ; on client versions 1.2.3 and earlier.
+    ;
+    ;suggestVersion=
+  
+    ; Setting this to "true" will alert any user who does not have positional audio
+    ; enabled that the server administrators recommend enabling it. Setting it to
+    ; "false" will have the opposite effect - if you do not care whether the user
+    ; enables positional audio or not, set it to blank. The message will appear in
+    ; the log window upon connection, but only if the user's settings do not match
+    ; what the server requests.
+    ;
+    ; Note that the suggest* options appeared after 1.2.3 and will have no effect
+    ; on client versions 1.2.3 and earlier.
+    ;
+    ;suggestPositional=
+  
+    ; Setting this to "true" will alert any user who does not have Push-To-Talk
+    ; enabled that the server administrators recommend enabling it. Setting it to
+    ; "false" will have the opposite effect - if you do not care whether the user
+    ; enables PTT or not, set it to blank. The message will appear in the log
+    ; window upon connection, but only if the user's settings do not match what the
+    ; server requests.
+    ;
+    ; Note that the suggest* options appeared after 1.2.3 and will have no effect
+    ; on client versions 1.2.3 and earlier.
+    ;
+    ;suggestPushToTalk=
+  
+    ; This sets password hash storage to legacy mode (1.2.4 and before)
+    ; (Note that setting this to true is insecure and should not be used unless absolutely necessary)
+    ;legacyPasswordHash=false
+  
+    ; By default a strong amount of PBKDF2 iterations are chosen automatically. If >0 this setting
+    ; overrides the automatic benchmark and forces a specific number of iterations.
+    ; (Note that you should only change this value if you know what you are doing)
+    ;kdfIterations=-1
+  
+    ; In order to prevent misconfigured, impolite or malicious clients from
+    ; affecting the low-latency of other users, Murmur has a rudimentary global-ban
+    ; system. It's configured using the autobanAttempts, autobanTimeframe and
+    ; autobanTime settings.
+    ;
+    ; If a client attempts autobanAttempts connections in autobanTimeframe seconds,
+    ; they will be banned for autobanTime seconds. This is a global ban, from all
+    ; virtual servers on the Murmur process. It will not show up in any of the
+    ; ban-lists on the server, and they can't be removed without restarting the
+    ; Murmur process - just let them expire. A single, properly functioning client
+    ; should not trip these bans.
+    ;
+    ; To disable, set autobanAttempts or autobanTimeframe to 0. Commenting these
+    ; settings out will cause Murmur to use the defaults:
+    ;
+    ;autobanAttempts=10
+    ;autobanTimeframe=120
+    ;autobanTime=300
+  
+    ; You can configure any of the configuration options for Ice here. We recommend
+    ; leave the defaults as they are.
+    ; Please note that this section has to be last in the configuration file.
+    ;
+    [Ice]
+    Ice.Warn.UnknownProperties=1
+    Ice.MessageSizeMax=65536
+---
+# Source: opr/charts/multiplayer/charts/matchmaker/charts/reflect-common-chart/templates/clusterrole.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: matchmaker-clusterrole
+  labels:
+    helm.sh/chart: reflect-common-chart-1.0.0
+    
+    app.kubernetes.io/name: matchmaker
+    app.kubernetes.io/instance: opr
+    app.kubernetes.io/managed-by: Helm
+  annotations:
+rules:
+  - apiGroups:
+    - ""
+    - apps
+    - batch
+    resources:
+    - services
+    - jobs
+    verbs:
+    - create
+    - get
+    - watch
+    - list
+    - delete
+---
+# Source: opr/charts/multiplayer/charts/netcode/charts/reflect-common-chart/templates/clusterrole.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: netcode-clusterrole
+  labels:
+    helm.sh/chart: reflect-common-chart-1.0.0
+    
+    app.kubernetes.io/name: opr-reflect-common-chart
+    app.kubernetes.io/instance: opr
+    app.kubernetes.io/managed-by: Helm
+  annotations:
+rules:
+  - apiGroups:
+    - ""
+    resources:
+    - services
+    - nodes
+    - secrets
+    verbs:
+    - get
+    - watch
+    - list
+---
+# Source: opr/charts/multiplayer/charts/matchmaker/charts/reflect-common-chart/templates/clusterrolebinding.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: matchmaker-rb
+  labels:
+    helm.sh/chart: reflect-common-chart-1.0.0
+    
+    app.kubernetes.io/name: matchmaker
+    app.kubernetes.io/instance: opr
+    app.kubernetes.io/managed-by: Helm
+  annotations:
+subjects:
+  - kind: ServiceAccount
+    name: matchmaker-sa
+    namespace: opr-develop
+roleRef:
+  kind: ClusterRole
+  name: matchmaker-clusterrole
+  apiGroup: rbac.authorization.k8s.io
+---
+# Source: opr/charts/multiplayer/charts/netcode/charts/reflect-common-chart/templates/clusterrolebinding.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: netcode-rb
+  labels:
+    helm.sh/chart: reflect-common-chart-1.0.0
+    
+    app.kubernetes.io/name: opr-reflect-common-chart
+    app.kubernetes.io/instance: opr
+    app.kubernetes.io/managed-by: Helm
+  annotations:
+subjects:
+  - kind: ServiceAccount
+    name: netcode-sa
+    namespace: opr-develop
+roleRef:
+  kind: ClusterRole
+  name: netcode-clusterrole
+  apiGroup: rbac.authorization.k8s.io
+---
+# Source: opr/charts/rabbitmq/templates/role.yaml
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: opr-rabbitmq-endpoint-reader
+  namespace: "opr-develop"
+  labels:
+    app.kubernetes.io/name: rabbitmq
+    helm.sh/chart: rabbitmq-12.0.9
+    app.kubernetes.io/instance: opr
+    app.kubernetes.io/managed-by: Helm
+rules:
+  - apiGroups: [""]
+    resources: ["endpoints"]
+    verbs: ["get"]
+  - apiGroups: [""]
+    resources: ["events"]
+    verbs: ["create"]
+---
+# Source: opr/charts/rabbitmq/templates/rolebinding.yaml
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: opr-rabbitmq-endpoint-reader
+  namespace: "opr-develop"
+  labels:
+    app.kubernetes.io/name: rabbitmq
+    helm.sh/chart: rabbitmq-12.0.9
+    app.kubernetes.io/instance: opr
+    app.kubernetes.io/managed-by: Helm
+subjects:
+  - kind: ServiceAccount
+    name: opr-rabbitmq
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: opr-rabbitmq-endpoint-reader
+---
+# Source: opr/charts/annotations/charts/reflect-common-chart/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: annotations
+  labels:
+    helm.sh/chart: reflect-common-chart-1.0.0
+    
+    app.kubernetes.io/name: annotations
+    app.kubernetes.io/instance: opr
+    app.kubernetes.io/managed-by: Helm
+spec:
+  type: ClusterIP
+  ports:
+    - name: http
+      port: 80
+      protocol: TCP
+    - name: prom-publisher
+      port: 1234
+      protocol: TCP
+  selector:
+    
+    app.kubernetes.io/name: annotations
+    app.kubernetes.io/instance: opr
+---
+# Source: opr/charts/commonui/charts/reflect-common-chart/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: commonui
+  labels:
+    helm.sh/chart: reflect-common-chart-1.0.0
+    
+    app.kubernetes.io/name: commonui
+    app.kubernetes.io/instance: opr
+    app.kubernetes.io/managed-by: Helm
+spec:
+  type: ClusterIP
+  ports:
+    - name: http
+      port: 5000
+      protocol: TCP
+  selector:
+    
+    app.kubernetes.io/name: commonui
+    app.kubernetes.io/instance: opr
+---
+# Source: opr/charts/keycloak/templates/service-headless.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: opr-keycloak-headless
+  labels:
+    helm.sh/chart: keycloak-18.4.3
+    app.kubernetes.io/name: keycloak
+    app.kubernetes.io/instance: opr
+    app.kubernetes.io/version: "21.1.2"
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/component: headless
+spec:
+  type: ClusterIP
+  clusterIP: None
+  ports:
+    - name: http
+      port: 80
+      targetPort: http
+      protocol: TCP
+  selector:
+    app.kubernetes.io/name: keycloak
+    app.kubernetes.io/instance: opr
+---
+# Source: opr/charts/keycloak/templates/service-http.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: opr-keycloak-http
+  labels:
+    helm.sh/chart: keycloak-18.4.3
+    app.kubernetes.io/name: keycloak
+    app.kubernetes.io/instance: opr
+    app.kubernetes.io/version: "21.1.2"
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/component: http
+spec:
+  type: ClusterIP
+  ports:
+    - name: http
+      port: 80
+      targetPort: http
+      protocol: TCP
+    - name: https
+      port: 8443
+      targetPort: https
+      protocol: TCP
+    - name: http-management
+      port: 9990
+      targetPort: http-management
+      protocol: TCP
+  selector:
+    app.kubernetes.io/name: keycloak
+    app.kubernetes.io/instance: opr
+---
+# Source: opr/charts/links/charts/reflect-common-chart/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: links
+  labels:
+    helm.sh/chart: reflect-common-chart-1.0.0
+    
+    app.kubernetes.io/name: links
+    app.kubernetes.io/instance: opr
+    app.kubernetes.io/managed-by: Helm
+spec:
+  type: ClusterIP
+  ports:
+    - name: http
+      port: 80
+      protocol: TCP
+  selector:
+    
+    app.kubernetes.io/name: links
+    app.kubernetes.io/instance: opr
+---
+# Source: opr/charts/multiplayer/charts/matchmaker/charts/reflect-common-chart/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: matchmaker
+  labels:
+    helm.sh/chart: reflect-common-chart-1.0.0
+    
+    app.kubernetes.io/name: matchmaker
+    app.kubernetes.io/instance: opr
+    app.kubernetes.io/managed-by: Helm
+spec:
+  type: ClusterIP
+  ports:
+    - name: http
+      port: 80
+      protocol: TCP
+    - name: prom-publisher
+      port: 1234
+      protocol: TCP
+    - name: grpc
+      port: 10042
+      protocol: TCP
+      targetPort: 10042
+  selector:
+    
+    app.kubernetes.io/name: matchmaker
+    app.kubernetes.io/instance: opr
+---
+# Source: opr/charts/postgres-integration-svc/charts/reflect-common-chart/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-integration-svc
+  labels:
+    helm.sh/chart: reflect-common-chart-1.0.0
+    app.kubernetes.io/component: primary
+    app.kubernetes.io/name: postgresql
+    app.kubernetes.io/instance: opr
+    app.kubernetes.io/managed-by: Helm
+spec:
+  type: NodePort
+  ports:
+    - name: postrgres-integration-test-svc
+      nodePort: 30432
+      port: 5432
+      protocol: TCP
+      targetPort: 5432
+  selector:
+    app.kubernetes.io/component: primary
+    app.kubernetes.io/name: postgresql
+    app.kubernetes.io/instance: opr
+---
+# Source: opr/charts/postgresql/templates/primary/svc-headless.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: opr-postgresql-hl
+  namespace: "opr-develop"
+  labels:
+    app.kubernetes.io/name: postgresql
+    helm.sh/chart: postgresql-12.8.0
+    app.kubernetes.io/instance: opr
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/component: primary
+    # Use this annotation in addition to the actual publishNotReadyAddresses
+    # field below because the annotation will stop being respected soon but the
+    # field is broken in some versions of Kubernetes:
+    # https://github.com/kubernetes/kubernetes/issues/58662
+    service.alpha.kubernetes.io/tolerate-unready-endpoints: "true"
+spec:
+  type: ClusterIP
+  clusterIP: None
+  # We want all pods in the StatefulSet to have their addresses published for
+  # the sake of the other Postgresql pods even before they're ready, since they
+  # have to be able to talk to each other in order to become ready.
+  publishNotReadyAddresses: true
+  ports:
+    - name: tcp-postgresql
+      port: 5432
+      targetPort: tcp-postgresql
+  selector:
+    app.kubernetes.io/name: postgresql
+    app.kubernetes.io/instance: opr
+    app.kubernetes.io/component: primary
+---
+# Source: opr/charts/postgresql/templates/primary/svc.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: opr-postgresql
+  namespace: "opr-develop"
+  labels:
+    app.kubernetes.io/name: postgresql
+    helm.sh/chart: postgresql-12.8.0
+    app.kubernetes.io/instance: opr
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/component: primary
+spec:
+  type: ClusterIP
+  sessionAffinity: None
+  ports:
+    - name: tcp-postgresql
+      port: 5432
+      targetPort: tcp-postgresql
+      nodePort: null
+  selector:
+    app.kubernetes.io/name: postgresql
+    app.kubernetes.io/instance: opr
+    app.kubernetes.io/component: primary
+---
+# Source: opr/charts/project-grpc-nodeport/charts/reflect-common-chart/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: project-grpc
+  labels:
+    helm.sh/chart: reflect-common-chart-1.0.0
+    app.kubernetes.io/name: project
+    app.kubernetes.io/instance: opr
+    app.kubernetes.io/managed-by: Helm
+spec:
+  type: NodePort
+  ports:
+    - name: project-grpc
+      nodePort: 30010
+      port: 10010
+      protocol: TCP
+      targetPort: 10010
+  selector:
+    app.kubernetes.io/name: project
+    app.kubernetes.io/instance: opr
+---
+# Source: opr/charts/project/charts/reflect-common-chart/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: project
+  labels:
+    helm.sh/chart: reflect-common-chart-1.0.0
+    
+    app.kubernetes.io/name: project
+    app.kubernetes.io/instance: opr
+    app.kubernetes.io/managed-by: Helm
+spec:
+  type: ClusterIP
+  ports:
+    - name: prom-publisher
+      port: 1234
+      protocol: TCP
+    - name: grpc
+      port: 10010
+      protocol: TCP
+      targetPort: 10010
+    - name: grpc-web
+      port: 8080
+      protocol: TCP
+      targetPort: 8080
+    - name: http
+      port: 80
+      protocol: TCP
+      targetPort: 80
+    - name: grpc-web-admin
+      port: 9901
+      protocol: TCP
+      targetPort: 9901
+  selector:
+    
+    app.kubernetes.io/name: project
+    app.kubernetes.io/instance: opr
+---
+# Source: opr/charts/rabbitmq/templates/svc-headless.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: opr-rabbitmq-headless
+  namespace: "opr-develop"
+  labels:
+    app.kubernetes.io/name: rabbitmq
+    helm.sh/chart: rabbitmq-12.0.9
+    app.kubernetes.io/instance: opr
+    app.kubernetes.io/managed-by: Helm
+spec:
+  clusterIP: None
+  ports:
+    - name: epmd
+      port: 4369
+      targetPort: epmd
+    - name: amqp
+      port: 5672
+      targetPort: amqp
+    - name: dist
+      port: 25672
+      targetPort: dist
+    - name: http-stats
+      port: 15672
+      targetPort: stats
+  selector: 
+    app.kubernetes.io/name: rabbitmq
+    app.kubernetes.io/instance: opr
+  publishNotReadyAddresses: true
+---
+# Source: opr/charts/rabbitmq/templates/svc.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: opr-rabbitmq
+  namespace: "opr-develop"
+  labels:
+    app.kubernetes.io/name: rabbitmq
+    helm.sh/chart: rabbitmq-12.0.9
+    app.kubernetes.io/instance: opr
+    app.kubernetes.io/managed-by: Helm
+spec:
+  type: ClusterIP
+  sessionAffinity: None
+  ports:
+    - name: amqp
+      port: 5672
+      targetPort: amqp
+      nodePort: null
+    - name: epmd
+      port: 4369
+      targetPort: epmd
+      nodePort: null
+    - name: dist
+      port: 25672
+      targetPort: dist
+      nodePort: null
+    - name: http-stats
+      port: 15672
+      targetPort: stats
+      nodePort: null
+  selector: 
+    app.kubernetes.io/name: rabbitmq
+    app.kubernetes.io/instance: opr
+---
+# Source: opr/charts/sync/charts/api/charts/reflect-common-chart/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: sync-api
+  labels:
+    helm.sh/chart: reflect-common-chart-1.0.0
+    
+    app.kubernetes.io/name: sync-api
+    app.kubernetes.io/instance: opr
+    app.kubernetes.io/managed-by: Helm
+spec:
+  type: ClusterIP
+  ports:
+    - name: prom-publisher
+      port: 1234
+      protocol: TCP
+    - name: grpc
+      port: 10011
+      protocol: TCP
+      targetPort: 10011
+    - name: http
+      port: 80
+      protocol: TCP
+  selector:
+    
+    app.kubernetes.io/name: sync-api
+    app.kubernetes.io/instance: opr
+---
+# Source: opr/charts/sync/charts/decimator/charts/reflect-common-chart/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: sync-decimator
+  labels:
+    helm.sh/chart: reflect-common-chart-1.0.0
+    
+    app.kubernetes.io/name: sync-decimator
+    app.kubernetes.io/instance: opr
+    app.kubernetes.io/managed-by: Helm
+spec:
+  type: ClusterIP
+  ports:
+    - name: prom-publisher
+      port: 1234
+      protocol: TCP
+    - name: http
+      port: 80
+      protocol: TCP
+      targetPort: 80
+  selector:
+    
+    app.kubernetes.io/name: sync-decimator
+    app.kubernetes.io/instance: opr
+---
+# Source: opr/charts/sync/charts/hlodbuilder/charts/reflect-common-chart/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: sync-hlodbuilder
+  labels:
+    helm.sh/chart: reflect-common-chart-1.0.0
+    
+    app.kubernetes.io/name: sync-hlodbuilder
+    app.kubernetes.io/instance: opr
+    app.kubernetes.io/managed-by: Helm
+spec:
+  type: ClusterIP
+  ports:
+    - name: prom-publisher
+      port: 1234
+      protocol: TCP
+    - name: http
+      port: 80
+      protocol: TCP
+      targetPort: 80
+  selector:
+    
+    app.kubernetes.io/name: sync-hlodbuilder
+    app.kubernetes.io/instance: opr
+---
+# Source: opr/charts/sync/charts/modelprocessor-safemode/charts/reflect-common-chart/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: sync-modelprocessor-safemode
+  labels:
+    helm.sh/chart: reflect-common-chart-1.0.0
+    
+    app.kubernetes.io/name: sync-modelprocessor-safemode
+    app.kubernetes.io/instance: opr
+    app.kubernetes.io/managed-by: Helm
+spec:
+  type: ClusterIP
+  ports:
+    - name: prom-publisher
+      port: 1234
+      protocol: TCP
+    - name: http
+      port: 80
+      protocol: TCP
+      targetPort: 80
+  selector:
+    
+    app.kubernetes.io/name: sync-modelprocessor-safemode
+    app.kubernetes.io/instance: opr
+---
+# Source: opr/charts/sync/charts/modelprocessor/charts/reflect-common-chart/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: sync-modelprocessor
+  labels:
+    helm.sh/chart: reflect-common-chart-1.0.0
+    
+    app.kubernetes.io/name: sync-modelprocessor
+    app.kubernetes.io/instance: opr
+    app.kubernetes.io/managed-by: Helm
+spec:
+  type: ClusterIP
+  ports:
+    - name: prom-publisher
+      port: 1234
+      protocol: TCP
+    - name: http
+      port: 80
+      protocol: TCP
+      targetPort: 80
+  selector:
+    
+    app.kubernetes.io/name: sync-modelprocessor
+    app.kubernetes.io/instance: opr
+---
+# Source: opr/charts/sync/charts/worker/charts/reflect-common-chart/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: sync-worker
+  labels:
+    helm.sh/chart: reflect-common-chart-1.0.0
+    
+    app.kubernetes.io/name: sync-worker
+    app.kubernetes.io/instance: opr
+    app.kubernetes.io/managed-by: Helm
+spec:
+  type: ClusterIP
+  ports:
+    - name: prom-publisher
+      port: 1234
+      protocol: TCP
+    - name: http
+      port: 80
+      protocol: TCP
+      targetPort: 80
+  selector:
+    
+    app.kubernetes.io/name: sync-worker
+    app.kubernetes.io/instance: opr
+---
+# Source: opr/charts/voip/charts/mumble-rest/charts/reflect-common-chart/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: mumble-rest
+  labels:
+    helm.sh/chart: reflect-common-chart-2.0.5
+    
+    app.kubernetes.io/name: mumble-rest
+    app.kubernetes.io/instance: opr
+    app.kubernetes.io/managed-by: Helm
+spec:
+  type: ClusterIP
+  ports:
+    - name: http
+      port: 8082
+      protocol: TCP
+  selector:
+    
+    app.kubernetes.io/name: mumble-rest
+    app.kubernetes.io/instance: opr
+---
+# Source: opr/charts/voip/charts/murmur/charts/reflect-common-chart/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: murmur
+  labels:
+    helm.sh/chart: reflect-common-chart-2.0.5
+    
+    app.kubernetes.io/name: murmur
+    app.kubernetes.io/instance: opr
+    app.kubernetes.io/managed-by: Helm
+spec:
+  type: NodePort
+  ports:
+    - name: murmur-ice
+      nodePort: 30001
+      port: 6502
+      protocol: TCP
+      targetPort: 6502
+    - name: murmur-tcp
+      nodePort: 30000
+      port: 64738
+      protocol: TCP
+      targetPort: 64738
+    - name: murmur-udp
+      nodePort: 30000
+      port: 64738
+      protocol: UDP
+      targetPort: 64738
+  selector:
+    
+    app.kubernetes.io/name: murmur
+    app.kubernetes.io/instance: opr
+---
+# Source: opr/charts/annotations/charts/reflect-common-chart/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: annotations
+  labels:
+    helm.sh/chart: reflect-common-chart-1.0.0
+    
+    app.kubernetes.io/name: annotations
+    app.kubernetes.io/instance: opr
+    app.kubernetes.io/managed-by: Helm
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      
+      app.kubernetes.io/name: annotations
+      app.kubernetes.io/instance: opr
+  template:
+    metadata:
+      annotations:
+        checksum/config: f526f5f014e5b0ef395f29bd1c5f4f955a7f489dfce43349fa078341aba3addf
+        checksum/secrets: 70332b45058e5490f4a8c3b40e188e418e6afd5fbb6d5cc2141d8d2642ce1dd5
+        checksum/externalSecrets: 5acf3ff77b4420677b5923071f303facaba7a9273a346284a667a275df325146
+      labels:
+        
+        app.kubernetes.io/name: annotations
+        app.kubernetes.io/instance: opr
+    spec:
+      imagePullSecrets:
+        - name: regcred-gcp
+      serviceAccountName: default
+      securityContext:
+        {}
+      terminationGracePeriodSeconds: 30
+      containers:
+        - name: annotations
+          securityContext:
+            {}
+          image: "us-east1-docker.pkg.dev/unity-solutions-tyndall-prd/docker/reflect-annotations:develop-latest"
+          imagePullPolicy: Always
+          envFrom:
+            - secretRef:
+                name: annotations-secret
+            - configMapRef:
+                name: annotations-config
+          ports:
+            - containerPort: 80
+              name: http
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 80
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 80
+          resources:
+            {}
+---
+# Source: opr/charts/commonui/charts/reflect-common-chart/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: commonui
+  labels:
+    helm.sh/chart: reflect-common-chart-1.0.0
+    
+    app.kubernetes.io/name: commonui
+    app.kubernetes.io/instance: opr
+    app.kubernetes.io/managed-by: Helm
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      
+      app.kubernetes.io/name: commonui
+      app.kubernetes.io/instance: opr
+  template:
+    metadata:
+      annotations:
+        checksum/config: 79276a9d8fc73ad74b967c4e3baee602709e1cecb669ba65baed3ffb2d56cc34
+        checksum/secrets: 44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a
+        checksum/externalSecrets: 5acf3ff77b4420677b5923071f303facaba7a9273a346284a667a275df325146
+      labels:
+        
+        app.kubernetes.io/name: commonui
+        app.kubernetes.io/instance: opr
+    spec:
+      imagePullSecrets:
+        - name: regcred-gcp
+      serviceAccountName: default
+      securityContext:
+        {}
+      terminationGracePeriodSeconds: 30
+      containers:
+        - name: commonui
+          securityContext:
+            {}
+          image: "us-east1-docker.pkg.dev/unity-solutions-tyndall-prd/docker/reflect-dashboard:develop-latest"
+          imagePullPolicy: Always
+          envFrom:
+            - configMapRef:
+                name: commonui-config
+          ports:
+            - containerPort: 5000
+              name: http
+              protocol: TCP
+          resources:
+            limits:
+              cpu: 500m
+              memory: 1000Mi
+            requests:
+              cpu: 500m
+              memory: 1000Mi
+---
+# Source: opr/charts/links/charts/reflect-common-chart/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: links
+  labels:
+    helm.sh/chart: reflect-common-chart-1.0.0
+    
+    app.kubernetes.io/name: links
+    app.kubernetes.io/instance: opr
+    app.kubernetes.io/managed-by: Helm
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      
+      app.kubernetes.io/name: links
+      app.kubernetes.io/instance: opr
+  template:
+    metadata:
+      annotations:
+        checksum/config: b7dd1b46a37cda7d596bb3cc1a7d75e8781bccb9e6e093ded50bb28146b5458c
+        checksum/secrets: 44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a
+        checksum/externalSecrets: 5acf3ff77b4420677b5923071f303facaba7a9273a346284a667a275df325146
+      labels:
+        
+        app.kubernetes.io/name: links
+        app.kubernetes.io/instance: opr
+    spec:
+      imagePullSecrets:
+        - name: regcred-gcp
+      serviceAccountName: default
+      securityContext:
+        {}
+      terminationGracePeriodSeconds: 30
+      containers:
+        - name: links
+          securityContext:
+            {}
+          image: "us-east1-docker.pkg.dev/unity-solutions-tyndall-prd/docker/reflect-links:develop-latest"
+          imagePullPolicy: Always
+          envFrom:
+            - configMapRef:
+                name: links-config
+          ports:
+            - containerPort: 80
+              name: http
+              protocol: TCP
+          resources:
+            {}
+---
+# Source: opr/charts/multiplayer/charts/matchmaker/charts/reflect-common-chart/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: matchmaker
+  labels:
+    helm.sh/chart: reflect-common-chart-1.0.0
+    
+    app.kubernetes.io/name: matchmaker
+    app.kubernetes.io/instance: opr
+    app.kubernetes.io/managed-by: Helm
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      
+      app.kubernetes.io/name: matchmaker
+      app.kubernetes.io/instance: opr
+  template:
+    metadata:
+      annotations:
+        checksum/config: b8677dbde48ced43986ba512f074d0577e421b8f78d1d93a60e6211b18020f78
+        checksum/secrets: 6bf08e4cae2f2379312d45da04f1eb2a7c08ba9fd7d3d96f27b734d14a2629bd
+        checksum/externalSecrets: 5acf3ff77b4420677b5923071f303facaba7a9273a346284a667a275df325146
+      labels:
+        
+        app.kubernetes.io/name: matchmaker
+        app.kubernetes.io/instance: opr
+    spec:
+      imagePullSecrets:
+        - name: regcred-gcp
+      serviceAccountName: matchmaker-sa
+      securityContext:
+        {}
+      terminationGracePeriodSeconds: 30
+      containers:
+        - name: matchmaker
+          securityContext:
+            {}
+          image: "us-east1-docker.pkg.dev/unity-solutions-tyndall-prd/docker/reflect-matchmaker:develop-latest"
+          imagePullPolicy: Always
+          envFrom:
+            - secretRef:
+                name: matchmaker-secrets
+            - configMapRef:
+                name: matchmaker-config
+          env:
+            - name: REFLECT_POD_NAME
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: metadata.name
+          volumeMounts:
+            - mountPath: /app/netcode-manifests
+              name: netcode-manifests
+              readOnly: true
+          ports:
+            - containerPort: 10042
+              name: grpc
+            - containerPort: 80
+              name: http
+            - containerPort: 1234
+              name: prom-publisher
+          livenessProbe:
+            exec:
+              command:
+              - /bin/grpc_health_probe
+              - -addr=:10042
+          readinessProbe:
+            exec:
+              command:
+              - /bin/grpc_health_probe
+              - -addr=:10042
+          resources:
+            limits:
+              cpu: 500m
+              memory: 1000Mi
+            requests:
+              cpu: 500m
+              memory: 1000Mi
+      volumes:
+        - name: cloudsql-credentials
+          secret:
+            defaultMode: 420
+            secretName: cloudsql
+        - configMap:
+            name: netcode-manifests
+          name: netcode-manifests
+---
+# Source: opr/charts/project/charts/reflect-common-chart/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: project
+  labels:
+    helm.sh/chart: reflect-common-chart-1.0.0
+    
+    app.kubernetes.io/name: project
+    app.kubernetes.io/instance: opr
+    app.kubernetes.io/managed-by: Helm
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      
+      app.kubernetes.io/name: project
+      app.kubernetes.io/instance: opr
+  template:
+    metadata:
+      annotations:
+        checksum/config: a993289c3829186e97f2463b8b6e6997f4c77b6e9be742db5d6652184268fcf5
+        checksum/secrets: 5dfc82d60892b53e1c7028f8fc6cc2b6507ad0b0a195ed18e26d14f725916a0d
+        checksum/externalSecrets: 5acf3ff77b4420677b5923071f303facaba7a9273a346284a667a275df325146
+      labels:
+        
+        app.kubernetes.io/name: project
+        app.kubernetes.io/instance: opr
+    spec:
+      imagePullSecrets:
+        - name: regcred-gcp
+      serviceAccountName: reflect-project-sa
+      securityContext:
+        {}
+      terminationGracePeriodSeconds: 30
+      containers:
+        - name: project
+          securityContext:
+            {}
+          image: "us-east1-docker.pkg.dev/unity-solutions-tyndall-prd/docker/reflect-project:develop-latest"
+          imagePullPolicy: Always
+          envFrom:
+            - secretRef:
+                name: project-external-secrets
+            - configMapRef:
+                name: project-config
+          ports:
+            - containerPort: 10010
+              name: grpc
+            - containerPort: 80
+              name: http
+            - containerPort: 1234
+              name: prom-publisher
+          livenessProbe:
+            exec:
+              command:
+              - /bin/grpc_health_probe
+              - -addr=:10010
+          readinessProbe:
+            exec:
+              command:
+              - /bin/grpc_health_probe
+              - -addr=:10010
+          resources:
+            {}
+        - image: us-east1-docker.pkg.dev/unity-solutions-tyndall-prd/docker/reflect-envoy-k8s:develop-latest
+          imagePullPolicy: Always
+          name: envoy
+          resources: {}
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsUser: 2
+      volumes:
+        - name: cert
+          secret:
+            secretName: project-cert
+      hostname:
+        reflect-project
+---
+# Source: opr/charts/sync/charts/api/charts/reflect-common-chart/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sync-api
+  labels:
+    helm.sh/chart: reflect-common-chart-1.0.0
+    
+    app.kubernetes.io/name: sync-api
+    app.kubernetes.io/instance: opr
+    app.kubernetes.io/managed-by: Helm
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      
+      app.kubernetes.io/name: sync-api
+      app.kubernetes.io/instance: opr
+  template:
+    metadata:
+      annotations:
+        cluster-autoscaler.kubernetes.io/safe-to-evict: "true"
+        checksum/config: 0adcc0b9c2865215f85d98a4ada769a3903cf3d42dc18a5c677680f7db1139d9
+        checksum/secrets: 394cc4842a1afafeacfd20e40559248ae41d1b6af69470cf774689f7906662bd
+        checksum/externalSecrets: 5acf3ff77b4420677b5923071f303facaba7a9273a346284a667a275df325146
+      labels:
+        
+        app.kubernetes.io/name: sync-api
+        app.kubernetes.io/instance: opr
+    spec:
+      imagePullSecrets:
+        - name: regcred-gcp
+      serviceAccountName: default
+      securityContext:
+        {}
+      terminationGracePeriodSeconds: 30
+      containers:
+        - name: sync-api
+          args:
+            - --service
+            - api
+          securityContext:
+            {}
+          image: "us-east1-docker.pkg.dev/unity-solutions-tyndall-prd/docker/reflect-sync:develop-latest"
+          imagePullPolicy: Always
+          envFrom:
+            - secretRef:
+                name: sync-api-secrets
+            - configMapRef:
+                name: sync-api-config
+          volumeMounts:
+            - mountPath: /storage
+              name: scratch-volume
+          ports:
+            - containerPort: 80
+              name: http
+            - containerPort: 10011
+              name: grpc
+            - containerPort: 1234
+              name: prom-publisher
+          livenessProbe:
+            exec:
+              command:
+              - /bin/grpc_health_probe
+              - -addr=:10011
+          readinessProbe:
+            exec:
+              command:
+              - /bin/grpc_health_probe
+              - -addr=:10011
+          resources:
+            {}
+      volumes:
+        - emptyDir: {}
+          name: scratch-volume
+---
+# Source: opr/charts/sync/charts/decimator/charts/reflect-common-chart/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sync-decimator
+  labels:
+    helm.sh/chart: reflect-common-chart-1.0.0
+    
+    app.kubernetes.io/name: sync-decimator
+    app.kubernetes.io/instance: opr
+    app.kubernetes.io/managed-by: Helm
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      
+      app.kubernetes.io/name: sync-decimator
+      app.kubernetes.io/instance: opr
+  template:
+    metadata:
+      annotations:
+        cluster-autoscaler.kubernetes.io/safe-to-evict: "true"
+        checksum/config: be0dbc1b77fa7347d5bf5ce80a06c0351fabd629664a000f189abd9f7969e891
+        checksum/secrets: 2921f0c2ad94864397051c3132c7c31d1b19e8f712e9f4c5a2c2b82b15995c6b
+        checksum/externalSecrets: 5acf3ff77b4420677b5923071f303facaba7a9273a346284a667a275df325146
+      labels:
+        
+        app.kubernetes.io/name: sync-decimator
+        app.kubernetes.io/instance: opr
+    spec:
+      imagePullSecrets:
+        - name: regcred-gcp
+      serviceAccountName: default
+      securityContext:
+        {}
+      terminationGracePeriodSeconds: 60
+      containers:
+        - name: sync-decimator
+          args:
+            - --service
+            - decimator
+          securityContext:
+            {}
+          image: "us-east1-docker.pkg.dev/unity-solutions-tyndall-prd/docker/reflect-sync:develop-latest"
+          imagePullPolicy: Always
+          envFrom:
+            - secretRef:
+                name: sync-decimator-secrets
+            - configMapRef:
+                name: sync-decimator-config
+          env:
+            - name: REFLECTSYNC_PixyzOptimizeSdk__ValidationKey
+              valueFrom:
+                secretKeyRef:
+                  key: validation-key
+                  name: pixyz-license
+          volumeMounts:
+            - mountPath: /app/licenses/
+              name: pixyz-license
+              readOnly: true
+            - mountPath: /storage
+              name: scratch-volume
+          ports:
+            - containerPort: 80
+              name: http
+            - containerPort: 1234
+              name: prom-publisher
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
+          resources:
+            {}
+      volumes:
+        - name: pixyz-license
+          secret:
+            items:
+            - key: license-file
+              path: license
+            secretName: pixyz-license
+        - emptyDir:
+            medium: Memory
+          name: scratch-volume
+---
+# Source: opr/charts/sync/charts/hlodbuilder/charts/reflect-common-chart/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sync-hlodbuilder
+  labels:
+    helm.sh/chart: reflect-common-chart-1.0.0
+    
+    app.kubernetes.io/name: sync-hlodbuilder
+    app.kubernetes.io/instance: opr
+    app.kubernetes.io/managed-by: Helm
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      
+      app.kubernetes.io/name: sync-hlodbuilder
+      app.kubernetes.io/instance: opr
+  template:
+    metadata:
+      annotations:
+        cluster-autoscaler.kubernetes.io/safe-to-evict: "true"
+        checksum/config: 23a8bd6fb0da4cd9c59f3d09f6bc2633b141a23e0b4e5a36e1534e8ed67d330d
+        checksum/secrets: 612a48b92276b972140d7969dbcbb3447e7448ec76d00a84151331bd4558656e
+        checksum/externalSecrets: 5acf3ff77b4420677b5923071f303facaba7a9273a346284a667a275df325146
+      labels:
+        
+        app.kubernetes.io/name: sync-hlodbuilder
+        app.kubernetes.io/instance: opr
+    spec:
+      imagePullSecrets:
+        - name: regcred-gcp
+      serviceAccountName: default
+      securityContext:
+        {}
+      terminationGracePeriodSeconds: 300
+      containers:
+        - name: sync-hlodbuilder
+          args:
+            - --service
+            - hlodbuilder
+          securityContext:
+            {}
+          image: "us-east1-docker.pkg.dev/unity-solutions-tyndall-prd/docker/reflect-sync:develop-latest"
+          imagePullPolicy: Always
+          envFrom:
+            - secretRef:
+                name: sync-hlodbuilder-secrets
+            - configMapRef:
+                name: sync-hlodbuilder-config
+          env:
+            - name: REFLECTSYNC_PixyzOptimizeSdk__ValidationKey
+              valueFrom:
+                secretKeyRef:
+                  key: validation-key
+                  name: pixyz-license
+          volumeMounts:
+            - mountPath: /app/licenses/
+              name: pixyz-license
+              readOnly: true
+            - mountPath: /storage
+              name: scratch-volume
+          ports:
+            - containerPort: 80
+              name: http
+            - containerPort: 1234
+              name: prom-publisher
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
+          resources:
+            {}
+      volumes:
+        - name: pixyz-license
+          secret:
+            items:
+            - key: license-file
+              path: license
+            secretName: pixyz-license
+        - emptyDir:
+            medium: Memory
+          name: scratch-volume
+---
+# Source: opr/charts/sync/charts/modelprocessor-safemode/charts/reflect-common-chart/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sync-modelprocessor-safemode
+  labels:
+    helm.sh/chart: reflect-common-chart-1.0.0
+    
+    app.kubernetes.io/name: sync-modelprocessor-safemode
+    app.kubernetes.io/instance: opr
+    app.kubernetes.io/managed-by: Helm
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      
+      app.kubernetes.io/name: sync-modelprocessor-safemode
+      app.kubernetes.io/instance: opr
+  template:
+    metadata:
+      annotations:
+        cluster-autoscaler.kubernetes.io/safe-to-evict: "true"
+        checksum/config: e9f9d27fe21052319c59b27bff55b3929f4a67b168032df5074ef8df93bdadfe
+        checksum/secrets: 014e6dfe69a24a599dc1d14a8d221d79277b9d7962587552e76bb22d4771a77b
+        checksum/externalSecrets: 5acf3ff77b4420677b5923071f303facaba7a9273a346284a667a275df325146
+      labels:
+        
+        app.kubernetes.io/name: sync-modelprocessor-safemode
+        app.kubernetes.io/instance: opr
+    spec:
+      imagePullSecrets:
+        - name: regcred-gcp
+      serviceAccountName: default
+      securityContext:
+        {}
+      terminationGracePeriodSeconds: 60
+      containers:
+        - name: sync-modelprocessor-safemode
+          args:
+            - --service
+            - modelprocessorsafemode
+          securityContext:
+            {}
+          image: "us-east1-docker.pkg.dev/unity-solutions-tyndall-prd/docker/reflect-sync:develop-latest"
+          imagePullPolicy: Always
+          envFrom:
+            - secretRef:
+                name: sync-modelprocessor-safemode-secrets
+            - configMapRef:
+                name: sync-modelprocessor-safemode-config
+          env:
+            - name: REFLECTSYNC_PixyzOptimizeSdk__ValidationKey
+              valueFrom:
+                secretKeyRef:
+                  key: validation-key
+                  name: pixyz-license
+          volumeMounts:
+            - mountPath: /app/licenses/
+              name: pixyz-license
+              readOnly: true
+            - mountPath: /storage
+              name: scratch-volume
+          ports:
+            - containerPort: 80
+              name: http
+            - containerPort: 1234
+              name: prom-publisher
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
+          resources:
+            {}
+      volumes:
+        - name: pixyz-license
+          secret:
+            items:
+            - key: license-file
+              path: license
+            secretName: pixyz-license
+        - emptyDir:
+            medium: Memory
+          name: scratch-volume
+---
+# Source: opr/charts/sync/charts/modelprocessor/charts/reflect-common-chart/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sync-modelprocessor
+  labels:
+    helm.sh/chart: reflect-common-chart-1.0.0
+    
+    app.kubernetes.io/name: sync-modelprocessor
+    app.kubernetes.io/instance: opr
+    app.kubernetes.io/managed-by: Helm
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      
+      app.kubernetes.io/name: sync-modelprocessor
+      app.kubernetes.io/instance: opr
+  template:
+    metadata:
+      annotations:
+        cluster-autoscaler.kubernetes.io/safe-to-evict: "true"
+        checksum/config: 05282ba43ecc1f5bcb215b9a967745c92737b5a2a88c44dfa8baf8368c77d88c
+        checksum/secrets: 322f4bb3d6b909123304a27cbb463aa908ccc5c23e3002ccef7fa396aca9ab71
+        checksum/externalSecrets: 5acf3ff77b4420677b5923071f303facaba7a9273a346284a667a275df325146
+      labels:
+        
+        app.kubernetes.io/name: sync-modelprocessor
+        app.kubernetes.io/instance: opr
+    spec:
+      imagePullSecrets:
+        - name: regcred-gcp
+      serviceAccountName: default
+      securityContext:
+        {}
+      terminationGracePeriodSeconds: 60
+      containers:
+        - name: sync-modelprocessor
+          args:
+            - --service
+            - modelprocessor
+          securityContext:
+            {}
+          image: "us-east1-docker.pkg.dev/unity-solutions-tyndall-prd/docker/reflect-sync:develop-latest"
+          imagePullPolicy: Always
+          envFrom:
+            - secretRef:
+                name: sync-modelprocessor-secrets
+            - configMapRef:
+                name: sync-modelprocessor-config
+          volumeMounts:
+            - mountPath: /storage
+              name: scratch-volume
+          ports:
+            - containerPort: 80
+              name: http
+            - containerPort: 1234
+              name: prom-publisher
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
+          resources:
+            {}
+      volumes:
+        - emptyDir:
+            medium: Memory
+          name: scratch-volume
+---
+# Source: opr/charts/sync/charts/worker/charts/reflect-common-chart/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sync-worker
+  labels:
+    helm.sh/chart: reflect-common-chart-1.0.0
+    
+    app.kubernetes.io/name: sync-worker
+    app.kubernetes.io/instance: opr
+    app.kubernetes.io/managed-by: Helm
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      
+      app.kubernetes.io/name: sync-worker
+      app.kubernetes.io/instance: opr
+  template:
+    metadata:
+      annotations:
+        cluster-autoscaler.kubernetes.io/safe-to-evict: "true"
+        checksum/config: 40f1164b63ea6c102164f1c5dd30a951309732e1d866b21659e512c580d46293
+        checksum/secrets: d330b37f997e3dac369722cd9dce9417274462c413a492e85da5d5203bd1dc22
+        checksum/externalSecrets: 5acf3ff77b4420677b5923071f303facaba7a9273a346284a667a275df325146
+      labels:
+        
+        app.kubernetes.io/name: sync-worker
+        app.kubernetes.io/instance: opr
+    spec:
+      imagePullSecrets:
+        - name: regcred-gcp
+      serviceAccountName: default
+      securityContext:
+        {}
+      terminationGracePeriodSeconds: 30
+      containers:
+        - name: sync-worker
+          args:
+            - --service
+            - worker
+          securityContext:
+            {}
+          image: "us-east1-docker.pkg.dev/unity-solutions-tyndall-prd/docker/reflect-sync:develop-latest"
+          imagePullPolicy: Always
+          envFrom:
+            - secretRef:
+                name: sync-worker-secrets
+            - configMapRef:
+                name: sync-worker-config
+          ports:
+            - containerPort: 80
+              name: http
+            - containerPort: 1234
+              name: prom-publisher
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
+          resources:
+            {}
+---
+# Source: opr/charts/voip/charts/mumble-rest/charts/reflect-common-chart/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mumble-rest
+  labels:
+    helm.sh/chart: reflect-common-chart-2.0.5
+    
+    app.kubernetes.io/name: mumble-rest
+    app.kubernetes.io/instance: opr
+    app.kubernetes.io/managed-by: Helm
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      
+      app.kubernetes.io/name: mumble-rest
+      app.kubernetes.io/instance: opr
+  template:
+    metadata:
+      annotations:
+        checksum/config: e6d03d454b4bb569e66458e248f3dd606c1279f0c6b812cefe94e213d4834e20
+        checksum/secrets: 0bbd60b7b313343502a2e0aa664cd530664d596c451dd07fe5699c6a5dabac7e
+        checksum/externalSecrets: 5acf3ff77b4420677b5923071f303facaba7a9273a346284a667a275df325146
+      labels:
+        
+        app.kubernetes.io/name: mumble-rest
+        app.kubernetes.io/instance: opr
+    spec:
+      imagePullSecrets:
+        - name: regcred-gcp
+      serviceAccountName: default
+      securityContext:
+        {}
+      terminationGracePeriodSeconds: 30
+      containers:
+        - name: mumble-rest
+          securityContext:
+            {}
+          image: "us-east1-docker.pkg.dev/unity-solutions-tyndall-prd/docker/reflect-mumble-rest:develop-latest"
+          imagePullPolicy: Always
+          envFrom:
+            - secretRef:
+                name: mumble-rest-secrets
+            - configMapRef:
+                name: mumble-rest-config
+          ports:
+            - containerPort: 8082
+              name: http
+              protocol: TCP
+          resources:
+            {}
+---
+# Source: opr/charts/voip/charts/murmur/charts/reflect-common-chart/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: murmur
+  labels:
+    helm.sh/chart: reflect-common-chart-2.0.5
+    
+    app.kubernetes.io/name: murmur
+    app.kubernetes.io/instance: opr
+    app.kubernetes.io/managed-by: Helm
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      
+      app.kubernetes.io/name: murmur
+      app.kubernetes.io/instance: opr
+  template:
+    metadata:
+      annotations:
+        checksum/config: 48908aa6dca14bb5606e109b236235b4dac899bc05280b13f8a32f7bd49cbfa0
+        checksum/secrets: 44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a
+        checksum/externalSecrets: 5acf3ff77b4420677b5923071f303facaba7a9273a346284a667a275df325146
+      labels:
+        
+        app.kubernetes.io/name: murmur
+        app.kubernetes.io/instance: opr
+    spec:
+      imagePullSecrets:
+        - name: regcred-gcp
+      serviceAccountName: default
+      securityContext:
+        {}
+      terminationGracePeriodSeconds: 30
+      containers:
+        - name: murmur
+          securityContext:
+            {}
+          image: "us-east1-docker.pkg.dev/unity-solutions-tyndall-prd/docker/reflect-murmur:develop-latest"
+          imagePullPolicy: Always
+          envFrom:
+            - configMapRef:
+                name: murmur-config
+          volumeMounts:
+            - mountPath: /etc/murmur
+              name: murmur-files
+              readOnly: true
+            - mountPath: /etc/opr/murmur-cert
+              name: murmur-ssl-cert
+              readOnly: true
+          ports:
+            - containerPort: 64738
+              name: murmur-tcp
+              protocol: TCP
+            - containerPort: 64738
+              name: murmur-udp
+              protocol: UDP
+            - containerPort: 6502
+              name: murmur-ice
+              protocol: TCP
+          resources:
+            {}
+      volumes:
+        - configMap:
+            name: murmur-files
+          name: murmur-files
+        - name: murmur-ssl-cert
+          secret:
+            defaultMode: 420
+            secretName: voip-develop-tls
+---
+# Source: opr/charts/keycloak/templates/statefulset.yaml
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: opr-keycloak
+  labels:
+    helm.sh/chart: keycloak-18.4.3
+    app.kubernetes.io/name: keycloak
+    app.kubernetes.io/instance: opr
+    app.kubernetes.io/version: "21.1.2"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: keycloak
+      app.kubernetes.io/instance: opr
+  replicas: 1
+  serviceName: opr-keycloak-headless
+  podManagementPolicy: Parallel
+  updateStrategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      annotations:
+        checksum/config-startup: 4cb048ca6f292cd235b96507e6b61952f28b489524542e4b1009acd543928cdf
+        checksum/secrets: 21a95277c01ca536d365d4eb2f6a7fdb129147228bba5803e00a933ad5f4097c
+      labels:
+        app.kubernetes.io/name: keycloak
+        app.kubernetes.io/instance: opr
+    spec:
+      containers:
+        - name: keycloak
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1000
+          image: "registry1.dso.mil/ironbank/opensource/keycloak/keycloak:21.1.2"
+          imagePullPolicy: IfNotPresent
+          command:
+            - /opt/keycloak/bin/kc.sh
+          args:
+            - start-dev
+            - --import-realm
+            - --health-enabled=true
+          env:
+            - name: KEYCLOAK_IMPORT
+              value: /opt/keycloak/data/import/realm.json
+            - name: KEYCLOAK_REFLECT_REALM_NAME
+              value: "reflect"
+            - name: KEYCLOAK_LOGLEVEL
+              value: DEBUG
+            - name: PROXY_ADDRESS_FORWARDING
+              value: 'true'
+            - name: KC_PROXY
+              value: edge
+            - name: KC_HOSTNAME_URL
+              value: "https://keycloak-develop.opr.unity.com"
+            
+          envFrom:
+            - secretRef:
+                name: opr-keycloak-env
+            
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+            - name: https
+              containerPort: 8443
+              protocol: TCP
+            - name: http-management
+              containerPort: 9990
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /health/live
+              port: http
+            initialDelaySeconds: 0
+            timeoutSeconds: 5
+            
+          readinessProbe:
+            httpGet:
+              path: /health/ready
+              port: http
+            initialDelaySeconds: 30
+            timeoutSeconds: 1
+            
+          startupProbe:
+            httpGet:
+              path: /health/started
+              port: http
+            initialDelaySeconds: 30
+            timeoutSeconds: 1
+            failureThreshold: 60
+            periodSeconds: 5
+            
+          resources:
+            {}
+          volumeMounts:
+            - name: startup
+              mountPath: "/opt/jboss/startup-scripts/keycloak.cli"
+              subPath: "keycloak.cli"
+              readOnly: true
+            - name: realm-secret
+              mountPath: "/opt/keycloak/data/import/"
+              readOnly: true
+            
+      imagePullSecrets:
+        - name: regcred-ironbank
+      serviceAccountName: opr-keycloak
+      securityContext:
+        fsGroup: 1000
+      enableServiceLinks: true
+      restartPolicy: Always
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchLabels:
+                  app.kubernetes.io/name: keycloak
+                  app.kubernetes.io/instance: opr
+                matchExpressions:
+                  - key: app.kubernetes.io/component
+                    operator: NotIn
+                    values:
+                      - test
+              topologyKey: kubernetes.io/hostname
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app.kubernetes.io/name: keycloak
+                    app.kubernetes.io/instance: opr
+                  matchExpressions:
+                    - key: app.kubernetes.io/component
+                      operator: NotIn
+                      values:
+                        - test
+                topologyKey: failure-domain.beta.kubernetes.io/zone
+        
+      terminationGracePeriodSeconds: 60
+      volumes:
+        - name: startup
+          configMap:
+            name: opr-keycloak-startup
+            defaultMode: 0555
+            items:
+              - key: keycloak.cli
+                path: keycloak.cli
+        - name: realm-secret
+          secret:
+            secretName: realm-secret
+---
+# Source: opr/charts/postgresql/templates/primary/statefulset.yaml
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: opr-postgresql
+  namespace: "opr-develop"
+  labels:
+    app.kubernetes.io/name: postgresql
+    helm.sh/chart: postgresql-12.8.0
+    app.kubernetes.io/instance: opr
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/component: primary
+spec:
+  replicas: 1
+  serviceName: opr-postgresql-hl
+  updateStrategy:
+    rollingUpdate: {}
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: postgresql
+      app.kubernetes.io/instance: opr
+      app.kubernetes.io/component: primary
+  template:
+    metadata:
+      name: opr-postgresql
+      labels:
+        app.kubernetes.io/name: postgresql
+        helm.sh/chart: postgresql-12.8.0
+        app.kubernetes.io/instance: opr
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/component: primary
+      annotations:
+        checksum/extended-configuration: 1eddd68c66acac809f88f47ff1159ff40a92236fecd067cb67b65f5696e675cc
+    spec:
+      serviceAccountName: default
+      
+      imagePullSecrets:
+        - name: regcred-ironbank
+        - name: map[name:regcred-ironbank]
+      affinity:
+        podAffinity:
+          
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app.kubernetes.io/name: postgresql
+                    app.kubernetes.io/instance: opr
+                    app.kubernetes.io/component: primary
+                topologyKey: kubernetes.io/hostname
+              weight: 1
+        nodeAffinity:
+          
+      securityContext:
+        fsGroup: 1001
+      hostNetwork: false
+      hostIPC: false
+      containers:
+        - name: postgresql
+          image: registry1.dso.mil/ironbank/bitnami/postgres/postgresql11:11.19.0
+          imagePullPolicy: "IfNotPresent"
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+            runAsGroup: 0
+            runAsNonRoot: true
+            runAsUser: 1001
+            seccompProfile:
+              type: RuntimeDefault
+          env:
+            - name: BITNAMI_DEBUG
+              value: "false"
+            - name: POSTGRESQL_PORT_NUMBER
+              value: "5432"
+            - name: POSTGRESQL_VOLUME_DIR
+              value: "/bitnami/postgresql"
+            - name: PGDATA
+              value: "/bitnami/postgresql/data"
+            # Authentication
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: opr-postgresql
+                  key: postgres-password
+            # Replication
+            # Initdb
+            # Standby
+            # LDAP
+            - name: POSTGRESQL_ENABLE_LDAP
+              value: "no"
+            # TLS
+            - name: POSTGRESQL_ENABLE_TLS
+              value: "no"
+            # Audit
+            - name: POSTGRESQL_LOG_HOSTNAME
+              value: "false"
+            - name: POSTGRESQL_LOG_CONNECTIONS
+              value: "false"
+            - name: POSTGRESQL_LOG_DISCONNECTIONS
+              value: "false"
+            - name: POSTGRESQL_PGAUDIT_LOG_CATALOG
+              value: "off"
+            # Others
+            - name: POSTGRESQL_CLIENT_MIN_MESSAGES
+              value: "error"
+            - name: POSTGRESQL_SHARED_PRELOAD_LIBRARIES
+              value: "pgaudit"
+            - name: POSTGRES_USER
+              value: postgres
+            - name: PROJECT_SERVICE_DB_PASSWORD
+              value: reflect
+            - name: SYNC_SERVICE_DB_PASSWORD
+              value: reflect
+            - name: ANNOTATIONS_DB_PASSWORD
+              value: reflect
+            - name: MATCHMAKER_DB_PASSWORD
+              value: reflect
+            - name: MURMUR_DB_PASSWORD
+              value: reflect
+          ports:
+            - name: tcp-postgresql
+              containerPort: 5432
+          livenessProbe:
+            failureThreshold: 6
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 5
+            exec:
+              command:
+                - /bin/sh
+                - -c
+                - exec pg_isready -U "postgres" -h 127.0.0.1 -p 5432
+          readinessProbe:
+            failureThreshold: 6
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 5
+            exec:
+              command:
+                - /bin/sh
+                - -c
+                - -e
+                - |
+                  exec pg_isready -U "postgres" -h 127.0.0.1 -p 5432
+                  [ -f /opt/bitnami/postgresql/tmp/.initialized ] || [ -f /bitnami/postgresql/.initialized ]
+          resources:
+            limits: {}
+            requests:
+              cpu: 250m
+              memory: 256Mi
+          volumeMounts:
+            - name: custom-init-scripts
+              mountPath: /docker-entrypoint-initdb.d/
+            - name: postgresql-extended-config
+              mountPath: /bitnami/postgresql/conf/conf.d/
+            - name: dshm
+              mountPath: /dev/shm
+            - name: data
+              mountPath: /bitnami/postgresql
+      volumes:
+        - name: postgresql-extended-config
+          configMap:
+            name: opr-postgresql-extended-configuration
+        - name: custom-init-scripts
+          configMap:
+            name: db-init
+        - name: dshm
+          emptyDir:
+            medium: Memory
+  volumeClaimTemplates:
+    - apiVersion: v1
+      kind: PersistentVolumeClaim
+      metadata:
+        name: data
+      spec:
+        accessModes:
+          - "ReadWriteOnce"
+        resources:
+          requests:
+            storage: "10Gi"
+---
+# Source: opr/charts/rabbitmq/templates/statefulset.yaml
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: opr-rabbitmq
+  namespace: "opr-develop"
+  labels:
+    app.kubernetes.io/name: rabbitmq
+    helm.sh/chart: rabbitmq-12.0.9
+    app.kubernetes.io/instance: opr
+    app.kubernetes.io/managed-by: Helm
+spec:
+  serviceName: opr-rabbitmq-headless
+  podManagementPolicy: OrderedReady
+  replicas: 1
+  updateStrategy:
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: rabbitmq
+      app.kubernetes.io/instance: opr
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: rabbitmq
+        helm.sh/chart: rabbitmq-12.0.9
+        app.kubernetes.io/instance: opr
+        app.kubernetes.io/managed-by: Helm
+      annotations:
+        checksum/config: e6b000560ab2de554c856f67b76b7c3f2f41152fe9ea6a62b339cd4cb04a9299
+        checksum/secret: 1f27339a38862e204e7c995987096235fc96dc7d561c5a9564215762d92fd9ca
+    spec:
+      
+      serviceAccountName: opr-rabbitmq
+      affinity:
+        podAffinity:
+          
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app.kubernetes.io/name: rabbitmq
+                    app.kubernetes.io/instance: opr
+                topologyKey: kubernetes.io/hostname
+              weight: 1
+        nodeAffinity:
+          
+      securityContext:
+        fsGroup: 1001
+      terminationGracePeriodSeconds: 120
+      initContainers:
+      containers:
+        - name: rabbitmq
+          image: docker.io/bitnami/rabbitmq:3.12.2-debian-11-r8
+          imagePullPolicy: "IfNotPresent"
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1001
+          lifecycle:
+            preStop:
+              exec:
+                command:
+                  - /bin/bash
+                  - -ec
+                  - |
+                    if [[ -f /opt/bitnami/scripts/rabbitmq/nodeshutdown.sh ]]; then
+                        /opt/bitnami/scripts/rabbitmq/nodeshutdown.sh -t "120" -d "false"
+                    else
+                        rabbitmqctl stop_app
+                    fi
+          env:
+            - name: BITNAMI_DEBUG
+              value: "false"
+            - name: MY_POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+            - name: MY_POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: MY_POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: K8S_SERVICE_NAME
+              value: opr-rabbitmq-headless
+            - name: K8S_ADDRESS_TYPE
+              value: hostname
+            - name: RABBITMQ_FORCE_BOOT
+              value: "no"
+            - name: RABBITMQ_NODE_NAME
+              value: "rabbit@$(MY_POD_NAME).$(K8S_SERVICE_NAME).$(MY_POD_NAMESPACE).svc.cluster.local"
+            - name: K8S_HOSTNAME_SUFFIX
+              value: ".$(K8S_SERVICE_NAME).$(MY_POD_NAMESPACE).svc.cluster.local"
+            - name: RABBITMQ_MNESIA_DIR
+              value: "/bitnami/rabbitmq/mnesia/$(RABBITMQ_NODE_NAME)"
+            - name: RABBITMQ_LDAP_ENABLE
+              value: "no"
+            - name: RABBITMQ_LOGS
+              value: "-"
+            - name: RABBITMQ_ULIMIT_NOFILES
+              value: "65536"
+            - name: RABBITMQ_USE_LONGNAME
+              value: "true"
+            - name: RABBITMQ_ERL_COOKIE
+              valueFrom:
+                secretKeyRef:
+                  name: opr-rabbitmq
+                  key: rabbitmq-erlang-cookie
+            - name: RABBITMQ_LOAD_DEFINITIONS
+              value: "no"
+            - name: RABBITMQ_DEFINITIONS_FILE
+              value: "/app/load_definition.json"
+            - name: RABBITMQ_SECURE_PASSWORD
+              value: "no"
+            - name: RABBITMQ_USERNAME
+              value: "admin"
+            - name: RABBITMQ_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: opr-rabbitmq
+                  key: rabbitmq-password
+            - name: RABBITMQ_PLUGINS
+              value: "rabbitmq_management, rabbitmq_peer_discovery_k8s, rabbitmq_auth_backend_ldap"
+          envFrom:
+          ports:
+            - name: amqp
+              containerPort: 5672
+            - name: dist
+              containerPort: 25672
+            - name: stats
+              containerPort: 15672
+            - name: epmd
+              containerPort: 4369
+          livenessProbe:
+            failureThreshold: 6
+            initialDelaySeconds: 120
+            periodSeconds: 30
+            successThreshold: 1
+            timeoutSeconds: 20
+            exec:
+              command:
+                - sh
+                - -ec
+                - curl -f --user admin:$RABBITMQ_PASSWORD 127.0.0.1:15672/api/health/checks/virtual-hosts
+          readinessProbe:
+            failureThreshold: 3
+            initialDelaySeconds: 10
+            periodSeconds: 30
+            successThreshold: 1
+            timeoutSeconds: 20
+            exec:
+              command:
+                - sh
+                - -ec
+                - curl -f --user admin:$RABBITMQ_PASSWORD 127.0.0.1:15672/api/health/checks/local-alarms
+          resources:
+            limits: {}
+            requests: {}
+          volumeMounts:
+            - name: configuration
+              mountPath: /bitnami/rabbitmq/conf
+            - name: data
+              mountPath: /bitnami/rabbitmq/mnesia
+      volumes:
+        - name: configuration
+          projected:
+            sources:
+              - secret:
+                  name: opr-rabbitmq-config
+  volumeClaimTemplates:
+    - apiVersion: v1
+      kind: PersistentVolumeClaim
+      metadata:
+        name: data
+        labels:
+          app.kubernetes.io/name: rabbitmq
+          app.kubernetes.io/instance: opr
+      spec:
+        accessModes:
+            - "ReadWriteOnce"
+        resources:
+          requests:
+            storage: "8Gi"
+        storageClassName: rabbitmq-storage-class
+---
+# Source: opr/charts/annotations/charts/reflect-common-chart/templates/ingress.yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: annotations
+  labels:
+    helm.sh/chart: reflect-common-chart-1.0.0
+    
+    app.kubernetes.io/name: annotations
+    app.kubernetes.io/instance: opr
+    app.kubernetes.io/managed-by: Helm
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - "annotations-develop.opr.unity.com"
+      secretName: annotations-develop-tls
+  rules:
+    - host: annotations-develop.opr.unity.com
+      http:
+        paths:
+        - backend:
+            service:
+              name: annotations
+              port:
+                name: http
+          path: /
+          pathType: ImplementationSpecific
+---
+# Source: opr/charts/commonui/charts/reflect-common-chart/templates/ingress.yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: commonui
+  labels:
+    helm.sh/chart: reflect-common-chart-1.0.0
+    
+    app.kubernetes.io/name: commonui
+    app.kubernetes.io/instance: opr
+    app.kubernetes.io/managed-by: Helm
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt
+    kubernetes.io/ingress.class: nginx
+spec:
+  tls:
+    - hosts:
+        - "dashboard-develop.opr.unity.com"
+      secretName: dashboard-develop-tls
+  rules:
+    - host: dashboard-develop.opr.unity.com
+      http:
+        paths:
+        - backend:
+            service:
+              name: commonui
+              port:
+                name: http
+          path: /
+          pathType: ImplementationSpecific
+---
+# Source: opr/charts/keycloak/templates/ingress.yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: opr-keycloak
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt"
+    nginx.ingress.kubernetes.io/cors-allow-origin: "https://dashboard-develop.opr.unity.com"
+    nginx.ingress.kubernetes.io/cors-expose-headers: "*"
+    nginx.ingress.kubernetes.io/enable-cors: "true"
+  labels:
+    helm.sh/chart: keycloak-18.4.3
+    app.kubernetes.io/name: keycloak
+    app.kubernetes.io/instance: opr
+    app.kubernetes.io/version: "21.1.2"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - "keycloak-develop.opr.unity.com"
+      secretName: keycloak-develop-tls
+  rules:
+    -
+      host: "keycloak-develop.opr.unity.com"
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: opr-keycloak-http
+                port:
+                  name: http
+---
+# Source: opr/charts/links/charts/reflect-common-chart/templates/ingress.yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: links-http
+  labels:
+    helm.sh/chart: reflect-common-chart-1.0.0
+    
+    app.kubernetes.io/name: links
+    app.kubernetes.io/instance: opr
+    app.kubernetes.io/managed-by: Helm
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - "links-develop.opr.unity.com"
+      secretName: links-develop-tls
+  rules:
+    - host: links-develop.opr.unity.com
+      http:
+        paths:
+        - backend:
+            service:
+              name: links
+              port:
+                name: http
+          path: /
+          pathType: ImplementationSpecific
+---
+# Source: opr/charts/multiplayer/charts/matchmaker/charts/reflect-common-chart/templates/ingress.yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: matchmaker-grpc
+  labels:
+    helm.sh/chart: reflect-common-chart-1.0.0
+    
+    app.kubernetes.io/name: matchmaker
+    app.kubernetes.io/instance: opr
+    app.kubernetes.io/managed-by: Helm
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt
+    nginx.ingress.kubernetes.io/backend-protocol: GRPC
+    nginx.ingress.kubernetes.io/proxy-body-size: 1024m
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - "matchmaker-develop.opr.unity.com"
+      secretName: matchmaker-reflect-tls
+  rules:
+    - host: matchmaker-develop.opr.unity.com
+      http:
+        paths:
+        - backend:
+            service:
+              name: matchmaker
+              port:
+                name: grpc
+          path: /
+          pathType: ImplementationSpecific
+---
+# Source: opr/charts/multiplayer/charts/matchmaker/charts/reflect-common-chart/templates/ingress.yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: matchmaker-http
+  labels:
+    helm.sh/chart: reflect-common-chart-1.0.0
+    
+    app.kubernetes.io/name: matchmaker
+    app.kubernetes.io/instance: opr
+    app.kubernetes.io/managed-by: Helm
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - "matchmaker-develop.opr.unity.com"
+      secretName: matchmaker-reflect-tls
+  rules:
+    - host: matchmaker-develop.opr.unity.com
+      http:
+        paths:
+        - backend:
+            service:
+              name: matchmaker
+              port:
+                name: http
+          path: /api
+          pathType: ImplementationSpecific
+---
+# Source: opr/charts/project/charts/reflect-common-chart/templates/ingress.yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: project-grpc
+  labels:
+    helm.sh/chart: reflect-common-chart-1.0.0
+    
+    app.kubernetes.io/name: project
+    app.kubernetes.io/instance: opr
+    app.kubernetes.io/managed-by: Helm
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt
+    nginx.ingress.kubernetes.io/backend-protocol: GRPC
+    nginx.ingress.kubernetes.io/cors-allow-headers: x-user-agent,x-grpc-web,x-reflect-appid,x-reflect-clienttrace,authorization,content-type
+    nginx.ingress.kubernetes.io/cors-allow-origin: https://dashboard-develop.opr.unity.com
+    nginx.ingress.kubernetes.io/cors-expose-headers: '*'
+    nginx.ingress.kubernetes.io/enable-cors: "true"
+    nginx.ingress.kubernetes.io/proxy-body-size: 1024m
+    nginx.ingress.kubernetes.io/use-regex: "true"
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - "develop.opr.unity.com"
+      secretName: develop-tls
+    - hosts:
+        - "web-develop.opr.unity.com"
+      secretName: web-develop-tls
+  rules:
+    - host: develop.opr.unity.com
+      http:
+        paths:
+        - backend:
+            service:
+              name: project
+              port:
+                name: grpc
+          path: /
+          pathType: ImplementationSpecific
+    - host: web-develop.opr.unity.com
+      http:
+        paths:
+        - backend:
+            service:
+              name: project
+              port:
+                name: grpc-web
+          path: /
+          pathType: ImplementationSpecific
+---
+# Source: opr/charts/project/charts/reflect-common-chart/templates/ingress.yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: project-http
+  labels:
+    helm.sh/chart: reflect-common-chart-1.0.0
+    
+    app.kubernetes.io/name: project
+    app.kubernetes.io/instance: opr
+    app.kubernetes.io/managed-by: Helm
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt
+    nginx.ingress.kubernetes.io/use-regex: "true"
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - "develop.opr.unity.com"
+      secretName: develop-tls
+  rules:
+    - host: develop.opr.unity.com
+      http:
+        paths:
+        - backend:
+            service:
+              name: project
+              port:
+                name: http
+          path: /(api|swagger|v1)
+          pathType: Prefix
+---
+# Source: opr/charts/rabbitmq/templates/ingress.yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: opr-rabbitmq
+  namespace: "opr-develop"
+  labels:
+    app.kubernetes.io/name: rabbitmq
+    helm.sh/chart: rabbitmq-12.0.9
+    app.kubernetes.io/instance: opr
+    app.kubernetes.io/managed-by: Helm
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt
+spec:
+  ingressClassName: "nginx"
+  rules:
+    - host: rabbitmq-develop.opr.unity.com
+      http:
+        paths:
+          - path: /
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: opr-rabbitmq
+                port:
+                  name: http-stats
+  tls:
+    - hosts:
+        - "rabbitmq-develop.opr.unity.com"
+      secretName: rabbitmq-develop.opr.unity.com-tls
+---
+# Source: opr/charts/sync/charts/api/charts/reflect-common-chart/templates/ingress.yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: sync-api-grpc
+  labels:
+    helm.sh/chart: reflect-common-chart-1.0.0
+    
+    app.kubernetes.io/name: sync-api
+    app.kubernetes.io/instance: opr
+    app.kubernetes.io/managed-by: Helm
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt
+    nginx.ingress.kubernetes.io/backend-protocol: GRPC
+    nginx.ingress.kubernetes.io/proxy-body-size: 1024m
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - "sync-develop.opr.unity.com"
+      secretName: sync-develop-tls
+  rules:
+    - host: sync-develop.opr.unity.com
+      http:
+        paths:
+        - backend:
+            service:
+              name: sync-api
+              port:
+                name: grpc
+          path: /
+          pathType: ImplementationSpecific
+---
+# Source: opr/charts/sync/charts/api/charts/reflect-common-chart/templates/ingress.yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: sync-api-http
+  labels:
+    helm.sh/chart: reflect-common-chart-1.0.0
+    
+    app.kubernetes.io/name: sync-api
+    app.kubernetes.io/instance: opr
+    app.kubernetes.io/managed-by: Helm
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt
+    nginx.ingress.kubernetes.io/proxy-body-size: 1024m
+    nginx.ingress.kubernetes.io/use-regex: "true"
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - "sync-develop.opr.unity.com"
+      secretName: sync-develop-tls
+  rules:
+    - host: sync-develop.opr.unity.com
+      http:
+        paths:
+        - backend:
+            service:
+              name: sync-api
+              port:
+                name: http
+          path: /api
+          pathType: ImplementationSpecific
+

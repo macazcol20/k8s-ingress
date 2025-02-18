@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  annotations:
+    app.kubernetes.io/instance: opr
+    app.kubernetes.io/name: matchmaker
+  creationTimestamp: "2024-01-16T20:14:51Z"
+  labels:
+    app.kubernetes.io/instance: opr
+    app.kubernetes.io/managed-by: manual
+    app.kubernetes.io/name: matchmaker
+  name: netcode-sa
+  namespace: opr-develop
+  resourceVersion: "130593948"
+  uid: 0abade40-27e0-466b-b574-3f8f01b77e1b
