@@ -1,0 +1,191 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    deployment.kubernetes.io/revision: '1'
+    meta.helm.sh/release-name: opr
+    meta.helm.sh/release-namespace: opr-develop
+  creationTimestamp: '2024-04-03T22:26:12Z'
+  generation: 1
+  labels:
+    app.kubernetes.io/instance: opr
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: mumble-rest
+    helm.sh/chart: reflect-common-chart-2.0.5
+  managedFields:
+    - apiVersion: apps/v1
+      fieldsType: FieldsV1
+      fieldsV1:
+        f:metadata:
+          f:annotations:
+            .: {}
+            f:meta.helm.sh/release-name: {}
+            f:meta.helm.sh/release-namespace: {}
+          f:labels:
+            .: {}
+            f:app.kubernetes.io/instance: {}
+            f:app.kubernetes.io/managed-by: {}
+            f:app.kubernetes.io/name: {}
+            f:helm.sh/chart: {}
+        f:spec:
+          f:progressDeadlineSeconds: {}
+          f:replicas: {}
+          f:revisionHistoryLimit: {}
+          f:selector: {}
+          f:strategy:
+            f:rollingUpdate:
+              .: {}
+              f:maxSurge: {}
+              f:maxUnavailable: {}
+            f:type: {}
+          f:template:
+            f:metadata:
+              f:annotations:
+                .: {}
+                f:checksum/config: {}
+                f:checksum/externalSecrets: {}
+                f:checksum/secrets: {}
+              f:labels:
+                .: {}
+                f:app.kubernetes.io/instance: {}
+                f:app.kubernetes.io/name: {}
+            f:spec:
+              f:containers:
+                k:{"name":"mumble-rest"}:
+                  .: {}
+                  f:envFrom: {}
+                  f:image: {}
+                  f:imagePullPolicy: {}
+                  f:name: {}
+                  f:ports:
+                    .: {}
+                    k:{"containerPort":8082,"protocol":"TCP"}:
+                      .: {}
+                      f:containerPort: {}
+                      f:name: {}
+                      f:protocol: {}
+                  f:resources: {}
+                  f:securityContext: {}
+                  f:terminationMessagePath: {}
+                  f:terminationMessagePolicy: {}
+              f:dnsPolicy: {}
+              f:imagePullSecrets:
+                .: {}
+                k:{"name":"regcred-gcp"}: {}
+              f:restartPolicy: {}
+              f:schedulerName: {}
+              f:securityContext: {}
+              f:serviceAccount: {}
+              f:serviceAccountName: {}
+              f:terminationGracePeriodSeconds: {}
+      manager: helm
+      operation: Update
+      time: '2024-04-04T20:19:15Z'
+    - apiVersion: apps/v1
+      fieldsType: FieldsV1
+      fieldsV1:
+        f:metadata:
+          f:annotations:
+            f:deployment.kubernetes.io/revision: {}
+        f:status:
+          f:availableReplicas: {}
+          f:conditions:
+            .: {}
+            k:{"type":"Available"}:
+              .: {}
+              f:lastTransitionTime: {}
+              f:lastUpdateTime: {}
+              f:message: {}
+              f:reason: {}
+              f:status: {}
+              f:type: {}
+            k:{"type":"Progressing"}:
+              .: {}
+              f:lastTransitionTime: {}
+              f:lastUpdateTime: {}
+              f:message: {}
+              f:reason: {}
+              f:status: {}
+              f:type: {}
+          f:observedGeneration: {}
+          f:readyReplicas: {}
+          f:replicas: {}
+          f:updatedReplicas: {}
+      manager: kube-controller-manager
+      operation: Update
+      subresource: status
+      time: '2025-02-05T20:46:02Z'
+  name: mumble-rest
+  namespace: opr-develop
+  resourceVersion: '406680845'
+  uid: 79e65cf3-45d4-4c57-9715-d45727dd5742
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: opr
+      app.kubernetes.io/name: mumble-rest
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      annotations:
+        checksum/config: e6d03d454b4bb569e66458e248f3dd606c1279f0c6b812cefe94e213d4834e20
+        checksum/externalSecrets: 5acf3ff77b4420677b5923071f303facaba7a9273a346284a667a275df325146
+        checksum/secrets: 0bbd60b7b313343502a2e0aa664cd530664d596c451dd07fe5699c6a5dabac7e
+      creationTimestamp: null
+      labels:
+        app.kubernetes.io/instance: opr
+        app.kubernetes.io/name: mumble-rest
+    spec:
+      containers:
+        - envFrom:
+            - secretRef:
+                name: mumble-rest-secrets
+            - configMapRef:
+                name: mumble-rest-config
+          image: >-
+            us-east1-docker.pkg.dev/unity-solutions-tyndall-prd/docker/reflect-mumble-rest:develop-latest
+          imagePullPolicy: Always
+          name: mumble-rest
+          ports:
+            - containerPort: 8082
+              name: http
+              protocol: TCP
+          resources: {}
+          securityContext: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+      dnsPolicy: ClusterFirst
+      imagePullSecrets:
+        - name: regcred-gcp
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      serviceAccount: default
+      serviceAccountName: default
+      terminationGracePeriodSeconds: 30
+status:
+  availableReplicas: 1
+  conditions:
+    - lastTransitionTime: '2024-04-03T22:26:12Z'
+      lastUpdateTime: '2024-04-03T22:26:24Z'
+      message: ReplicaSet "mumble-rest-975f89f95" has successfully progressed.
+      reason: NewReplicaSetAvailable
+      status: 'True'
+      type: Progressing
+    - lastTransitionTime: '2025-02-05T20:46:02Z'
+      lastUpdateTime: '2025-02-05T20:46:02Z'
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: 'True'
+      type: Available
+  observedGeneration: 1
+  readyReplicas: 1
+  replicas: 1
+  updatedReplicas: 1

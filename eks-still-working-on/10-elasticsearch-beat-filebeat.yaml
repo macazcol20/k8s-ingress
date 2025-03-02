@@ -1,0 +1,276 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  annotations:
+    deprecated.daemonset.template.generation: '4'
+  creationTimestamp: '2023-11-22T06:13:21Z'
+  generation: 4
+  labels:
+    beat.k8s.elastic.co/name: elasticsearch
+    common.k8s.elastic.co/template-hash: '3424348594'
+    common.k8s.elastic.co/type: beat
+  managedFields:
+    - apiVersion: apps/v1
+      fieldsType: FieldsV1
+      fieldsV1:
+        f:metadata:
+          f:annotations:
+            .: {}
+            f:deprecated.daemonset.template.generation: {}
+          f:labels:
+            .: {}
+            f:beat.k8s.elastic.co/name: {}
+            f:common.k8s.elastic.co/template-hash: {}
+            f:common.k8s.elastic.co/type: {}
+          f:ownerReferences:
+            .: {}
+            k:{"uid":"7336eaef-63e2-424b-a830-c6430b59b5bf"}: {}
+        f:spec:
+          f:revisionHistoryLimit: {}
+          f:selector: {}
+          f:template:
+            f:metadata:
+              f:annotations:
+                .: {}
+                f:beat.k8s.elastic.co/config-hash: {}
+              f:labels:
+                .: {}
+                f:beat.k8s.elastic.co/name: {}
+                f:beat.k8s.elastic.co/version: {}
+                f:common.k8s.elastic.co/type: {}
+            f:spec:
+              f:automountServiceAccountToken: {}
+              f:containers:
+                k:{"name":"filebeat"}:
+                  .: {}
+                  f:args: {}
+                  f:image: {}
+                  f:imagePullPolicy: {}
+                  f:name: {}
+                  f:resources:
+                    .: {}
+                    f:limits:
+                      .: {}
+                      f:cpu: {}
+                      f:memory: {}
+                    f:requests:
+                      .: {}
+                      f:cpu: {}
+                      f:memory: {}
+                  f:terminationMessagePath: {}
+                  f:terminationMessagePolicy: {}
+                  f:volumeMounts:
+                    .: {}
+                    k:{"mountPath":"/etc/beat.yml"}:
+                      .: {}
+                      f:mountPath: {}
+                      f:name: {}
+                      f:readOnly: {}
+                      f:subPath: {}
+                    k:{"mountPath":"/mnt/elastic-internal/elasticsearch-certs"}:
+                      .: {}
+                      f:mountPath: {}
+                      f:name: {}
+                      f:readOnly: {}
+                    k:{"mountPath":"/usr/share/filebeat/data"}:
+                      .: {}
+                      f:mountPath: {}
+                      f:name: {}
+                    k:{"mountPath":"/var/lib/docker/containers"}:
+                      .: {}
+                      f:mountPath: {}
+                      f:name: {}
+                    k:{"mountPath":"/var/log/containers"}:
+                      .: {}
+                      f:mountPath: {}
+                      f:name: {}
+                    k:{"mountPath":"/var/log/pods"}:
+                      .: {}
+                      f:mountPath: {}
+                      f:name: {}
+              f:dnsPolicy: {}
+              f:hostNetwork: {}
+              f:restartPolicy: {}
+              f:schedulerName: {}
+              f:securityContext:
+                .: {}
+                f:runAsUser: {}
+              f:terminationGracePeriodSeconds: {}
+              f:volumes:
+                .: {}
+                k:{"name":"beat-data"}:
+                  .: {}
+                  f:hostPath:
+                    .: {}
+                    f:path: {}
+                    f:type: {}
+                  f:name: {}
+                k:{"name":"config"}:
+                  .: {}
+                  f:name: {}
+                  f:secret:
+                    .: {}
+                    f:defaultMode: {}
+                    f:optional: {}
+                    f:secretName: {}
+                k:{"name":"elasticsearch-certs"}:
+                  .: {}
+                  f:name: {}
+                  f:secret:
+                    .: {}
+                    f:defaultMode: {}
+                    f:optional: {}
+                    f:secretName: {}
+                k:{"name":"varlibdockercontainers"}:
+                  .: {}
+                  f:hostPath:
+                    .: {}
+                    f:path: {}
+                    f:type: {}
+                  f:name: {}
+                k:{"name":"varlogcontainers"}:
+                  .: {}
+                  f:hostPath:
+                    .: {}
+                    f:path: {}
+                    f:type: {}
+                  f:name: {}
+                k:{"name":"varlogpods"}:
+                  .: {}
+                  f:hostPath:
+                    .: {}
+                    f:path: {}
+                    f:type: {}
+                  f:name: {}
+          f:updateStrategy:
+            f:rollingUpdate:
+              .: {}
+              f:maxSurge: {}
+              f:maxUnavailable: {}
+            f:type: {}
+      manager: elastic-operator
+      operation: Update
+      time: '2024-11-26T18:00:53Z'
+    - apiVersion: apps/v1
+      fieldsType: FieldsV1
+      fieldsV1:
+        f:status:
+          f:currentNumberScheduled: {}
+          f:desiredNumberScheduled: {}
+          f:numberAvailable: {}
+          f:numberMisscheduled: {}
+          f:numberReady: {}
+          f:observedGeneration: {}
+          f:updatedNumberScheduled: {}
+      manager: kube-controller-manager
+      operation: Update
+      subresource: status
+      time: '2025-02-05T20:40:54Z'
+  name: elasticsearch-beat-filebeat
+  namespace: opr-develop
+  ownerReferences:
+    - apiVersion: beat.k8s.elastic.co/v1beta1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Beat
+      name: elasticsearch
+      uid: 7336eaef-63e2-424b-a830-c6430b59b5bf
+  resourceVersion: '406675889'
+  uid: 49d16c6d-98ff-41df-acab-72d2355a3871
+spec:
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      beat.k8s.elastic.co/name: elasticsearch
+      common.k8s.elastic.co/type: beat
+  template:
+    metadata:
+      annotations:
+        beat.k8s.elastic.co/config-hash: '4177596416'
+      creationTimestamp: null
+      labels:
+        beat.k8s.elastic.co/name: elasticsearch
+        beat.k8s.elastic.co/version: 8.7.0
+        common.k8s.elastic.co/type: beat
+    spec:
+      automountServiceAccountToken: false
+      containers:
+        - args:
+            - '-e'
+            - '-c'
+            - /etc/beat.yml
+          image: docker.elastic.co/beats/filebeat:8.7.0
+          imagePullPolicy: IfNotPresent
+          name: filebeat
+          resources:
+            limits:
+              cpu: 100m
+              memory: 300Mi
+            requests:
+              cpu: 100m
+              memory: 300Mi
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+            - mountPath: /usr/share/filebeat/data
+              name: beat-data
+            - mountPath: /etc/beat.yml
+              name: config
+              readOnly: true
+              subPath: beat.yml
+            - mountPath: /mnt/elastic-internal/elasticsearch-certs
+              name: elasticsearch-certs
+              readOnly: true
+            - mountPath: /var/lib/docker/containers
+              name: varlibdockercontainers
+            - mountPath: /var/log/containers
+              name: varlogcontainers
+            - mountPath: /var/log/pods
+              name: varlogpods
+      dnsPolicy: ClusterFirstWithHostNet
+      hostNetwork: true
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext:
+        runAsUser: 0
+      terminationGracePeriodSeconds: 30
+      volumes:
+        - hostPath:
+            path: /var/lib/opr-develop/elasticsearch/filebeat-data
+            type: DirectoryOrCreate
+          name: beat-data
+        - name: config
+          secret:
+            defaultMode: 292
+            optional: false
+            secretName: elasticsearch-beat-filebeat-config
+        - name: elasticsearch-certs
+          secret:
+            defaultMode: 420
+            optional: false
+            secretName: elasticsearch-beat-es-ca
+        - hostPath:
+            path: /var/lib/docker/containers
+            type: ''
+          name: varlibdockercontainers
+        - hostPath:
+            path: /var/log/containers
+            type: ''
+          name: varlogcontainers
+        - hostPath:
+            path: /var/log/pods
+            type: ''
+          name: varlogpods
+  updateStrategy:
+    rollingUpdate:
+      maxSurge: 0
+      maxUnavailable: 1
+    type: RollingUpdate
+status:
+  currentNumberScheduled: 4
+  desiredNumberScheduled: 4
+  numberAvailable: 4
+  numberMisscheduled: 0
+  numberReady: 4
+  observedGeneration: 4
+  updatedNumberScheduled: 4

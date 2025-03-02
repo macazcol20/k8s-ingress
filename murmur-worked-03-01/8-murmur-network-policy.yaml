@@ -1,0 +1,35 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  annotations:
+    meta.helm.sh/release-name: opr
+    meta.helm.sh/release-namespace: opr-develop
+  labels:
+    app.kubernetes.io/instance: opr
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: murmur
+    helm.sh/chart: reflect-common-chart-2.0.5
+  name: murmur-network-policy
+  namespace: opr-develop
+spec:
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: mumble-rest
+      ports:
+        - port: 6502
+          protocol: TCP
+    - from:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+      ports:
+        - port: 64738
+          protocol: TCP
+        - port: 64738
+          protocol: UDP
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: murmur
+  policyTypes:
+    - Ingress

@@ -1,0 +1,84 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt
+    meta.helm.sh/release-name: opr
+    meta.helm.sh/release-namespace: opr-develop
+  creationTimestamp: '2024-03-26T16:51:03Z'
+  generation: 1
+  labels:
+    app.kubernetes.io/instance: opr
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: matchmaker
+    helm.sh/chart: reflect-common-chart-1.0.0
+  managedFields:
+    - apiVersion: networking.k8s.io/v1
+      fieldsType: FieldsV1
+      fieldsV1:
+        f:metadata:
+          f:annotations:
+            .: {}
+            f:cert-manager.io/cluster-issuer: {}
+            f:meta.helm.sh/release-name: {}
+            f:meta.helm.sh/release-namespace: {}
+          f:labels:
+            .: {}
+            f:app.kubernetes.io/instance: {}
+            f:app.kubernetes.io/managed-by: {}
+            f:app.kubernetes.io/name: {}
+            f:helm.sh/chart: {}
+        f:spec:
+          f:ingressClassName: {}
+          f:rules: {}
+          f:tls: {}
+      manager: helm
+      operation: Update
+      time: '2024-03-26T16:51:03Z'
+    - apiVersion: networking.k8s.io/v1
+      fieldsType: FieldsV1
+      fieldsV1:
+        f:status:
+          f:loadBalancer:
+            f:ingress: {}
+      manager: nginx-ingress-controller
+      operation: Update
+      subresource: status
+      time: '2025-02-05T20:42:27Z'
+    - apiVersion: networking.k8s.io/v1
+      fieldsType: FieldsV1
+      fieldsV1:
+        f:metadata:
+          f:annotations:
+            f:field.cattle.io/publicEndpoints: {}
+      manager: rancher
+      operation: Update
+      time: '2025-02-05T20:42:27Z'
+  name: matchmaker-http
+  namespace: opr-develop
+  resourceVersion: '406678587'
+  uid: f97e6073-47ee-43fb-8240-ae2c172555d5
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: matchmaker.s3gis.be
+      http:
+        paths:
+          - backend:
+              service:
+                name: matchmaker
+                port:
+                  name: http
+            path: /api
+            pathType: ImplementationSpecific
+  tls:
+    - hosts:
+        - matchmaker.s3gis.be
+      secretName: matchmaker-reflect-tls
+status:
+  loadBalancer:
+    ingress:
+      - ip: 10.2.0.20
+      - ip: 10.2.0.29
+      - ip: 10.2.0.30
+      - ip: 10.2.0.31

@@ -1,0 +1,60 @@
+apiVersion: v1
+data:
+  APP_DEBUG: 'False'
+  APP_HOST: 0.0.0.0
+  APP_PORT: '8082'
+  AUTH_JWK_URL: >-
+    https://keycloak.s3gis.be/realms/reflect/protocol/openid-connect/certs
+  AUTH_JWT_VALID_ISSUER: https://keycloak.s3gis.be/realms/reflect
+  AUTH_NAME_CLAIM: preferred_username
+  AUTH_UID_OFFSET: '1000'
+  ENABLE_AUTH: 'True'
+  MURMUR_ICE_HOST: murmur.opr-develop.svc.cluster.local
+  MURMUR_ICE_PORT: '6502'
+  REFLECT_COMPONENT: mumble-rest
+kind: ConfigMap
+metadata:
+  annotations:
+    meta.helm.sh/release-name: opr
+    meta.helm.sh/release-namespace: opr-develop
+  creationTimestamp: '2024-04-03T22:26:01Z'
+  labels:
+    app.kubernetes.io/instance: opr
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: mumble-rest
+    helm.sh/chart: reflect-common-chart-2.0.5
+  managedFields:
+    - apiVersion: v1
+      fieldsType: FieldsV1
+      fieldsV1:
+        f:data:
+          .: {}
+          f:APP_DEBUG: {}
+          f:APP_HOST: {}
+          f:APP_PORT: {}
+          f:AUTH_JWK_URL: {}
+          f:AUTH_JWT_VALID_ISSUER: {}
+          f:AUTH_NAME_CLAIM: {}
+          f:AUTH_UID_OFFSET: {}
+          f:ENABLE_AUTH: {}
+          f:MURMUR_ICE_HOST: {}
+          f:MURMUR_ICE_PORT: {}
+          f:REFLECT_COMPONENT: {}
+        f:metadata:
+          f:annotations:
+            .: {}
+            f:meta.helm.sh/release-name: {}
+            f:meta.helm.sh/release-namespace: {}
+          f:labels:
+            .: {}
+            f:app.kubernetes.io/instance: {}
+            f:app.kubernetes.io/managed-by: {}
+            f:app.kubernetes.io/name: {}
+            f:helm.sh/chart: {}
+      manager: helm
+      operation: Update
+      time: '2024-04-04T20:19:05Z'
+  name: mumble-rest-config
+  namespace: opr-develop
+  resourceVersion: '199680585'
+  uid: 1e8918f8-a834-4856-94d5-92563a10b239

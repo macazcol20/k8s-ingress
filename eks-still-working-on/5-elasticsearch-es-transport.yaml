@@ -1,0 +1,69 @@
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: '2023-11-28T18:00:41Z'
+  labels:
+    common.k8s.elastic.co/type: elasticsearch
+    elasticsearch.k8s.elastic.co/cluster-name: elasticsearch
+  managedFields:
+    - apiVersion: v1
+      fieldsType: FieldsV1
+      fieldsV1:
+        f:metadata:
+          f:labels:
+            .: {}
+            f:common.k8s.elastic.co/type: {}
+            f:elasticsearch.k8s.elastic.co/cluster-name: {}
+          f:ownerReferences:
+            .: {}
+            k:{"uid":"fa65119f-aabd-4df2-923b-ee9e4a481662"}: {}
+        f:spec:
+          f:clusterIP: {}
+          f:internalTrafficPolicy: {}
+          f:ports:
+            .: {}
+            k:{"port":9300,"protocol":"TCP"}:
+              .: {}
+              f:name: {}
+              f:port: {}
+              f:protocol: {}
+              f:targetPort: {}
+          f:publishNotReadyAddresses: {}
+          f:selector: {}
+          f:sessionAffinity: {}
+          f:type: {}
+      manager: elastic-operator
+      operation: Update
+      time: '2023-11-28T18:00:41Z'
+  name: elasticsearch-es-transport
+  namespace: opr-develop
+  ownerReferences:
+    - apiVersion: elasticsearch.k8s.elastic.co/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Elasticsearch
+      name: elasticsearch
+      uid: fa65119f-aabd-4df2-923b-ee9e4a481662
+  resourceVersion: '87336182'
+  uid: 425a3674-b5a4-42c7-bdd2-43cd0e7a4d99
+spec:
+  clusterIP: None
+  clusterIPs:
+    - None
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+    - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+    - name: tls-transport
+      port: 9300
+      protocol: TCP
+      targetPort: 9300
+  publishNotReadyAddresses: true
+  selector:
+    common.k8s.elastic.co/type: elasticsearch
+    elasticsearch.k8s.elastic.co/cluster-name: elasticsearch
+  sessionAffinity: None
+  type: ClusterIP
+status:
+  loadBalancer: {}

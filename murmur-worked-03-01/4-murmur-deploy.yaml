@@ -1,0 +1,321 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    deployment.kubernetes.io/revision: '1'
+    meta.helm.sh/release-name: opr
+    meta.helm.sh/release-namespace: opr-develop
+  creationTimestamp: '2024-04-03T22:26:12Z'
+  generation: 2
+  labels:
+    app.kubernetes.io/instance: opr
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: murmur
+    helm.sh/chart: reflect-common-chart-2.0.5
+  managedFields:
+    - apiVersion: apps/v1
+      fieldsType: FieldsV1
+      fieldsV1:
+        f:metadata:
+          f:annotations:
+            f:field.cattle.io/publicEndpoints: {}
+      manager: rancher
+      operation: Update
+      time: '2024-04-03T22:26:12Z'
+    - apiVersion: apps/v1
+      fieldsType: FieldsV1
+      fieldsV1:
+        f:metadata:
+          f:annotations:
+            .: {}
+            f:meta.helm.sh/release-name: {}
+            f:meta.helm.sh/release-namespace: {}
+          f:labels:
+            .: {}
+            f:app.kubernetes.io/instance: {}
+            f:app.kubernetes.io/managed-by: {}
+            f:app.kubernetes.io/name: {}
+            f:helm.sh/chart: {}
+        f:spec:
+          f:progressDeadlineSeconds: {}
+          f:replicas: {}
+          f:revisionHistoryLimit: {}
+          f:selector: {}
+          f:strategy:
+            f:rollingUpdate:
+              .: {}
+              f:maxSurge: {}
+              f:maxUnavailable: {}
+            f:type: {}
+          f:template:
+            f:metadata:
+              f:annotations:
+                .: {}
+                f:checksum/config: {}
+                f:checksum/externalSecrets: {}
+                f:checksum/secrets: {}
+              f:labels:
+                .: {}
+                f:app.kubernetes.io/instance: {}
+                f:app.kubernetes.io/name: {}
+            f:spec:
+              f:containers:
+                k:{"name":"murmur"}:
+                  .: {}
+                  f:envFrom: {}
+                  f:image: {}
+                  f:imagePullPolicy: {}
+                  f:name: {}
+                  f:ports:
+                    .: {}
+                    k:{"containerPort":6502,"protocol":"TCP"}:
+                      .: {}
+                      f:containerPort: {}
+                      f:name: {}
+                      f:protocol: {}
+                    k:{"containerPort":64738,"protocol":"TCP"}:
+                      .: {}
+                      f:containerPort: {}
+                      f:name: {}
+                      f:protocol: {}
+                    k:{"containerPort":64738,"protocol":"UDP"}:
+                      .: {}
+                      f:containerPort: {}
+                      f:name: {}
+                      f:protocol: {}
+                  f:resources: {}
+                  f:securityContext: {}
+                  f:terminationMessagePath: {}
+                  f:terminationMessagePolicy: {}
+                  f:volumeMounts:
+                    .: {}
+                    k:{"mountPath":"/etc/murmur"}:
+                      .: {}
+                      f:mountPath: {}
+                      f:name: {}
+                      f:readOnly: {}
+                    k:{"mountPath":"/etc/opr/murmur-cert"}:
+                      .: {}
+                      f:mountPath: {}
+                      f:name: {}
+                      f:readOnly: {}
+              f:dnsPolicy: {}
+              f:imagePullSecrets:
+                .: {}
+                k:{"name":"regcred-gcp"}: {}
+              f:restartPolicy: {}
+              f:schedulerName: {}
+              f:securityContext: {}
+              f:serviceAccount: {}
+              f:serviceAccountName: {}
+              f:terminationGracePeriodSeconds: {}
+              f:volumes:
+                .: {}
+                k:{"name":"murmur-files"}:
+                  .: {}
+                  f:configMap:
+                    .: {}
+                    f:defaultMode: {}
+                    f:name: {}
+                  f:name: {}
+                k:{"name":"murmur-ssl-cert"}:
+                  .: {}
+                  f:name: {}
+                  f:secret:
+                    .: {}
+                    f:defaultMode: {}
+                    f:secretName: {}
+      manager: helm
+      operation: Update
+      time: '2024-04-04T20:19:15Z'
+    - apiVersion: apps/v1
+      fieldsType: FieldsV1
+      fieldsV1:
+        f:metadata:
+          f:annotations:
+            f:deployment.kubernetes.io/revision: {}
+        f:status:
+          f:availableReplicas: {}
+          f:conditions:
+            .: {}
+            k:{"type":"Available"}:
+              .: {}
+              f:lastTransitionTime: {}
+              f:lastUpdateTime: {}
+              f:message: {}
+              f:reason: {}
+              f:status: {}
+              f:type: {}
+            k:{"type":"Progressing"}:
+              .: {}
+              f:lastTransitionTime: {}
+              f:lastUpdateTime: {}
+              f:message: {}
+              f:reason: {}
+              f:status: {}
+              f:type: {}
+          f:observedGeneration: {}
+          f:readyReplicas: {}
+          f:replicas: {}
+          f:updatedReplicas: {}
+      manager: kube-controller-manager
+      operation: Update
+      subresource: status
+      time: '2025-02-05T20:42:17Z'
+  name: murmur
+  namespace: opr-develop
+  resourceVersion: '406678318'
+  uid: e4ab0ec8-c105-4c89-8767-bb88e2400b3e
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: opr
+      app.kubernetes.io/name: murmur
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      annotations:
+        checksum/config: 48908aa6dca14bb5606e109b236235b4dac899bc05280b13f8a32f7bd49cbfa0
+        checksum/externalSecrets: 5acf3ff77b4420677b5923071f303facaba7a9273a346284a667a275df325146
+        checksum/secrets: 44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a
+      creationTimestamp: null
+      labels:
+        app.kubernetes.io/instance: opr
+        app.kubernetes.io/name: murmur
+    spec:
+      containers:
+        - envFrom:
+            - configMapRef:
+                name: murmur-config
+          image: >-
+            us-east1-docker.pkg.dev/unity-solutions-tyndall-prd/docker/reflect-murmur:develop-latest
+          imagePullPolicy: Always
+          name: murmur
+          ports:
+            - containerPort: 64738
+              name: murmur-tcp
+              protocol: TCP
+            - containerPort: 64738
+              name: murmur-udp
+              protocol: UDP
+            - containerPort: 6502
+              name: murmur-ice
+              protocol: TCP
+          resources: {}
+          securityContext: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+            - mountPath: /etc/murmur
+              name: murmur-files
+              readOnly: true
+            - mountPath: /etc/opr/murmur-cert
+              name: murmur-ssl-cert
+              readOnly: true
+      dnsPolicy: ClusterFirst
+      imagePullSecrets:
+        - name: regcred-gcp
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      serviceAccount: default
+      serviceAccountName: default
+      terminationGracePeriodSeconds: 30
+      volumes:
+        - configMap:
+            defaultMode: 420
+            name: murmur-files
+          name: murmur-files
+        - name: murmur-ssl-cert
+          secret:
+            defaultMode: 420
+            secretName: voip-develop-tls
+status:
+  availableReplicas: 1
+  conditions:
+    - lastTransitionTime: '2024-04-03T22:26:12Z'
+      lastUpdateTime: '2024-04-03T22:26:17Z'
+      message: ReplicaSet "murmur-769b4dff79" has successfully progressed.
+      reason: NewReplicaSetAvailable
+      status: 'True'
+      type: Progressing
+    - lastTransitionTime: '2025-02-05T20:42:17Z'
+      lastUpdateTime: '2025-02-05T20:42:17Z'
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: 'True'
+      type: Available
+  observedGeneration: 2
+  readyReplicas: 1
+  replicas: 1
+  updatedReplicas: 1
+---
+## below edited
+
+# apiVersion: apps/v1
+# kind: Deployment
+# metadata:
+#   name: murmur
+#   namespace: opr-develop
+#   labels:
+#     app.kubernetes.io/instance: opr
+#     app.kubernetes.io/name: murmur
+# spec:
+#   replicas: 1
+#   strategy:
+#     rollingUpdate:
+#       maxSurge: 25%
+#       maxUnavailable: 25%
+#     type: RollingUpdate
+#   selector:
+#     matchLabels:
+#       app.kubernetes.io/instance: opr
+#       app.kubernetes.io/name: murmur
+#   template:
+#     metadata:
+#       labels:
+#         app.kubernetes.io/instance: opr
+#         app.kubernetes.io/name: murmur
+#     spec:
+#       containers:
+#         - name: murmur
+#           image: us-east1-docker.pkg.dev/unity-solutions-tyndall-prd/docker/reflect-murmur:develop-latest
+#           imagePullPolicy: Always
+#           envFrom:
+#             - configMapRef:
+#                 name: murmur-config
+#           ports:
+#             - containerPort: 64738
+#               name: murmur-tcp
+#               protocol: TCP
+#             - containerPort: 64738
+#               name: murmur-udp
+#               protocol: UDP
+#             - containerPort: 6502
+#               name: murmur-ice
+#               protocol: TCP
+#           volumeMounts:
+#             - mountPath: /etc/murmur
+#               name: murmur-files
+#               readOnly: true
+#             - mountPath: /etc/opr/murmur-cert
+#               name: murmur-ssl-cert
+#               readOnly: true
+#       volumes:
+#         - name: murmur-files
+#           configMap:
+#             name: murmur-files
+#         - name: murmur-ssl-cert
+#           secret:
+#             secretName: voip-develop-tls
+#       imagePullSecrets:
+#         - name: regcred-gcp
+#       restartPolicy: Always
+#       terminationGracePeriodSeconds: 30

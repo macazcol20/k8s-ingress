@@ -1,0 +1,127 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  annotations:
+    meta.helm.sh/release-name: opr
+    meta.helm.sh/release-namespace: opr-develop
+  creationTimestamp: "2024-01-16T20:14:50Z"
+  labels:
+    app.kubernetes.io/instance: opr
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: matchmaker
+    helm.sh/chart: reflect-common-chart-1.0.0
+  name: matchmaker-sa
+  namespace: opr-develop
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  annotations:
+    meta.helm.sh/release-name: opr
+    meta.helm.sh/release-namespace: opr-develop
+  creationTimestamp: "2024-01-16T20:15:00Z"
+  finalizers:
+  - wrangler.cattle.io/auth-prov-v2-crb
+  labels:
+    app.kubernetes.io/instance: opr
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: matchmaker
+    helm.sh/chart: reflect-common-chart-1.0.0
+  name: matchmaker-rb
+  resourceVersion: "130594039"
+  uid: 569fa7f8-e7a6-45ea-9cab-c1ca2635e5fd
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: matchmaker-clusterrole
+subjects:
+- kind: ServiceAccount
+  name: matchmaker-sa
+  namespace: opr-develop
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  annotations:
+    meta.helm.sh/release-name: opr
+    meta.helm.sh/release-namespace: opr-develop
+  creationTimestamp: "2024-01-16T20:15:00Z"
+  finalizers:
+  - wrangler.cattle.io/auth-prov-v2-crb
+  labels:
+    app.kubernetes.io/instance: opr
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: opr-reflect-common-chart
+    helm.sh/chart: reflect-common-chart-1.0.0
+  name: netcode-rb
+  resourceVersion: "148928737"
+  uid: e74b7ef1-530c-4a0a-b7a6-1f67ab9d3184
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: netcode-clusterrole
+subjects:
+- kind: ServiceAccount
+  name: netcode-sa
+  namespace: opr-develop
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  annotations:
+    meta.helm.sh/release-name: opr
+    meta.helm.sh/release-namespace: opr-develop
+  creationTimestamp: "2024-01-16T20:14:59Z"
+  finalizers:
+  - wrangler.cattle.io/auth-prov-v2-crole
+  labels:
+    app.kubernetes.io/instance: opr
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: matchmaker
+    helm.sh/chart: reflect-common-chart-1.0.0
+  name: matchmaker-clusterrole
+  resourceVersion: "130594034"
+  uid: e22886c0-242d-470a-9eab-6d3164de7a1e
+rules:
+- apiGroups:
+  - ""
+  - apps
+  - batch
+  resources:
+  - services
+  - jobs
+  verbs:
+  - create
+  - get
+  - watch
+  - list
+  - delete
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  annotations:
+    meta.helm.sh/release-name: opr
+    meta.helm.sh/release-namespace: opr-develop
+  creationTimestamp: "2024-01-16T20:15:00Z"
+  finalizers:
+  - wrangler.cattle.io/auth-prov-v2-crole
+  labels:
+    app.kubernetes.io/instance: opr
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: opr-reflect-common-chart
+    helm.sh/chart: reflect-common-chart-1.0.0
+  name: netcode-clusterrole
+  resourceVersion: "130594036"
+  uid: ffc08364-c0a2-4e2f-a4e1-97058a2104e7
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - services
+  - nodes
+  - secrets
+  verbs:
+  - get
+  - watch
+  - list

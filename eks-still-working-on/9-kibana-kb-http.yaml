@@ -1,0 +1,66 @@
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: '2023-11-20T23:47:18Z'
+  labels:
+    common.k8s.elastic.co/type: kibana
+    kibana.k8s.elastic.co/name: kibana
+  managedFields:
+    - apiVersion: v1
+      fieldsType: FieldsV1
+      fieldsV1:
+        f:metadata:
+          f:labels:
+            .: {}
+            f:common.k8s.elastic.co/type: {}
+            f:kibana.k8s.elastic.co/name: {}
+          f:ownerReferences:
+            .: {}
+            k:{"uid":"d0498303-2a17-441c-ac50-272f776f5061"}: {}
+        f:spec:
+          f:internalTrafficPolicy: {}
+          f:ports:
+            .: {}
+            k:{"port":5601,"protocol":"TCP"}:
+              .: {}
+              f:name: {}
+              f:port: {}
+              f:protocol: {}
+              f:targetPort: {}
+          f:selector: {}
+          f:sessionAffinity: {}
+          f:type: {}
+      manager: elastic-operator
+      operation: Update
+      time: '2023-11-20T23:47:18Z'
+  name: kibana-kb-http
+  namespace: opr-develop
+  ownerReferences:
+    - apiVersion: kibana.k8s.elastic.co/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Kibana
+      name: kibana
+      uid: d0498303-2a17-441c-ac50-272f776f5061
+  resourceVersion: '80548693'
+  uid: 39fb4485-be18-45dd-9d15-c82177b85725
+spec:
+  clusterIP: 10.43.42.232
+  clusterIPs:
+    - 10.43.42.232
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+    - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+    - name: https
+      port: 5601
+      protocol: TCP
+      targetPort: 5601
+  selector:
+    common.k8s.elastic.co/type: kibana
+    kibana.k8s.elastic.co/name: kibana
+  sessionAffinity: None
+  type: ClusterIP
+status:
+  loadBalancer: {}

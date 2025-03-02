@@ -1,0 +1,38 @@
+apiVersion: v1
+data:
+  unicast_hosts.txt: 10.42.1.216:9300
+kind: ConfigMap
+metadata:
+  creationTimestamp: '2023-11-28T18:00:42Z'
+  labels:
+    common.k8s.elastic.co/type: elasticsearch
+    elasticsearch.k8s.elastic.co/cluster-name: elasticsearch
+  managedFields:
+    - apiVersion: v1
+      fieldsType: FieldsV1
+      fieldsV1:
+        f:data:
+          .: {}
+          f:unicast_hosts.txt: {}
+        f:metadata:
+          f:labels:
+            .: {}
+            f:common.k8s.elastic.co/type: {}
+            f:elasticsearch.k8s.elastic.co/cluster-name: {}
+          f:ownerReferences:
+            .: {}
+            k:{"uid":"fa65119f-aabd-4df2-923b-ee9e4a481662"}: {}
+      manager: elastic-operator
+      operation: Update
+      time: '2025-02-05T20:41:36Z'
+  name: elasticsearch-es-unicast-hosts
+  namespace: opr-develop
+  ownerReferences:
+    - apiVersion: elasticsearch.k8s.elastic.co/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Elasticsearch
+      name: elasticsearch
+      uid: fa65119f-aabd-4df2-923b-ee9e4a481662
+  resourceVersion: '406677699'
+  uid: 22b57433-a89f-42eb-8ea8-b480f1f59429

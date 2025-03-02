@@ -1,0 +1,94 @@
+apiVersion: v1
+data:
+  ASPNETCORE_URLS: http://+:8090
+  OTEL_EXPORTER_OTLP_ENDPOINT: http://apm-server-apm-http:8200
+  OTEL_EXPORTER_OTLP_HEADERS: Authorization=Bearer 4113wNO7AFYO336Yn3vj2yvP
+  OTEL_RESOURCE_ATTRIBUTES: deployment.environment=production
+  OTEL_SERVICE_NAME: matchmaker
+  REFLECT_COMPONENT: matchmaker
+  REFLECT_ENVIRONMENT: Production
+  REFLECTMULTIPLAYER_ClusterController__AllocationPool__PoolSize: '0'
+  REFLECTMULTIPLAYER_ClusterController__KubeApi__CertsSecretName: matchmaker-reflect-tls
+  REFLECTMULTIPLAYER_ClusterController__KubeApi__Images__Init: >-
+    us-east1-docker.pkg.dev/unity-solutions-tyndall-prd/docker/reflect-netcode-init:develop-latest
+  REFLECTMULTIPLAYER_ClusterController__KubeApi__Images__Netcode: >-
+    us-east1-docker.pkg.dev/unity-solutions-tyndall-prd/docker/reflect-netcode:develop-latest
+  REFLECTMULTIPLAYER_ClusterController__KubeApi__KubeNamespace: opr-develop
+  REFLECTMULTIPLAYER_ClusterController__KubeApi__KubeNodepool: 'kubernetes.io/os : linux'
+  REFLECTMULTIPLAYER_ClusterController__KubeApi__MatchMakerEndpoint: matchmaker
+  REFLECTMULTIPLAYER_ClusterController__KubeApi__Namespace: default
+  REFLECTMULTIPLAYER_ClusterController__KubeApi__NetcodeServerAddress: develop.s3gis.be
+  REFLECTMULTIPLAYER_Mumble__OwnerManagerAclGroupName: OprOwnerManager
+  REFLECTMULTIPLAYER_Mumble__RestApiUrl: http://mumble-rest.opr-develop.svc.cluster.local:8082
+  REFLECTMULTIPLAYER_ProjectServer__Address: http://project:10010
+  REFLECTMULTIPLAYER_ProjectServer__HttpAddress: https://develop.s3gis.be
+  REFLECTMULTIPLAYER_Prometheus__Enabled: 'true'
+  # REFLECTMULTIPLAYER_Sentry__Environment: gcp-test
+  REFLECTMULTIPLAYER_Serilog__MinimumLevel__Default: Debug
+  URLS: http://+:8090
+kind: ConfigMap
+metadata:
+  annotations:
+    meta.helm.sh/release-name: opr
+    meta.helm.sh/release-namespace: opr-develop
+  creationTimestamp: '2024-01-16T20:14:56Z'
+  labels:
+    app.kubernetes.io/instance: opr
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: matchmaker
+    helm.sh/chart: reflect-common-chart-1.0.0
+  managedFields:
+    - apiVersion: v1
+      fieldsType: FieldsV1
+      fieldsV1:
+        f:data:
+          f:REFLECTMULTIPLAYER_Serilog__MinimumLevel__Default: {}
+      manager: rancher
+      operation: Update
+      time: '2024-03-04T16:56:54Z'
+    - apiVersion: v1
+      fieldsType: FieldsV1
+      fieldsV1:
+        f:data:
+          .: {}
+          f:ASPNETCORE_URLS: {}
+          f:OTEL_EXPORTER_OTLP_ENDPOINT: {}
+          f:OTEL_EXPORTER_OTLP_HEADERS: {}
+          f:OTEL_RESOURCE_ATTRIBUTES: {}
+          f:OTEL_SERVICE_NAME: {}
+          f:REFLECT_COMPONENT: {}
+          f:REFLECT_ENVIRONMENT: {}
+          f:REFLECTMULTIPLAYER_ClusterController__AllocationPool__PoolSize: {}
+          f:REFLECTMULTIPLAYER_ClusterController__KubeApi__CertsSecretName: {}
+          f:REFLECTMULTIPLAYER_ClusterController__KubeApi__Images__Init: {}
+          f:REFLECTMULTIPLAYER_ClusterController__KubeApi__Images__Netcode: {}
+          f:REFLECTMULTIPLAYER_ClusterController__KubeApi__KubeNamespace: {}
+          f:REFLECTMULTIPLAYER_ClusterController__KubeApi__KubeNodepool: {}
+          f:REFLECTMULTIPLAYER_ClusterController__KubeApi__MatchMakerEndpoint: {}
+          f:REFLECTMULTIPLAYER_ClusterController__KubeApi__Namespace: {}
+          f:REFLECTMULTIPLAYER_ClusterController__KubeApi__NetcodeServerAddress: {}
+          f:REFLECTMULTIPLAYER_Mumble__OwnerManagerAclGroupName: {}
+          f:REFLECTMULTIPLAYER_Mumble__RestApiUrl: {}
+          f:REFLECTMULTIPLAYER_ProjectServer__Address: {}
+          f:REFLECTMULTIPLAYER_ProjectServer__HttpAddress: {}
+          f:REFLECTMULTIPLAYER_Prometheus__Enabled: {}
+          f:REFLECTMULTIPLAYER_Sentry__Environment: {}
+          f:URLS: {}
+        f:metadata:
+          f:annotations:
+            .: {}
+            f:meta.helm.sh/release-name: {}
+            f:meta.helm.sh/release-namespace: {}
+          f:labels:
+            .: {}
+            f:app.kubernetes.io/instance: {}
+            f:app.kubernetes.io/managed-by: {}
+            f:app.kubernetes.io/name: {}
+            f:helm.sh/chart: {}
+      manager: helm
+      operation: Update
+      time: '2024-03-28T16:26:49Z'
+  name: matchmaker-config
+  namespace: opr-develop
+  resourceVersion: '193319503'
+  uid: d733c8bc-7129-480d-ae7a-1fdbeb6566b8

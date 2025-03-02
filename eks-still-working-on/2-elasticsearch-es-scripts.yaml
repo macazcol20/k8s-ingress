@@ -1,0 +1,145 @@
+apiVersion: v1
+data:
+  pre-stop-hook-script.sh: "#!/usr/bin/env bash\n\nset -uo pipefail\n\n# This script will wait for up to $PRE_STOP_ADDITIONAL_WAIT_SECONDS before allowing termination of the Pod \n# This slows down the process shutdown and allows to make changes to the pool gracefully, without blackholing traffic when DNS\n# still contains the IP that is already inactive. \n# As this runs in parallel to grace period after which process is SIGKILLed,\n# it should be set to allow enough time for the process to gracefully terminate.\n# It allows kube-proxy to refresh its rules and remove the terminating Pod IP.\n# Kube-proxy refresh period defaults to every 30 seconds, but the operation itself can take much longer if\n# using iptables with a lot of services, in which case the default 30sec might not be enough.\n# Also gives some additional bonus time to in-flight requests to terminate, and new requests to still\n# target the Pod IP before Elasticsearch stops.\nPRE_STOP_ADDITIONAL_WAIT_SECONDS=${PRE_STOP_ADDITIONAL_WAIT_SECONDS:=50}\n\n# PRE_STOP_SHUTDOWN_TYPE controls the type of shutdown that will be communicated to Elasticsearch. This should not be\n# changed to anything but restart. Specifically setting remove can lead to extensive data migration that might exceed the\n# terminationGracePeriodSeconds and lead to an incomplete shutdown.\nshutdown_type=${PRE_STOP_SHUTDOWN_TYPE:=restart}\n\n# capture response bodies in a temp file for better error messages and to extract necessary information for subsequent requests\nresp_body=$(mktemp)\n# shellcheck disable=SC2064\ntrap \"rm -f $resp_body\" EXIT\n\nscript_start=$(date +%s)\n\n# compute time in seconds since the given start time\nfunction duration() {\n  local start=$1\n  end=$(date +%s)\n  echo $((end-start))\n}\n\n# use DNS errors as a proxy to abort this script early if there is no chance of successful completion\n# DNS errors are for example expected when the whole cluster including its service is being deleted\n# and the service URL can no longer be resolved even though we still have running Pods.\nmax_dns_errors=${PRE_STOP_MAX_DNS_ERRORS:=2}\nglobal_dns_error_cnt=0\n\nfunction request() {\n  local status exit\n  status=$(curl -k -sS -o \"$resp_body\" -w \"%{http_code}\" \"$@\")\n  exit=$?\n  if [ \"$exit\" -ne 0 ] || [ \"$status\" -lt 200 ] || [ \"$status\" -gt 299 ]; then\n    # track curl DNS errors separately\n    if [ \"$exit\" -eq 6 ]; then ((global_dns_error_cnt++)); fi\n    # make sure we have a non-zero exit code in the presence of errors\n    if [ \"$exit\" -eq 0 ]; then exit=1; fi\n    log  \"$status\" \"$3\" #by convention the third arg contains the URL\n    return $exit\n  fi\n  global_dns_error_cnt=0\n  return 0\n}\n\nfunction retry() {\n  local retries=$1\n  shift\n\n  local count=0\n  until \"$@\"; do\n    exit=$?\n    wait=$((2 ** count))\n    count=$((count + 1))\n    if [ $global_dns_error_cnt -gt \"$max_dns_errors\" ]; then\n      error_exit \"too many DNS errors, giving up\"\n    fi\n    if [ $count -lt \"$retries\" ]; then\n      log \"retry $count/$retries exited $exit, retrying in $wait seconds\"\n      sleep $wait\n    else\n      log \"retry $count/$retries exited $exit, no more retries left\"\n      return $exit\n    fi\n  done\n  return 0\n}\n\nfunction log() {\n   local timestamp\n   timestamp=$(date --iso-8601=seconds)\n   echo \"{\\\"@timestamp\\\": \\\"${timestamp}\\\", \\\"message\\\": \\\"$*\\\", \\\"ecs.version\\\": \\\"1.2.0\\\", \\\"event.dataset\\\": \\\"elasticsearch.pre-stop-hook\\\"}\" | tee /proc/1/fd/2 2> /dev/null\n}\n\nfunction error_exit() {\n  log \"$@\"\n  delayed_exit 1\n}\n\nfunction delayed_exit() {\n  local elapsed\n  elapsed=$(duration \"$script_start\")\n  local remaining=$((PRE_STOP_ADDITIONAL_WAIT_SECONDS - elapsed))\n  if (( remaining < 0 )); then\n    exit ${1-0}\n  fi\n  log \"delaying termination for $remaining seconds\"\n  sleep $remaining\n  exit ${1-0}\n}\n\nfunction supports_node_shutdown() {\n  local version=\"$1\"\n  version=${version#[vV]}\n  major=\"${version%%\\.*}\"\n  minor=\"${version#*.}\"\n  minor=\"${minor%.*}\"\n  patch=\"${version##*.}\"\n  # node shutdown is supported as of 7.15.2\n  if [ \"$major\" -lt 7 ]  || { [ \"$major\" -eq 7 ] && [ \"$minor\" -eq 15 ] && [ \"$patch\" -lt 2 ]; }; then\n    return 1\n  fi\n  return 0\n}\n\nversion=\"\"\nif [[ -f \"/mnt/elastic-internal/downward-api/labels\" ]]; then\n  # get Elasticsearch version from the downward API\n  version=$(grep \"elasticsearch.k8s.elastic.co/version\" /mnt/elastic-internal/downward-api/labels | cut -d '=' -f 2)\n  # remove quotes\n  version=$(echo \"${version}\" | tr -d '\"')\nfi\n\n# if ES version does not support node shutdown exit early\nif ! supports_node_shutdown \"$version\"; then\n  delayed_exit \nfi\n\n# setup basic auth if credentials are available\nif [ -f \"/mnt/elastic-internal/pod-mounted-users/elastic-internal-pre-stop\" ]; then\n  PROBE_PASSWORD=$(</mnt/elastic-internal/pod-mounted-users/elastic-internal-pre-stop)\n  BASIC_AUTH=\"-u elastic-internal-pre-stop:${PROBE_PASSWORD}\"\nelse\n  # typically the case on upgrades from versions that did not have this script yet and the necessary volume mounts are missing\n  log \"no API credentials available, will not attempt node shutdown orchestration from pre-stop hook\"\n  delayed_exit\nfi\n\nES_URL=https://elasticsearch-es-internal-http.opr-develop.svc:9200\n\nlog \"retrieving node ID\"\nretry 10 request -X GET \"$ES_URL/_cat/nodes?full_id=true&h=id,name\" $BASIC_AUTH\nif [ \"$?\" -ne 0 ]; then\n\terror_exit \"failed to retrieve node ID\"\nfi\n\nNODE_ID=$(grep \"$POD_NAME\" \"$resp_body\" | cut -f 1 -d ' ')\n\n# check if there is an ongoing shutdown request\nrequest -X GET $ES_URL/_nodes/\"$NODE_ID\"/shutdown $BASIC_AUTH\nif grep -q -v '\"nodes\":\\[\\]' \"$resp_body\"; then\n\tlog \"shutdown managed by ECK operator\"\n\tdelayed_exit      \nfi\n\nlog \"initiating node shutdown\"\nretry 10 request -X PUT $ES_URL/_nodes/\"$NODE_ID\"/shutdown $BASIC_AUTH -H 'Content-Type: application/json' -d\"\n{\n  \\\"type\\\": \\\"$shutdown_type\\\",\n  \\\"reason\\\": \\\"pre-stop hook\\\"\n}\n\"\nif [ \"$?\" -ne 0 ]; then\n   error_exit \"failed to call node shutdown API\"\nfi\n\nwhile :\ndo \n   log \"waiting for node shutdown to complete\"\n   request -X GET $ES_URL/_nodes/\"$NODE_ID\"/shutdown $BASIC_AUTH\n   if [ \"$?\" -eq 0 ] && grep -q -v 'IN_PROGRESS\\|STALLED' \"$resp_body\"; then\n      break\n   fi\n   sleep 10 \ndone\n\ndelayed_exit\n"
+  prepare-fs.sh: "#!/usr/bin/env bash\n\n\tset -eu\n\n\t# the operator only works with the default ES distribution\n\tlicense=/usr/share/elasticsearch/LICENSE.txt\n\tif [[ ! -f $license || $(grep -Exc \"ELASTIC LICENSE AGREEMENT|Elastic License 2.0\" $license) -ne 1 ]]; then\n\t\t>&2 echo \"unsupported_distribution\"\n\t\texit 42\n\tfi\n\n\t# compute time in seconds since the given start time\n\tfunction duration() {\n\t\tlocal start=$1\n\t\tend=$(date +%s)\n\t\techo $((end-start))\n\t}\n\n\t######################\n\t#        START       #\n\t######################\n\n\tscript_start=$(date +%s)\n\n\techo \"Starting init script\"\n\n\t######################\n\t#  Files persistence #\n\t######################\n\n\t# Persist the content of bin/, config/ and plugins/ to a volume,\n\t# so installed plugins files can to be used by the ES container\n\tmv_start=$(date +%s)\n\t\n\t\tif [[ -z \"$(ls -A /usr/share/elasticsearch/config)\" ]]; then\n\t\t\techo \"Empty dir /usr/share/elasticsearch/config\"\n\t\telse\n\t\t\techo \"Copying /usr/share/elasticsearch/config/* to /mnt/elastic-internal/elasticsearch-config-local/\"\n\t\t\t# Use \"yes\" and \"-f\" as we want the init container to be idempotent and not to fail when executed more than once.\n\t\t\tyes | cp -avf /usr/share/elasticsearch/config/* /mnt/elastic-internal/elasticsearch-config-local/ \n\t\tfi\n\t\n\t\tif [[ -z \"$(ls -A /usr/share/elasticsearch/plugins)\" ]]; then\n\t\t\techo \"Empty dir /usr/share/elasticsearch/plugins\"\n\t\telse\n\t\t\techo \"Copying /usr/share/elasticsearch/plugins/* to /mnt/elastic-internal/elasticsearch-plugins-local/\"\n\t\t\t# Use \"yes\" and \"-f\" as we want the init container to be idempotent and not to fail when executed more than once.\n\t\t\tyes | cp -avf /usr/share/elasticsearch/plugins/* /mnt/elastic-internal/elasticsearch-plugins-local/ \n\t\tfi\n\t\n\t\tif [[ -z \"$(ls -A /usr/share/elasticsearch/bin)\" ]]; then\n\t\t\techo \"Empty dir /usr/share/elasticsearch/bin\"\n\t\telse\n\t\t\techo \"Copying /usr/share/elasticsearch/bin/* to /mnt/elastic-internal/elasticsearch-bin-local/\"\n\t\t\t# Use \"yes\" and \"-f\" as we want the init container to be idempotent and not to fail when executed more than once.\n\t\t\tyes | cp -avf /usr/share/elasticsearch/bin/* /mnt/elastic-internal/elasticsearch-bin-local/ \n\t\tfi\n\t\n\techo \"Files copy duration: $(duration $mv_start) sec.\"\n\n\t######################\n\t#  Config linking    #\n\t######################\n\n\t# Link individual files from their mount location into the config dir\n\t# to a volume, to be used by the ES container\n\tln_start=$(date +%s)\n\t\n\t\techo \"Linking /mnt/elastic-internal/xpack-file-realm/users to /mnt/elastic-internal/elasticsearch-config-local/users\"\n\t\tln -sf /mnt/elastic-internal/xpack-file-realm/users /mnt/elastic-internal/elasticsearch-config-local/users\n\t\n\t\techo \"Linking /mnt/elastic-internal/xpack-file-realm/roles.yml to /mnt/elastic-internal/elasticsearch-config-local/roles.yml\"\n\t\tln -sf /mnt/elastic-internal/xpack-file-realm/roles.yml /mnt/elastic-internal/elasticsearch-config-local/roles.yml\n\t\n\t\techo \"Linking /mnt/elastic-internal/xpack-file-realm/users_roles to /mnt/elastic-internal/elasticsearch-config-local/users_roles\"\n\t\tln -sf /mnt/elastic-internal/xpack-file-realm/users_roles /mnt/elastic-internal/elasticsearch-config-local/users_roles\n\t\n\t\techo \"Linking /mnt/elastic-internal/elasticsearch-config/elasticsearch.yml to /mnt/elastic-internal/elasticsearch-config-local/elasticsearch.yml\"\n\t\tln -sf /mnt/elastic-internal/elasticsearch-config/elasticsearch.yml /mnt/elastic-internal/elasticsearch-config-local/elasticsearch.yml\n\t\n\t\techo \"Linking /mnt/elastic-internal/unicast-hosts/unicast_hosts.txt to /mnt/elastic-internal/elasticsearch-config-local/unicast_hosts.txt\"\n\t\tln -sf /mnt/elastic-internal/unicast-hosts/unicast_hosts.txt /mnt/elastic-internal/elasticsearch-config-local/unicast_hosts.txt\n\t\n\t\techo \"Linking /mnt/elastic-internal/xpack-file-realm/service_tokens to /mnt/elastic-internal/elasticsearch-config-local/service_tokens\"\n\t\tln -sf /mnt/elastic-internal/xpack-file-realm/service_tokens /mnt/elastic-internal/elasticsearch-config-local/service_tokens\n\t\n\techo \"File linking duration: $(duration $ln_start) sec.\"\n\n\t######################\n\t#  Volumes chown     #\n\t######################\n\n\t# chown the data and logs volume to the elasticsearch user\n\t# only done when running as root, other cases should be handled\n\t# with a proper security context\n\tchown_start=$(date +%s)\n\tif [[ $EUID -eq 0 ]]; then\n\t\t\n\t\t\techo \"chowning /usr/share/elasticsearch/data to elasticsearch:elasticsearch\"\n\t\t\tchown -v elasticsearch:elasticsearch /usr/share/elasticsearch/data\n\t\t\n\t\t\techo \"chowning /usr/share/elasticsearch/logs to elasticsearch:elasticsearch\"\n\t\t\tchown -v elasticsearch:elasticsearch /usr/share/elasticsearch/logs\n\t\t\n\tfi\n\techo \"chown duration: $(duration $chown_start) sec.\"\n\n\t######################\n\t#  Wait for certs    #\n\t######################\n\n\tINIT_CONTAINER_LOCAL_KEY_PATH=/mnt/elastic-internal/transport-certificates/${POD_NAME}.tls.key\n\n\t# wait for the transport certificates to show up\n\techo \"waiting for the transport certificates (${INIT_CONTAINER_LOCAL_KEY_PATH})\"\n\twait_start=$(date +%s)\n\twhile [ ! -f ${INIT_CONTAINER_LOCAL_KEY_PATH} ]\n\tdo\n\t  sleep 0.2\n\tdone\n\techo \"wait duration: $(duration wait_start) sec.\"\n\n\t######################\n\t#  Certs linking     #\n\t######################\n\n\tKEY_SOURCE_PATH=/usr/share/elasticsearch/config/transport-certs/${POD_NAME}.tls.key\n\tKEY_TARGET_PATH=/mnt/elastic-internal/elasticsearch-config-local/node-transport-cert/transport.tls.key\n\n\tCERT_SOURCE_PATH=/usr/share/elasticsearch/config/transport-certs/${POD_NAME}.tls.crt\n\tCERT_TARGET_PATH=/mnt/elastic-internal/elasticsearch-config-local/node-transport-cert/transport.tls.crt\n\n\t# Link individual files from their mount location into the config dir\n\t# to a volume, to be used by the ES container\n\tln_start=$(date +%s)\n\n\techo \"Linking $CERT_SOURCE_PATH to $CERT_TARGET_PATH\"\n\tmkdir -p $(dirname $KEY_TARGET_PATH)\n\tln -sf $KEY_SOURCE_PATH $KEY_TARGET_PATH\n\techo \"Linking $CERT_SOURCE_PATH to $CERT_TARGET_PATH\"\n\tmkdir -p $(dirname $CERT_TARGET_PATH)\n\tln -sf $CERT_SOURCE_PATH $CERT_TARGET_PATH\n\n\techo \"Certs linking duration: $(duration $ln_start) sec.\"\n\n\t######################\n\t#         End        #\n\t######################\n\n\techo \"Init script successful\"\n\techo \"Script duration: $(duration $script_start) sec.\"\n"
+  readiness-probe-script.sh: >
+    #!/usr/bin/env bash
+
+
+    # fail should be called as a last resort to help the user to understand why
+    the probe failed
+
+    function fail {
+      timestamp=$(date --iso-8601=seconds)
+      echo "{\"timestamp\": \"${timestamp}\", \"message\": \"readiness probe failed\", "$1"}" | tee /proc/1/fd/2 2> /dev/null
+      exit 1
+    }
+
+
+    labels="/mnt/elastic-internal/downward-api/labels"
+
+
+    version=""
+
+    if [[ -f "${labels}" ]]; then
+      # get Elasticsearch version from the downward API
+      version=$(grep "elasticsearch.k8s.elastic.co/version" ${labels} | cut -d '=' -f 2)
+      # remove quotes
+      version=$(echo "${version}" | tr -d '"')
+    fi
+
+
+    READINESS_PROBE_TIMEOUT=${READINESS_PROBE_TIMEOUT:=3}
+
+
+    # Check if PROBE_PASSWORD_PATH is set, otherwise fall back to its former
+    name in 1.0.0.beta-1: PROBE_PASSWORD_FILE
+
+    if [[ -z "${PROBE_PASSWORD_PATH}" ]]; then
+      probe_password_path="${PROBE_PASSWORD_FILE}"
+    else
+      probe_password_path="${PROBE_PASSWORD_PATH}"
+    fi
+
+
+    # setup basic auth if credentials are available
+
+    if [ -n "${PROBE_USERNAME}" ] && [ -f "${probe_password_path}" ]; then
+      PROBE_PASSWORD=$(<${probe_password_path})
+      BASIC_AUTH="-u ${PROBE_USERNAME}:${PROBE_PASSWORD}"
+    else
+      BASIC_AUTH=''
+    fi
+
+
+    # Check if we are using IPv6
+
+    if [[ $POD_IP =~ .*:.* ]]; then
+      LOOPBACK="[::1]"
+    else 
+      LOOPBACK=127.0.0.1
+    fi
+
+
+    # request Elasticsearch on /
+
+    # we are turning globbing off to allow for unescaped [] in case of IPv6
+
+    ENDPOINT="${READINESS_PROBE_PROTOCOL:-https}://${LOOPBACK}:9200/"
+
+    ORIGIN_HEADER="x-elastic-product-origin: cloud"
+
+    status=$(curl -o /dev/null -w "%{http_code}" --max-time
+    ${READINESS_PROBE_TIMEOUT} -H "${ORIGIN_HEADER}" -XGET -g -s -k
+    ${BASIC_AUTH} $ENDPOINT)
+
+    curl_rc=$?
+
+
+    if [[ ${curl_rc} -ne 0 ]]; then
+      fail "\"curl_rc\": \"${curl_rc}\""
+    fi
+
+
+    # ready if status code 200, 503 is tolerable if ES version is 6.x
+
+    if [[ ${status} == "200" ]] || [[ ${status} == "503" && ${version:0:2} ==
+    "6." ]]; then
+      exit 0
+    else
+      fail " \"status\": \"${status}\", \"version\":\"${version}\" "
+    fi
+  suspend.sh: >
+    #!/usr/bin/env bash
+
+    set -eu
+
+
+    while [[ $(grep -Exc $HOSTNAME
+    /mnt/elastic-internal/scripts/suspended_pods.txt) -eq 1 ]]; do
+
+    echo Pod suspended via eck.k8s.elastic.co/suspend annotation
+
+    sleep 10
+
+    done
+  suspended_pods.txt: ''
+kind: ConfigMap
+metadata:
+  creationTimestamp: '2023-11-28T18:00:41Z'
+  labels:
+    common.k8s.elastic.co/type: elasticsearch
+    elasticsearch.k8s.elastic.co/cluster-name: elasticsearch-es-scripts
+  managedFields:
+    - apiVersion: v1
+      fieldsType: FieldsV1
+      fieldsV1:
+        f:data:
+          .: {}
+          f:pre-stop-hook-script.sh: {}
+          f:prepare-fs.sh: {}
+          f:readiness-probe-script.sh: {}
+          f:suspend.sh: {}
+          f:suspended_pods.txt: {}
+        f:metadata:
+          f:labels:
+            .: {}
+            f:common.k8s.elastic.co/type: {}
+            f:elasticsearch.k8s.elastic.co/cluster-name: {}
+          f:ownerReferences:
+            .: {}
+            k:{"uid":"fa65119f-aabd-4df2-923b-ee9e4a481662"}: {}
+      manager: elastic-operator
+      operation: Update
+      time: '2023-11-28T18:00:41Z'
+  name: elasticsearch-es-scripts
+  namespace: opr-develop
+  ownerReferences:
+    - apiVersion: elasticsearch.k8s.elastic.co/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Elasticsearch
+      name: elasticsearch
+      uid: fa65119f-aabd-4df2-923b-ee9e4a481662
+  resourceVersion: '87336181'
+  uid: 7b000556-8795-44bc-b84f-9e2028f5bfee

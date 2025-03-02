@@ -1,0 +1,84 @@
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    meta.helm.sh/release-name: opr
+    meta.helm.sh/release-namespace: opr-develop
+  creationTimestamp: '2024-01-16T20:15:02Z'
+  labels:
+    app.kubernetes.io/instance: opr
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: matchmaker
+    helm.sh/chart: reflect-common-chart-1.0.0
+  managedFields:
+    - apiVersion: v1
+      fieldsType: FieldsV1
+      fieldsV1:
+        f:metadata:
+          f:annotations:
+            .: {}
+            f:meta.helm.sh/release-name: {}
+            f:meta.helm.sh/release-namespace: {}
+          f:labels:
+            .: {}
+            f:app.kubernetes.io/instance: {}
+            f:app.kubernetes.io/managed-by: {}
+            f:app.kubernetes.io/name: {}
+            f:helm.sh/chart: {}
+        f:spec:
+          f:internalTrafficPolicy: {}
+          f:ports:
+            .: {}
+            k:{"port":80,"protocol":"TCP"}:
+              .: {}
+              f:name: {}
+              f:port: {}
+              f:protocol: {}
+              f:targetPort: {}
+            k:{"port":1234,"protocol":"TCP"}:
+              .: {}
+              f:name: {}
+              f:port: {}
+              f:protocol: {}
+              f:targetPort: {}
+            k:{"port":10042,"protocol":"TCP"}:
+              .: {}
+              f:name: {}
+              f:port: {}
+              f:protocol: {}
+              f:targetPort: {}
+          f:selector: {}
+          f:sessionAffinity: {}
+          f:type: {}
+      manager: helm
+      operation: Update
+      time: '2024-03-26T19:15:11Z'
+  name: matchmaker
+  namespace: opr-develop
+  resourceVersion: '191643267'
+  uid: f70f9130-8c8c-43d5-b37c-49e1bd5c15ac
+spec:
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+    - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+    - name: http
+      port: 80
+      protocol: TCP
+      targetPort: 8090
+    - name: prom-publisher
+      port: 1234
+      protocol: TCP
+      targetPort: 1234
+    - name: grpc
+      port: 10042
+      protocol: TCP
+      targetPort: 10042
+  selector:
+    app.kubernetes.io/instance: opr
+    app.kubernetes.io/name: matchmaker
+  sessionAffinity: None
+  type: ClusterIP
+status:
+  loadBalancer: {}
