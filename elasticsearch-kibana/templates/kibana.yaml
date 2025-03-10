@@ -1,0 +1,120 @@
+apiVersion: kibana.k8s.elastic.co/v1
+kind: Kibana
+metadata:
+  name: {{ .Release.Name }}
+  namespace: {{ .Release.Namespace }}
+spec:
+  version: {{ .Values.kibana.version }}
+  count: {{ .Values.kibana.count }}
+  image: {{ .Values.kibana.image.repository }}:{{ .Values.kibana.image.tag }}
+
+  config:
+    {{- if and .Values.istio.enabled .Values.istio.elasticsearch.enabled }}
+    elasticsearch.hosts:
+      - http://{{ .Release.Name }}-es-http:9200
+    {{- end }}
+    {{- if .Values.bbtests.enabled }}
+    # To make Cypress happy we need to disable the strict CSP rules
+    csp.strict: false
+    {{- end }}
+    {{- with .Values.sso }}
+    {{- if .enabled }}
+    xpack.security.authc.providers:
+      oidc.oidc1:
+        enabled: true
+        order: 0
+        realm: {{ .oidc.realm }}
+      {{- if $.Values.kibanaBasicAuth.enabled }}
+      basic.basic1:
+        enabled: true
+        order: 1
+      {{- end }}
+    {{- end }}
+    {{- end }}
+    server:
+      {{- if .Values.kibana.host }}
+      publicBaseUrl: "https://{{ .Values.kibana.host }}"
+      {{- else if .Values.istio.kibana.hosts }}
+      publicBaseUrl: "https://{{ tpl (index .Values.istio.kibana.hosts 0) $ }}"
+      {{- else }}
+      publicBaseUrl: "https://kibana.bigbang.dev"
+      {{- end }}
+    {{- if and .Values.kibana.agents.elasticsearchHosts .Values.kibana.agents.fleetserverHosts .Values.kibana.agents.packages .Values.kibana.agents.agentPolicies }}
+    xpack.fleet.agents.elasticsearch.hosts: {{ .Values.kibana.agents.elasticsearchHosts }}
+    xpack.fleet.agents.fleet_server.hosts: {{ .Values.kibana.agents.fleetserverHosts }}
+    xpack.fleet.packages: {{- toYaml .Values.kibana.agents.packages | nindent 6 }}
+    xpack.fleet.agentPolicies: {{- toYaml .Values.kibana.agents.agentPolicies | nindent 6 }}
+    {{- end }}
+
+  elasticsearchRef:
+    name: {{ .Release.Name }}
+
+  {{- if .Values.istio.enabled }}
+  http:
+    tls:
+      selfSignedCertificate:
+        disabled: true
+  {{- end }}
+
+  podTemplate:
+    metadata:
+      {{- if .Values.kibana.podAnnotations }}
+      annotations:
+        {{- toYaml .Values.kibana.podAnnotations | nindent 8 }}
+      {{- end }}
+      labels:
+        {{ include "elasticsearch.labels" $ |  nindent 8 }}
+    spec:
+      serviceAccountName: {{ .Values.kibana.serviceAccountName }}
+      {{- if .Values.kibana.securityContext }}
+      securityContext:
+      {{- toYaml .Values.kibana.securityContext | nindent 8 }}
+      {{- end }}
+      {{- if .updateStrategy }}
+        updateStrategy:
+          {{- toYaml .updateStrategy | nindent 10 }}
+        {{- end }}
+      initContainers:
+        - name: elastic-internal-init
+          securityContext:
+            capabilities:
+              drop:
+                - ALL
+      containers:
+        - name: kibana
+          resources:
+            {{- toYaml .Values.kibana.resources | nindent 12 }}
+          lifecycle:
+            {{- toYaml .Values.kibana.lifecycle | nindent 12 }}
+          {{- if .Values.kibana.volumeMounts }}
+          volumeMounts:
+          {{- toYaml .Values.kibana.volumeMounts | nindent 10 }}
+          {{- end }}
+          imagePullPolicy: {{ .Values.imagePullPolicy }}
+          securityContext:
+          {{- toYaml .Values.kibana.containersecurityContext | nindent 12 }}
+      {{- if .Values.kibana.volumes }}
+      volumes:
+      {{- toYaml .Values.kibana.volumes | nindent 6 }}
+      {{- end }}
+      {{- with .Values.kibana.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- if .Values.istio.enabled }}
+      automountServiceAccountToken: true
+      {{- end }}
+      {{- with .Values.kibana }}
+      {{- if .nodeSelector }}
+      nodeSelector:
+        {{- toYaml .nodeSelector | nindent 8 }}
+      {{- end }}
+      {{- if .affinity }}
+      affinity:
+        {{- toYaml .affinity | nindent 8 }}
+      {{- end }}
+      {{- if .tolerations }}
+      tolerations:
+        {{- toYaml .tolerations | nindent 8 }}
+      {{- end }}
+      {{- end }}
