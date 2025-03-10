@@ -1,0 +1,198 @@
+installCRDs: true
+replicaCount: 1
+
+image:
+  repository: registry1.dso.mil/ironbank/elastic/eck-operator/eck-operator
+  tag: 2.16.1
+
+  pullPolicy: IfNotPresent
+  fips: false
+
+priorityClassName: ""
+
+imagePullSecrets: 
+  - name: private-registry
+
+resources: # Limits equal to request to provide QOS per BB Charter
+  limits:
+    cpu: 200m # Values pulled from PB IL2 cluster
+    memory: 256Mi
+  requests:
+    cpu: 200m
+    memory: 256Mi
+
+statefulsetAnnotations: {}
+statefulsetLabels: {}
+podAnnotations: {}
+podLabels: {}
+podSecurityContext:
+  runAsNonRoot: true
+  fsGroup: 1001
+  supplementalGroups: [1001]
+
+securityContext:
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+      - ALL
+  readOnlyRootFilesystem: true
+  runAsNonRoot: true
+  runAsUser: 1001
+  runAsGroup: 1001
+
+nodeSelector: {}
+tolerations: []
+affinity: {}
+podDisruptionBudget:
+  enabled: false
+  minAvailable: 1
+
+env: []
+volumeMounts: []
+volumes: []
+createClusterScopedResources: true
+automountServiceAccountToken: true
+serviceAccount:
+  create: true
+  automountServiceAccountToken: true
+  annotations: {}
+  name: ""
+
+tracing:
+  enabled: false
+  config:
+    ELASTIC_APM_SERVER_URL: http://localhost:8200
+    ELASTIC_APM_SERVER_TIMEOUT: 30s
+
+refs:
+  enforceRBAC: false
+
+webhook:
+  enabled: true
+  caBundle: Cg==
+  certManagerCert: null
+  certsDir: "/tmp/k8s-webhook-server/serving-certs"
+  failurePolicy: Ignore
+  manageCerts: true
+  namespaceSelector: {}
+  objectSelector: {}
+  port: 9443
+  certsSecret: ""
+
+hostNetwork: false
+
+softMultiTenancy:
+  enabled: false
+
+kubeAPIServerIP: null
+
+telemetry:
+  disabled: false
+  distributionChannel: "helm"
+config:
+  logVerbosity: "0"
+  metricsPort: 0
+
+  metrics:
+    port: "4321"
+    secureMode:
+      enabled: false
+      tls:
+
+        certificateSecret: ""
+
+  containerRegistry: docker.elastic.co
+  maxConcurrentReconciles: "3"
+  caValidity: 8760h
+  caRotateBefore: 24h
+  caDir: ""
+  certificatesValidity: 8760h
+  certificatesRotateBefore: 24h
+
+  disableConfigWatch: false
+
+  exposedNodeLabels: [ "topology.kubernetes.io/.*", "failure-domain.beta.kubernetes.io/.*" ]
+
+  ipFamily: ""
+  setDefaultSecurityContext: "auto-detect"
+  kubeClientTimeout: 60s
+  elasticsearchClientTimeout: 180s
+  validateStorageClass: true
+  enableLeaderElection: true
+  elasticsearchObservationInterval: 10s
+  ubiOnly: false
+podMonitor:
+  enabled: false
+
+  # labels adds additional labels to the podMonitor
+  labels: {}
+
+  # annotations adds additional annotations to the podMonitor
+  annotations: {}
+
+  # namespace determines in which namespace the podMonitor will be deployed.
+  # If not set the podMonitor will be created in the namespace where the Helm release is installed into
+  # namespace: monitoring
+
+  # interval specifies the interval at which metrics should be scraped
+  interval: 5m
+  scrapeTimeout: 30s
+  podTargetLabels: []
+  podMetricsEndpointConfig: {}
+serviceMonitor:
+  enabled: true
+
+  caSecret: ""
+  # caMountDirectory is the directory at which the CA certificate is mounted within the Prometheus pod.
+  #
+  # * You should only need to adjust this if you are *not* using the Prometheus operator.
+  caMountDirectory: "/etc/prometheus/secrets/"
+  # insecureSkipVerify specifies whether to skip verification of the TLS certificate for the secure metrics endpoint.
+  #
+  # * If this setting is set to false, then the following settings are required:
+  #   - certificateSecret
+  #   - caSecret
+  insecureSkipVerify: true
+global:
+  manifestGen: false
+  createOperatorNamespace: true
+  kubeVersion: 1.21.0
+
+license:
+  trial: false # Toggle to enable the trial license for development use
+  keyJSON: "" # Set this to your license JSON for production use
+
+networkPolicies:
+  enabled: false
+  # See `kubectl cluster-info` and then resolve to IP
+  controlPlaneCidr: 0.0.0.0/0
+  additionalPolicies: []
+monitoring:
+  enabled: false
+openshift: false
+
+istio:
+  enabled: false
+  hardened:
+    enabled: false
+    customAuthorizationPolicies: []
+    outboundTrafficPolicyMode: "REGISTRY_ONLY"
+    customServiceEntries: []
+  
+    tempo:
+      enabled: false
+      namespaces:
+      - tempo
+      principals:
+      - cluster.local/ns/tempo/sa/tempo-tempo
+  mtls:
+    # STRICT = Allow only mutual TLS traffic
+    # PERMISSIVE = Allow both plain text and mutual TLS traffic
+    mode: STRICT
+
+# Force replace CRD upgrade job needed for 1.7.x upgrade
+upgradeCrds:
+  enabled: false
+  image:
+    repository: registry1.dso.mil/ironbank/big-bang/base
+    tag: 2.1.0
