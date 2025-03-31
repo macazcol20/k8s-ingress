@@ -1,0 +1,509 @@
+Summary Statement
+This SOP outlines the standard practices for managing secrets and certificates using HashiCorp Vault. It defines the purpose, scope, procedures, and controls to ensure secure, auditable, and efficient management of credentials and digital certificates across environments.
+
+Main Document
+Purpose
+To establish a secure, automated, and centralized approach for managing secrets (e.g., passwords, API keys, tokens) and X.509 certificates using HashiCorp Vault, enabling compliance, operational efficiency, and reduced risk of exposure.
+
+Scope
+This SOP applies to all DevOps, Infrastructure, and Security teams responsible for managing application credentials, machine identities, and TLS certificates in production, staging, and development environments across cloud and on-premise systems.
+
+Procedures
+1. Secrets Management Configuration
+Enable and configure secrets engines (KV, database, etc.)
+
+Define paths, policies, and access control lists (ACLs)
+
+Configure authentication methods (e.g., Kubernetes, LDAP, OIDC)
+
+Store and retrieve secrets securely using Vault CLI or API
+
+2. Certificate Authority (CA) Configuration
+Initialize and configure PKI secrets engine
+
+Generate root or intermediate CA (manual or automated signing)
+
+Create roles for certificate issuance
+
+Define TTL, usage constraints, and auto-renew policies
+
+3. Certificate Issuance and Renewal
+Use CLI, Vault Agent, or Envconsul for dynamic certificate issuance
+
+Automate end-entity certificate renewal via TTLs or renewal endpoints
+
+Configure webhook or Ansible-based workflows for periodic renewal
+
+Maintain certificate chains for mutual TLS (mTLS)
+
+Workflow Diagram
+(Insert a diagram showing secret creation → policy → auth method → retrieval)
+(Another flow: ICA → roles → cert issuance → injection → renewal)
+
+I can help you generate a diagram if you provide your tool (draw.io, Lucidchart, Markdown Mermaid, etc.)
+
+Process Monitoring (Controls)
+1. Access Controls and Audit Logs
+Enable Vault audit devices (e.g., file, syslog)
+
+Log all authentication, read/write operations
+
+Enforce least-privilege access using Vault policies
+
+2. High Availability and Backups
+Monitor Vault HA cluster status (Raft or Consul)
+
+Automate snapshots and secure backup of Vault data
+
+Periodic restore testing
+
+3. Secrets/Certs Lifecycle Compliance
+Monitor secrets/certs expiry and rotation
+
+Define alerts via Prometheus or external integrations
+
+Validate certificate usage across applications
+
+Exception Handling
+Escalation path for failed cert issuance, expired secrets
+
+Manual revocation or rotation procedures
+
+Incident response for leaked or misused secrets
+
+Backup Vault unseal keys stored securely (e.g., HSM, offline)
+
+Let me know if you'd like this formatted in Word, Markdown, or if you'd like me to generate diagrams or add sample configurations for any section.
+
+
+
+
+-------------
+## Build a certificate authority (CA) in Vault with an offline root
+[tutorial Link:](https://developer.hashicorp.com/vault/tutorials/pki/pki-engine-external-ca)
+
+This tutorial builds on the Build Your Own Certificate Authority (CA) tutorial. You will learn how to create a CA chain hierarchy that uses an offline root and online intermediate CAs in Vault.
+
+```sh
+export VAULT_ADDR=http://10.0.0.19:8200
+export VAULT_TOKEN=xxxxx
+vault login $VAULT_TOKEN
+```
+
+## Step 0: install prerequisites
+```sh
+## install go
+cd /tmp
+curl -OL https://go.dev/dl/go1.21.6.linux-amd64.tar.gz
+sudo rm -rf /usr/local/go
+sudo tar -C /usr/local -xzf go1.21.6.linux-amd64.tar.gz
+
+export PATH=$PATH:/usr/local/go/bin
+source ~/.bashrc
+go version
+
+## install certstrap - https://github.com/square/certstrap/releases
+cd /usr/local/bin
+sudo wget -O certstrap https://github.com/square/certstrap/releases/download/v1.3.0/certstrap-linux-amd64
+sudo chmod +x certstrap
+
+## install terraform 
+sudo apt-get update && sudo apt-get install -y gnupg software-properties-common
+
+wget -O- https://apt.releases.hashicorp.com/gpg | \
+gpg --dearmor | \
+sudo tee /usr/share/keyrings/hashicorp-archive-keyring.gpg > /dev/null
+
+gpg --no-default-keyring \
+--keyring /usr/share/keyrings/hashicorp-archive-keyring.gpg \
+--fingerprint
+
+echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] \
+https://apt.releases.hashicorp.com $(lsb_release -cs) main" | \
+sudo tee /etc/apt/sources.list.d/hashicorp.list
+
+sudo apt update
+sudo apt-get install terraform
+terraform -help
+```
+
+## Step 1: Generate Your Own Certificates (using OpenSSL)
+
+```sh
+mkdir -p out
+
+# Generate Root CA key
+openssl genrsa -aes256 -out out/Testing_Root.key 4096
+
+# Create Root CA cert
+cat > root-openssl.cnf <<EOF
+[ req ]
+default_bits       = 4096
+distinguished_name = dn
+x509_extensions    = v3_ca
+prompt             = no
+
+days = 3650
+
+[ dn ]
+C  = US
+ST = MD
+L  = Bethesda
+O  = Test
+OU = Test Org
+CN = Testing Root
+
+[ v3_ca ]
+subjectKeyIdentifier=hash
+authorityKeyIdentifier=keyid:always,issuer
+basicConstraints = critical,CA:true,pathlen:2
+keyUsage = critical, digitalSignature, cRLSign, keyCertSign
+EOF
+
+openssl req -x509 -new -key out/Testing_Root.key -sha256 -days 3650 \
+  -out out/Testing_Root.crt -config root-openssl.cnf -extensions v3_ca
+
+openssl x509 -in out/Testing_Root.crt -noout -subject -issuer
+```
+
+## Step 2: Generate ICA1 in Vault
+
+```sh
+# Create Terraform config to enable PKI for ICA1
+cat > main.tf << EOF
+provider "vault" {}
+
+locals {
+ default_3y_in_sec   = 94608000
+ default_1y_in_sec   = 31536000
+ default_1hr_in_sec = 3600
+}
+EOF
+
+cat > test_org_ica1.tf << EOF
+resource "vault_mount" "test_org_v1_ica1_v1" {
+ path                      = "test-org/v1/ica1/v1"
+ type                      = "pki"
+ description               = "PKI engine hosting intermediate CA1 v1 for test org"
+ default_lease_ttl_seconds = local.default_1hr_in_sec
+ max_lease_ttl_seconds     = local.default_3y_in_sec
+}
+
+resource "vault_pki_secret_backend_intermediate_cert_request" "test_org_v1_ica1_v1" {
+ depends_on   = [vault_mount.test_org_v1_ica1_v1]
+ backend      = vault_mount.test_org_v1_ica1_v1.path
+ type         = "internal"
+ common_name  = "Intermediate CA1 v1 "
+ key_type     = "rsa"
+ key_bits     = "2048"
+ ou           = "test org"
+ organization = "test"
+ country      = "US"
+ locality     = "Bethesda"
+ province     = "MD"
+}
+EOF
+
+terraform init
+terraform apply --auto-approve
+
+mkdir -p csr
+
+terraform show -json | jq '.values["root_module"]["resources"][] | select(.name == "test_org_v1_ica1_v1") | .values.csr' -r > csr/Test_Org_v1_ICA1_v1.csr
+
+## Create the CA database and serial files
+touch index.txt
+echo 1000 > serial
+
+# Create ica1_openssl.cnf for signing with the Root CA:
+cat > ica1_openssl.cnf <<EOF
+[ ca ]
+default_ca = CA_default
+
+[ CA_default ]
+dir             = .
+database        = index.txt
+serial          = serial
+new_certs_dir   = .
+certificate     = out/Testing_Root.crt
+private_key     = out/Testing_Root.key
+default_md      = sha256
+policy          = policy_loose
+x509_extensions = v3_ica
+copy_extensions = copy
+
+[ policy_loose ]
+commonName             = supplied
+organizationName       = supplied
+organizationalUnitName = optional
+countryName            = optional
+stateOrProvinceName    = optional
+localityName           = optional
+
+[ v3_ica ]
+basicConstraints = critical, CA:true, pathlen:1
+subjectKeyIdentifier = hash
+authorityKeyIdentifier = keyid:always,issuer
+keyUsage = critical, digitalSignature, cRLSign, keyCertSign
+EOF
+
+## Sign ICA1 CSR using OpenSSL Root CA:
+openssl ca -batch -config ica1_openssl.cnf \
+  -extensions v3_ica \
+  -in csr/Test_Org_v1_ICA1_v1.csr \
+  -out out/Intermediate_CA1_v1.crt \
+  -days 1095
+
+## Create the cacerts folder to store the CA chain files that will be set on the PKI endpoints in Vault
+mkdir -p cacerts
+
+##  Create a CA Chain (ICA1 + Root)
+cat out/Intermediate_CA1_v1.crt out/Testing_Root.crt > cacerts/test_org_v1_ica1_v1.crt
+
+## Update Terraform to Set the Signed ICA1 in Vault
+cat >> test_org_ica1.tf << EOF
+
+resource "vault_pki_secret_backend_intermediate_set_signed" "test_org_v1_ica1_v1_signed_cert" {
+  depends_on   = [vault_mount.test_org_v1_ica1_v1]
+  backend      = vault_mount.test_org_v1_ica1_v1.path
+
+  certificate = file("\${path.module}/cacerts/test_org_v1_ica1_v1.crt")
+
+  lifecycle {
+    replace_triggered_by = [null_resource.force_update]
+  }
+}
+EOF
+
+##  also need to define a dummy null_resource.force_update so Terraform can detect changes
+
+cat >> main.tf << EOF
+
+resource "null_resource" "force_update" {
+  triggers = {
+    always_run = timestamp()
+  }
+}
+EOF
+
+
+terraform apply --auto-approve
+
+##  Verify that the Terraform output displays the new ICA1 set
+curl -s $VAULT_ADDR/v1/test-org/v1/ica1/v1/ca/pem | openssl crl2pkcs7 -nocrl -certfile /dev/stdin | openssl pkcs7 -print_certs -noout
+
+curl -s $VAULT_ADDR/v1/test-org/v1/ica1/v1/ca_chain | openssl crl2pkcs7 -nocrl -certfile /dev/stdin | openssl pkcs7 -print_certs -noout
+```
+
+## Step 3: Generate ICA2 in Vault
+
+```sh
+## 1. Next, generate Terraform code to create and manage ICA2 in Vault.
+cat > test_org_ica2.tf << EOF
+resource "vault_mount" "test_org_v1_ica2_v1" {
+ path                      = "test-org/v1/ica2/v1"
+ type                      = "pki"
+ description               = "PKI engine hosting intermediate CA2 v1 for test org"
+ default_lease_ttl_seconds = local.default_1hr_in_sec
+ max_lease_ttl_seconds     = local.default_1y_in_sec
+}
+
+resource "vault_pki_secret_backend_intermediate_cert_request" "test_org_v1_ica2_v1" {
+ depends_on   = [vault_mount.test_org_v1_ica2_v1]
+ backend      = vault_mount.test_org_v1_ica2_v1.path
+ type         = "internal"
+ common_name  = "Intermediate CA2 v1 "
+ key_type     = "rsa"
+ key_bits     = "2048"
+ ou           = "test org"
+ organization = "test"
+ country      = "US"
+ locality     = "Bethesda"
+ province     = "MD"
+}
+
+resource "vault_pki_secret_backend_root_sign_intermediate" "test_org_v1_sign_ica2_v1_by_ica1_v1" {
+ depends_on = [
+   vault_mount.test_org_v1_ica1_v1,
+   vault_pki_secret_backend_intermediate_cert_request.test_org_v1_ica2_v1,
+ ]
+ backend              = vault_mount.test_org_v1_ica1_v1.path
+ csr                  = vault_pki_secret_backend_intermediate_cert_request.test_org_v1_ica2_v1.csr
+ common_name          = "Intermediate CA2 v1.1"
+ exclude_cn_from_sans = true
+ ou                   = "test org"
+ organization         = "test"
+ country              = "US"
+ locality             = "Bethesda"
+ province             = "MD"
+ max_path_length      = 1
+ ttl                  = local.default_1y_in_sec
+}
+
+resource "vault_pki_secret_backend_intermediate_set_signed" "test_org_v1_ica2_v1_signed_cert" {
+ depends_on  = [vault_pki_secret_backend_root_sign_intermediate.test_org_v1_sign_ica2_v1_by_ica1_v1]
+ backend     = vault_mount.test_org_v1_ica2_v1.path
+ certificate = format("%s\n%s", vault_pki_secret_backend_root_sign_intermediate.test_org_v1_sign_ica2_v1_by_ica1_v1.certificate, file("\${path.module}/cacerts/test_org_v1_ica1_v1.crt"))
+}
+EOF
+
+## 2. Apply Terraform changes for ICA2.
+terraform apply
+
+## 3. Verify the ICA2 cert in Vault.
+curl -s $VAULT_ADDR/v1/test-org/v1/ica2/v1/ca/pem | openssl crl2pkcs7 -nocrl -certfile  /dev/stdin  | openssl pkcs7 -print_certs -noout
+
+curl -s $VAULT_ADDR/v1/test-org/v1/ica2/v1/ca_chain | openssl crl2pkcs7 -nocrl -certfile  /dev/stdin  | openssl pkcs7 -print_certs -noout
+
+curl -s $VAULT_ADDR/v1/test-org/v1/ica2/v1/ca/pem | openssl x509 -in /dev/stdin -noout -text | grep "X509v3 extensions"  -A 13
+```
+
+## Step 4: Issue a client x509 cert rooted in ICA2
+```sh
+## 1. Create a new PKI role rooted in ICA2 to issue client x509 certificates for test.com subdomains.
+cat > test_org_ica2_role_test_dot_com.tf << EOF
+resource "vault_pki_secret_backend_role" "role" {
+ backend            = vault_mount.test_org_v1_ica2_v1.path
+ name               = "test-dot-com-subdomain"
+ ttl                = local.default_1hr_in_sec
+ allow_ip_sans      = true
+ key_type           = "rsa"
+ key_bits           = 2048
+ key_usage          = [ "DigitalSignature"]
+ allow_any_name     = false
+ allow_localhost    = false
+ allowed_domains    = ["test.com"]
+ allow_bare_domains = false
+ allow_subdomains   = true
+ server_flag        = false
+ client_flag        = true
+ no_store           = true
+ country            = ["US"]
+ locality           = ["Bethesda"]
+ province           = ["MD"]
+}
+
+EOF
+
+## 2. Apply Terraform changes for ICA2.
+terraform apply
+
+## 3. Next, create a certificate rooted in ICA2 using Vault CLI.
+vault write -format=json test-org/v1/ica2/v1/issue/test-dot-com-subdomain \
+   common_name=1.test.com | jq .data.certificate -r | openssl x509 -in /dev/stdin -text -noout
+```
+
+## STEP 5: Optional Checks (if you're curious)
+***Verify full chain trust***
+
+```sh
+mkdir certs
+## Get the certificate issued by Vault (ICA2 signed cert):
+vault write -format=json test-org/v1/ica2/v1/issue/test-dot-com-subdomain common_name=1.test.com   > issued_cert.json
+## Extract the cert:
+jq -r .data.certificate issued_cert.json > certs/issued_cert.pem
+## Extract ICA2 cert (the issuing CA):
+jq -r .data.issuing_ca issued_cert.json > certs/ica2.pem
+## Create full chain file:
+cat certs/ica2.pem out/Intermediate_CA1_v1.crt out/Testing_Root.crt > certs/full_chain.pem
+## Verify the cert properly:
+openssl verify -CAfile certs/full_chain.pem certs/issued_cert.pem
+
+```
+
+***What I've Achieved:***
+
+this openssl verify showing OK means:
+
+- ICA2 signed the issued cert
+- ICA1 signed ICA2
+- Root signed ICA1
+- The chain is valid and complete
+
+I’ve officially built and verified a multi-tier PKI using:
+
+  OpenSSL for Root & ICA1
+  Vault for ICA1 & ICA2 CSR generation and ICA2 signing
+  A clean CA hierarchy: Root → ICA1 → ICA2 → issued cert
+
+***Step 1: Root CA (Offline)***
+Generated using OpenSSL with AES256-encrypted key
+Created X.509 root certificate with correct extensions (CA:true, pathlen:2)
+
+***Step 2: Intermediate CA1***
+CSR generated via Vault PKI (type = internal)
+Signed manually using OpenSSL with Root CA
+Configured path length 1 to allow ICA2 underneath
+Uploaded full chain (ICA1 + Root) back into Vault
+
+***Step 3: Intermediate CA2***
+CSR generated from Vault ICA2 endpoint
+Signed via Terraform using vault_pki_secret_backend_root_sign_intermediate from ICA1
+ICA2 chain constructed with ICA2 + ICA1 + Root
+Verified via /ca/pem and /ca_chain — looks good
+Basic Constraints and Key Usage on ICA2 were all correct (CA:true, pathlen:0)
+
+***Step 4: Role and Certificate Issuance***
+Defined a Vault PKI role that:
+Allows subdomains under test.com
+Allows IP SANs
+Is configured for client certificates (client_flag = true)
+Issued a test cert using vault write and confirmed:
+Proper SAN (1.test.com)
+Correct chain of trust: ICA2 ← ICA1 ← Root
+
+***NOTE TO SELF***
+Other usecases to consider now:
+- Enabling auto-renewals
+- Exporting this for trust store integrations
+- Or creating a Makefile or reusable script around this flow
+
+## STEP 6 - NEXT: Enabling auto-renewals
+For this I will provide 2 separatte options:
+
+- Option A: Envconsul Setup
+- Option B: Vault CSI Driver + Kubernetes
+
+### Option A: Envconsul Setup
+This is the recommended way to inject certs directly into your Kubernetes pods.
+
+```sh
+## 1. Install Envconsul and template
+wget https://releases.hashicorp.com/envconsul/0.13.3/envconsul_0.13.3_linux_amd64.zip
+unzip envconsul_0.13.3_linux_amd64.zip
+sudo mv envconsul /usr/local/bin/
+
+wget https://releases.hashicorp.com/consul-template/0.32.0/consul-template_0.32.0_linux_amd64.zip
+unzip consul-template_0.32.0_linux_amd64.zip
+sudo mv consul-template /usr/local/bin/
+
+## 2. Create the directory and put your config there:
+sudo mkdir -p /etc/envconsul
+sudo nano /etc/envconsul/envconsul.hcl
+sudo nano /etc/envconsul/cert.tpl
+
+## 3. Create Envconsul Config
+vault {
+  address = "http://10.0.0.19:8200"
+  unwrap_token = false
+}
+
+template {
+  source      = "/etc/envconsul/cert.tpl"
+  destination = "/etc/envconsul/client.pem"
+  command     = "/bin/systemctl reload nginx"
+  perms       = "0644"
+}
+
+## 4. create a cert.tpl file
+{{ with secret "test-org/v1/ica2/v1/issue/test-dot-com-subdomain" "common_name=1.test.com" }}
+{{ .Data.certificate }}
+{{ end }}
+
+## 5. create a policy
+vault token create -ttl=1h -policy=client-cert-policy
+
+## 6. Run Envconsul
+sudo VAULT_TOKEN=xxxxx consul-template -config=/etc/envconsul/envconsul.hcl
+
+```
