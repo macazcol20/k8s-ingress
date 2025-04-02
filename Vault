@@ -1,0 +1,53 @@
+This SOP covers the end-to-end operational lifecycle of secret and certificate management using HashiCorp Vault. It includes:
+
+Setting up and configuring Vault secret engines (KV, database, etc.)
+
+Managing policies, access control (RBAC), and authentication methods (OIDC, LDAP, Kubernetes)
+
+Implementing and operating the Vault PKI engine to manage Root and Intermediate Certificate Authorities (CAs)
+
+Issuing, renewing, and revoking TLS certificates
+
+Injecting secrets and certificates into applications (static/dynamic)
+
+Enforcing compliance and monitoring access patterns via audit logs
+
+Handling common exceptions and outages in Vault services
+
+Performing routine backups and recovery testing for disaster recovery
+---
+Why Vault is Vital for Our Organization
+As one of the largest health insurers in the country, we are entrusted with the most sensitive and regulated data imaginable — from personally identifiable information (PII) to healthcare claims, financial records, and prescription histories. In this landscape, the security, traceability, and lifecycle management of secrets and certificates is not just a technical concern — it's a business-critical, compliance-driven imperative.
+
+Our Current State and Risks
+Today, many of our credentials and TLS certificates — whether for application integrations, legacy IBM systems, or even Active Directory-bound services — exist in static form, scattered across configuration files, shared drives, or embedded within scripts and automation tools. While some of these have grown organically to meet operational needs, they also introduce serious risks:
+
+Credential sprawl and poor rotation practices leave us vulnerable to insider threats or credential leaks.
+
+No centralized visibility or audit trail means it's difficult to prove compliance or respond to incidents quickly.
+
+Manual certificate management increases downtime risk and weakens our zero-trust goals.
+
+Lack of access policies tied to identity (especially for AD/Kerberos-integrated systems) makes least-privilege hard to enforce.
+
+These are not just operational inefficiencies — they are attack surfaces and compliance liabilities, especially under HIPAA, HITRUST, and SOC 2 regulations.
+
+How Vault Transforms Our Security Posture
+HashiCorp Vault gives us a centralized, identity-aware platform to secure, access, and manage secrets and certificates dynamically — across our hybrid environment:
+
+✅ Seamless Integration with IBM Ecosystem & Active Directory
+Vault integrates with LDAP/AD to manage secrets access via our existing identity infrastructure — reducing friction for teams and aligning with enterprise RBAC strategies.
+
+✅ Secrets as a Service for Applications
+Vault allows us to securely inject credentials into IBM WebSphere, MQ, and DB2-based applications without hardcoding or exposing them in code or config files.
+
+✅ Dynamic Credentials for Zero Standing Access
+Instead of static secrets, Vault can issue short-lived, auto-expiring database credentials — making stolen creds useless and helping us move toward a zero trust model.
+
+✅ PKI-as-a-Service to Modernize Certificate Management
+Vault can act as our internal Certificate Authority (CA), issuing and renewing TLS certs dynamically for internal services, Kubernetes workloads, and legacy apps — all with full auditability and expiry monitoring.
+
+✅ End-to-End Audit and Compliance Visibility
+Every secret read/write, token issued, or certificate generated is logged and auditable. This means we can demonstrate governance and control to auditors — with actual evidence.
+
+
