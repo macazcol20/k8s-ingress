@@ -1,0 +1,173 @@
+Exception Handling in an SOP (Standard Operating Procedure) refers to what to do when things don’t go as planned. It outlines the predefined steps to take during errors, failures, outages, misconfigurations, or any abnormal events — so the team can respond quickly, reduce downtime, and minimize risk.
+
+In the context of Vault for secrets and certificate management, exception handling is all about:
+
+How to detect when something has gone wrong
+
+How to contain or fix the problem
+
+Who to notify
+
+What logs to check
+
+Whether to escalate or trigger an incident
+
+Any manual recovery or failover steps
+
+✅ Here's what you should write in the Exception Handling section:
+Exception Handling
+This section outlines procedures for identifying, responding to, and resolving exceptions or failures related to HashiCorp Vault operations.
+
+1. Vault Unavailability or Downtime
+Detection: Monitor alerts (e.g., Vault health endpoint /sys/health, Prometheus alert).
+
+Actions:
+
+Check if all Vault nodes are sealed or down.
+
+Verify storage backend (e.g., Raft, Consul) and networking connectivity.
+
+If sealed, perform unseal using key shares or HSM.
+
+Restart Vault pods (Kubernetes) or systemd service (bare-metal).
+
+Escalation: Notify SRE / DevOps and Infrastructure Lead.
+
+Post-Recovery: Perform integrity checks; validate service token/lease consistency.
+
+2. Failed Secret or Certificate Issuance
+Detection: Error logs or failure messages from apps using Vault API/Agent.
+
+Actions:
+
+Validate token or policy permissions for the app.
+
+Check if the correct role exists for issuing secrets/certs.
+
+Review Vault audit logs for denied or malformed requests.
+
+Temporary Workaround: Manually issue secret or cert via CLI if critical.
+
+Escalation: Notify Security or DevOps Engineer depending on context.
+
+3. Expired or Missing Certificates
+Detection: TLS handshake failures or alerts from monitoring (e.g., Blackbox exporter).
+
+Actions:
+
+Manually renew certificate using the correct PKI role:
+
+bash
+Copy
+Edit
+vault write pki/issue/your-role common_name="your-service.domain"
+Re-deploy the renewed certificate to the affected service.
+
+Root Cause: Investigate auto-renew misconfiguration (Vault Agent, Envconsul, etc.).
+
+Escalation: Notify DevOps and Application Owner.
+
+4. Compromised Secrets or Tokens
+Detection: Suspicious access patterns in audit logs or external incident reports.
+
+Actions:
+
+Immediately revoke affected tokens:
+
+bash
+Copy
+Edit
+vault token revoke <token_id>
+Rotate the exposed secrets manually.
+
+Review access policies tied to the identity.
+
+Escalation: Trigger incident response; notify Security and IT Leadership.
+
+5. Backup or Restore Failures
+Detection: Alerts from backup monitoring tools.
+
+Actions:
+
+Retry snapshot process.
+
+If restore fails, validate file integrity and backend storage path.
+
+Escalation: Notify Infrastructure Lead and conduct DR test if necessary.
+
+This Exception Handling section gives the end user confidence and clarity on what to do in crisis moments. You can always expand this to include a "known issues and fixes" appendix later if you'd like.
+
+---
+The Process Monitoring / Controls section defines how the Vault system is observed, what key things are monitored, and what tools/processes are in place to detect issues, enforce security, and ensure compliance.
+
+It answers questions like:
+
+How do we know Vault is working correctly?
+
+How do we monitor secret usage and certificate expiry?
+
+What security and compliance controls are in place?
+
+How do we detect and respond to anomalies or access violations?
+
+✅ How to Structure It
+You already have 3 subheadings. Here’s a practical and detailed way to fill them in:
+
+Process Monitoring (Controls)
+This section outlines the monitoring, alerting, and compliance controls in place to ensure the secure and continuous operation of Vault for secret and certificate management.
+
+1. Access Controls and Audit Logging
+Vault’s audit logging is enabled using the file or syslog backend.
+
+All user interactions (read/write/delete) are logged and timestamped.
+
+Audit logs are forwarded to a centralized SIEM (e.g., Splunk, ELK, or QRadar).
+
+Regular reviews are scheduled to detect unusual patterns such as:
+
+Repeated failed authentication attempts
+
+Access to high-privilege secrets or roles
+
+Alerts are triggered on policy violations or unauthorized access attempts.
+
+2. System Health and High Availability Monitoring
+Vault health endpoints (/v1/sys/health) are monitored via Prometheus or third-party tools.
+
+Vault nodes are part of a High Availability (HA) cluster using Raft or Consul.
+
+Heartbeat checks ensure Vault remains in an active or standby state.
+
+Alert thresholds are defined for:
+
+Unsealed state
+
+Leader election failures
+
+Pod or service restarts
+
+Storage backend issues (Raft consensus, disk I/O)
+
+3. Secret & Certificate Lifecycle Monitoring
+Certificate expiration alerts are configured (30, 15, 7 days before expiry).
+
+Automated jobs scan secrets and certificates with short TTLs or those nearing expiration.
+
+Integration with tools like:
+
+Prometheus exporters
+
+Blackbox monitoring for TLS endpoints
+
+Custom dashboards (Grafana) showing secret usage metrics
+
+Expired or unused secrets are rotated or revoked based on policy.
+
+Optional Add-ons You Could Include:
+
+Manual or automated compliance checks
+
+Vault configuration drift detection (via tools like Terraform or Vault config audit)
+
+Monthly access reviews for roles and policies
+
