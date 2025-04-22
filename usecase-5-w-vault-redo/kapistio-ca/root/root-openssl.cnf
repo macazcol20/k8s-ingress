@@ -1,0 +1,19 @@
+[ req ]
+default_bits       = 4096
+distinguished_name = dn
+x509_extensions    = v3_ca
+prompt             = no
+
+[ dn ]
+C  = US
+ST = Florida
+L  = Miami
+O  = PixiesCloud
+OU = Security
+CN = PixiesCloud Root CA
+
+[ v3_ca ]
+subjectKeyIdentifier=hash
+authorityKeyIdentifier=keyid:always,issuer
+basicConstraints = critical,CA:true,pathlen:2
+keyUsage = critical, digitalSignature, cRLSign, keyCertSign

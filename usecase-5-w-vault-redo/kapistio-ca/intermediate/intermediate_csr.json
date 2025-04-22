@@ -1,0 +1,14 @@
+{
+  "request_id": "81756081-84f3-5d75-824e-aaf09baa038b",
+  "lease_id": "",
+  "lease_duration": 0,
+  "renewable": false,
+  "data": {
+    "csr": "-----BEGIN CERTIFICATE REQUEST-----\nMIICazCCAVMCAQAwJjEkMCIGA1UEAxMbUGl4aWVzQ2xvdWQgSW50ZXJtZWRpYXRl\nIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAzty5PU6x0vBfc+QL\nHmUBLQr43TW1SfviBKWbdDR7Th3n/Je7Zk8cGAr+lJQHSWmkDXj1uwJNRxiX9KYS\njUUNsfVLhzXINdFDKCw4LPVsDL4ACQ/lOGa3wJQrA0U1NnRb/1SqcVI2zmdIyt24\n1wB/a5PK/n9KliBqqn70m0b2D9ic2mxOeZ+GWpF2vWiFm2H7apwUQ965r7AzhKBb\ndnJcGZH6MnMaX9GwHUQRVAbhTGeXJnNPGQ/EqoOHSSR8dJdpFcvyFX44j7OSf9GC\nGCV67nGFScjhdK7kpCpyNOxtNSWkxgmYDzgFHUS151oOdt3pPhlYIihvbodkTU0f\n4wtVlwIDAQABoAAwDQYJKoZIhvcNAQELBQADggEBAKp5QWfbSXPIU8bsXQwCxyWF\n26yWsjVYkd3GukDLcfHoEo3YMz50Ym8QCZHQJ8GcbzR+OHqyjT4nKFW0cdP2ZEdZ\nRlgMqHecUK1IgoeTNdetEM39Lkuwh2nEUEm8JP4CGjXXIU5DuqeGX7ai9Jf0OTR/\nml1V3FhkqIHi5g7/EsK24+Qb5pKC5tQDscVcq2RxmJQdLevpkaALjse35A7uP40/\nLz5BwQ+AQKjjEcuzW6qgR8UNDtgYNp7tinB32adgs2uN94P5Ns+zBo1r8XiGtLF1\nD2kf7si0eXV5HcDushi2lw9dbxoijk+Mtb6nDR/AMShV9AeFNKFES9eP1HOS7KU=\n-----END CERTIFICATE REQUEST-----",
+    "key_id": "9e8eaebf-3c15-3814-a8a4-aee063432c5f"
+  },
+  "warnings": [
+    "This mount hasn't configured any authority information access (AIA) fields; this may make it harder for systems to find missing certificates in the chain or to validate revocation status of certificates. Consider updating /config/urls or the newly generated issuer with this information. Since this certificate is an intermediate, it might be useful to regenerate this certificate after fixing this problem for the root mount."
+  ],
+  "mount_type": "pki"
+}
