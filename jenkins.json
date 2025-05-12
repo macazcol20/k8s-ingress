@@ -1,0 +1,24 @@
+pipeline {
+  agent any
+
+  environment {
+    VAULT_ADDR = 'https://vault.me.com' // 
+  }
+
+  stages {
+    stage('Fetch Vault Secret') {
+      steps {
+        withCredentials([string(credentialsId: 'vault-token', variable: 'VAULT_TOKEN')]) {
+          script {
+            def secretData = sh(
+              script: "vault kv get -format=json secrets/kv/middleware/vaultserver | jq -r '.data.data'",
+              returnStdout: true
+            ).trim()
+
+            echo "Vault Secret JSON: ${secretData}"
+          }
+        }
+      }
+    }
+  }
+}
