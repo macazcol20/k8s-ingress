@@ -1,0 +1,140 @@
+## policy-for-role
+
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Action": [
+                "ec2:AttachVolume",
+                "ec2:CreateSnapshot",
+                "ec2:DescribeAvailabilityZones",
+                "ec2:DescribeInstances",
+                "ec2:DescribeSnapshots",
+                "ec2:DescribeTags",
+                "ec2:DescribeVolumes",
+                "ec2:DescribeVolumesModifications",
+                "ec2:DetachVolume",
+                "ec2:ModifyVolume"
+            ],
+            "Resource": "*",
+            "Effect": "Allow"
+        },
+        {
+            "Condition": {
+                "StringEquals": {
+                    "ec2:CreateAction": [
+                        "CreateVolume",
+                        "CreateSnapshot"
+                    ]
+                }
+            },
+            "Action": "ec2:CreateTags",
+            "Resource": [
+                "arn:aws:ec2:*:*:snapshot/*",
+                "arn:aws:ec2:*:*:volume/*"
+            ],
+            "Effect": "Allow"
+        },
+        {
+            "Action": "ec2:DeleteTags",
+            "Resource": [
+                "arn:aws:ec2:*:*:snapshot/*",
+                "arn:aws:ec2:*:*:volume/*"
+            ],
+            "Effect": "Allow"
+        },
+        {
+            "Condition": {
+                "StringLike": {
+                    "aws:RequestTag/ebs.csi.aws.com/cluster": "true"
+                }
+            },
+            "Action": "ec2:CreateVolume",
+            "Resource": "*",
+            "Effect": "Allow"
+        },
+        {
+            "Condition": {
+                "StringLike": {
+                    "aws:RequestTag/CSIVolumeName": "*"
+                }
+            },
+            "Action": "ec2:CreateVolume",
+            "Resource": "*",
+            "Effect": "Allow"
+        },
+        {
+            "Condition": {
+                "StringLike": {
+                    "aws:RequestTag/kubernetes.io/cluster/*": "owned"
+                }
+            },
+            "Action": "ec2:CreateVolume",
+            "Resource": "*",
+            "Effect": "Allow"
+        },
+        {
+            "Condition": {
+                "StringLike": {
+                    "ec2:ResourceTag/ebs.csi.aws.com/cluster": "true"
+                }
+            },
+            "Action": [
+                "ec2:DeleteSnapshot",
+                "ec2:DeleteVolume"
+            ],
+            "Resource": "*",
+            "Effect": "Allow"
+        },
+        {
+            "Condition": {
+                "StringLike": {
+                    "ec2:ResourceTag/CSIVolumeName": "*"
+                }
+            },
+            "Action": "ec2:DeleteVolume",
+            "Resource": "*",
+            "Effect": "Allow"
+        },
+        {
+            "Condition": {
+                "StringLike": {
+                    "ec2:ResourceTag/kubernetes.io/cluster/*": "owned"
+                }
+            },
+            "Action": "ec2:DeleteVolume",
+            "Resource": "*",
+            "Effect": "Allow"
+        },
+        {
+            "Condition": {
+                "StringLike": {
+                    "ec2:ResourceTag/CSIVolumeSnapshotName": "*"
+                }
+            },
+            "Action": "ec2:DeleteSnapshot",
+            "Resource": "*",
+            "Effect": "Allow"
+        }
+    ]
+}
+
+## trust
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Principal": {
+                "Federated": "arn:aws:iam::111111111:oidc-provider/oidc.eks.us-east-1.amazonaws.com/id/DE3B5B54FFA16F7382"
+            },
+            "Action": "sts:AssumeRoleWithWebIdentity",
+            "Condition": {
+                "StringEquals": {
+                    "oidc.eks.us-east-1.amazonaws.com/id/DE3B5B54FFA16F7:aud": "sts.amazonaws.com",
+                    "oidc.eks.us-east-1.amazonaws.com/id/DE3B5B54FFA16F:sub": "system:serviceaccount:kube-system:ebs-csi-controller-sa"
+                }
+            }
+        }
+    ]
+}
