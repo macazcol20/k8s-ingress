@@ -1,0 +1,48 @@
+helm upgrade --install aws-efs-csi-driver aws-efs-csi-driver/aws-efs-csi-driver \
+  --namespace kube-system \
+  --set image.repository=602401143452.dkr.ecr.<your-region>.amazonaws.com/eks/aws-efs-csi-driver \
+  --set controller.serviceAccount.create=false \
+  --set controller.serviceAccount.name=efs-csi-controller-sa
+
+
+
+
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: efs-sc
+provisioner: efs.csi.aws.com
+parameters:
+  provisioningMode: efs-ap
+  fileSystemId: fs-xxxxxxxx      # Your EFS File System ID
+  accessPointId: fsap-xxxxxxxx   # Your EFS Access Point ID
+  iam: "true"                    # Enables IAM auth
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: efs-pvc
+spec:
+  accessModes:
+    - ReadWriteMany
+  storageClassName: efs-sc
+  resources:
+    requests:
+      storage: 5Gi
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: efs-test
+spec:
+  containers:
+  - name: app
+    image: busybox
+    command: ["sleep", "3600"]
+    volumeMounts:
+    - name: efs-volume
+      mountPath: /data
+  volumes:
+  - name: efs-volume
+    persistentVolumeClaim:
+      claimName: efs-pvc
